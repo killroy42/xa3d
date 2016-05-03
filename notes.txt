@@ -1,0 +1,6 @@
+
+References:
+
+Visual effects:
+	1. Translucent shield: https://stemkoski.github.io/Three.js/Shader-Glow.html
+	2. Basic glowing mesh: http://jeromeetienne.github.io/threex.geometricglow/examples/geometricglowmesh.html

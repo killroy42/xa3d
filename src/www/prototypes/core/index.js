@@ -1,31 +1,26 @@
 (function() {
-
-var THREE = require('THREE');
-var enhanceTHREE = require('enhanceTHREE');
-enhanceTHREE(THREE);
+var THREE = require('enhanceTHREE')(require('THREE'));
+var DynamicShaderMaterial = require('DynamicShaderMaterial');
+var MaterialRenderer = require('MaterialRenderer');
+var MouseHandler = require('MouseHandler');
+var XenoCard = require('XenoCard');
+var ForcefieldEffect = require('ForcefieldEffect');
+var DragAndDrop = require('DragAndDrop');
 var THREEPrototype = require('THREEPrototype');
-var MouseHandler = THREE.MouseHandler = require('MouseHandler');
-var XenoCard = THREE.XenoCard = require('XenoCard');	
-var DragAndDrop = require('DragAndDrop');	
+var initLights = require('initLights');
 
-var bgImageUrl = 'images/xa_logo_bg_720p.jpg'; //'https://dl.dropboxusercontent.com/s/chztu2r4te9jlpy/xa_logo_bg_720p.jpg';
-var boardImageUrl = 'images/xa_board_a_3.jpg'; //https://dl.dropboxusercontent.com/s/azi5swa368wrw8u/xa_board_a_3.jpg';
-var boardAlphaUrl = 'images/xa_board_alpha.png'; //'https://dl.dropboxusercontent.com/s/hibx78j739du628/xa_board_alpha.png';
-var cardImageUrl = 'images/buttonia.jpg'; //'https://dl.dropboxusercontent.com/s/0twvukrv4duyodh/buttonia.jpg';	
-
-var cssBackground = '#000 no-repeat center/cover url('+bgImageUrl+')';
-var cardBoardZ = 10;
-var cardDragZ = 300;
-	
+var boardImageUrl = '/images/xa_board_a_3.jpg';
+var boardAlphaUrl = '/images/xa_board_alpha.png';
+var cardImageUrl = '/images/buttonia.jpg';
+var cardBoardZ = 10, cardDragZ = 300;
 var cardW = 168, cardH = 230;
-var prototype = new THREEPrototype({background: cssBackground});
+
 
 function snapDropPosition(position) {
 	position.x = Math.round(position.x / cardW + 0.5)*cardW - cardW * 0.5;
 	position.y = Math.round(position.y / cardH + 0.5)*cardH - cardH * 0.5;
 	return position;
 }
-
 function animatePosition(position, vector, duration, easing) {
 	duration = duration || 0.1;
 	easing = easing || Power4.easeOut;
@@ -38,72 +33,61 @@ function animatePosition(position, vector, duration, easing) {
 		}
 	});
 }
-
 function CardMover(opts) {
 	this.card = opts.card;
 }
-	
+
 // Init
-	function initCamera(camera, controls) {
-		camera.position.set(0, -400, 1000);
-		var cameraTarget = new THREE.Vector3(0, -90, 0);
-		camera.lookAt(cameraTarget);
-		controls.target0.copy(cameraTarget);
-		controls.reset();
-	}
-	function createLights(scene) {
-		var ambientLight = new THREE.AmbientLight(0x404040);
-		var spotLight = new THREE.SpotLight(0xffffff, 1, 1700, 45 * Math.PI/180, 1, 0.1);
-		spotLight.position.set(200, 200, 1200);
-		spotLight.target.position.set(100, 0, 0);
-		spotLight.castShadow = true;
-		spotLight.shadow.bias = -0.000001;
-		spotLight.shadow.camera.near = 1;
-		spotLight.shadow.camera.far = 2000;
-		spotLight.shadow.camera.fov = 75;
-		spotLight.shadow.mapSize.width = 2048;
-		spotLight.shadow.mapSize.height = 2048;
-		scene.add(ambientLight);
-		scene.add(spotLight);
-		return scene;
+	function initDynamicMaterials(prototype) {
+		var dynamicMaterials = [];
+		var noiseMap = prototype.noiseMap = MaterialRenderer.createRenderTarget(512, 512);
+		var noiseMaterial = new DynamicShaderMaterial({
+			uniforms: {
+				time: {type: "f", value: 1.0},
+				scale: {type: "v2", value: new THREE.Vector2(1, 1)}
+			},
+			vertexShader: prototype.loadShader('simple.vertex'),
+			fragmentShader: prototype.loadShader('noise.fragment'),
+			lights: false,
+			onanimate: function(time) {
+				this.uniforms.time.value = time * 0.001;
+			}
+		});
+		dynamicMaterials.push({target: noiseMap, material: noiseMaterial});
+		var materialRenderer = new MaterialRenderer(prototype.renderer);
+		prototype.onrender = function(time) {
+			for(var i = 0, l = dynamicMaterials.length; i < l; i++) {
+				var material = dynamicMaterials[i].material;
+				var target = dynamicMaterials[i].target;
+				material.animate(time);
+				materialRenderer.render(material, target);
+			}
+		};
 	}
 	function createBoard(loadTexture) {
-		var boardTex = loadTexture(boardImageUrl);
-		var boardAlpha = loadTexture(boardAlphaUrl);
 		var board = new THREE.Object3D();
 		board.name = 'Board';
 		var boardMesh = new THREE.Mesh(
 			new THREE.PlaneGeometry(1440, 1060),
-			new THREE.MeshPhongMaterial({color: 0xff00ff})
+			new THREE.MeshPhongMaterial({
+				color: 0xffffff,
+				map: loadTexture(boardImageUrl),
+				alphaMap: loadTexture(boardAlphaUrl),
+				transparent: true,
+				alphaTest: 0.05
+			})
 		);
-		boardMesh.receiveShadow = true
+
+		boardMesh.receiveShadow = true;
+		boardMesh.renderOrder  = -1;
 		board.add(boardMesh);
-		boardMesh.position.set(0, -50, 0);	
-		boardMesh.material.color.setHex(0xffffff);
-		boardMesh.material.transparent = true;
-		boardTex.minFilter = THREE.LinearFilter;
-		boardMesh.material.map = boardTex;
-		if(boardAlpha) {
-			boardAlpha.minFilter = THREE.LinearFilter;
-			boardMesh.material.alphaMap = boardAlpha;
-		}
-		//board.material.lightMap = alpha;
-		//board.material.specular = 0xff0000;
-		boardMesh.material.needsUpdate = true;
+		boardMesh.position.set(0, -50, 0);
 		return board;
 	}
-	function createCard(loadTexture, type) {
-		var cardTex = loadTexture(cardImageUrl);
-		cardTex.minFilter = THREE.LinearFilter;
-		cardTex.repeat.y = 1/5;
-		cardTex.offset.y = (4-type)/5;
-		var card = new THREE.XenoCard(cardTex);
-		return card;
-	}
-	function initCards(loadTexture, scene) {
+	function createCards(scene, cardTex) {
 		for(var i = 0; i < 20; i++) {
 			var type = Math.floor(Math.random()*5);
-			var card = createCard(loadTexture, type);
+			var card = new XenoCard(type, cardTex);
 			card.position.set(
 				(Math.random()*2-1)*3*cardW,
 				(Math.random()*2-1)*2*cardH,
@@ -113,7 +97,6 @@ function CardMover(opts) {
 			scene.add(card);
 		}
 	}
-
 	function initGUI(prototype) {
 		var gui = new dat.GUI({});
 		var mouseHandler = prototype.scene.children
@@ -125,7 +108,8 @@ function CardMover(opts) {
 		}
 		
 		function aimCard() {
-			leaveGrabMode();
+			console.info('initGUI > aimCard();');
+			//leaveGrabMode();
 			var card = this;
 			var mesh = card.mesh;
 			var liftVector = new THREE.Vector3(0, 0, 100);
@@ -139,7 +123,6 @@ function CardMover(opts) {
 			});
 			mouseHandler.addEventListener('mousemove', function(e) {
 				if(e.intersection) {
-					//console.log(e.intersection.point.toString());
 					var m1 = new THREE.Matrix4();
 					var m2 = new THREE.Matrix4();
 					m1.lookAt(card.position, e.intersection.point, new THREE.Vector3(0, 0, 1));
@@ -150,20 +133,26 @@ function CardMover(opts) {
 			});
 		}
 		function enterGrabMode() {
+			console.info('initGUI > enterGrabMode();');
 			var cards = getCards();
 			prototype.controls.enabled = false;
 			cards.forEach(function(card) {
 				card.mesh.draggable = false;
-				card.addEventListener('mousedown', aimCard);
+				card.addEventListener('click', aimCard);
 			});
+			mouseHandler.addEventListener('mouseup', leaveGrabMode);
 		}
 		function leaveGrabMode() {
-			var cards = getCards();
-			prototype.controls.enabled = true;
-			cards.forEach(function(card) {
-				//card.mesh.draggable = true;
-				card.removeEventListener('mousedown', aimCard);
-			});
+			console.info('initGUI > leaveGrabMode();');
+			mouseHandler.removeEventListener('mouseup', leaveGrabMode);
+			setTimeout(function() {
+				var cards = getCards();
+				prototype.controls.enabled = true;
+				cards.forEach(function(card) {
+					card.mesh.draggable = true;
+					card.removeEventListener('click', aimCard);
+				});
+			}, 0);
 		}
 		
 		var shiftInterval;
@@ -232,27 +221,40 @@ function CardMover(opts) {
 	
 // Init Prototype
 	function Prototype_init() {
-		var renderer = this.renderer;
-		var camera = this.camera;
 		var scene = this.scene;
-		var controls = this.controls;
 		var loadTexture = this.getLoadTexture();
-		var dragAndDrop = new DragAndDrop({prototype: this, dropZ: cardBoardZ, dragZ: cardDragZ});
-		initCamera(camera, controls);
-		createLights(scene);
-		var interactiveLayer = new THREE.MouseHandler(renderer.domElement, camera);
+		var loadShader = this.getLoadShader();
+		this.setCamera(new THREE.Vector3(0, -400, 1000), new THREE.Vector3(0, -90, 0));
+		initLights(this);
+		initDynamicMaterials(this);
+
+		initGUI(this);
+		var interactiveLayer = new MouseHandler(this.renderer.domElement, this.camera);
+		scene.add(interactiveLayer);
+
 		interactiveLayer.add(createBoard(loadTexture));
-		initCards(loadTexture, interactiveLayer);
+				
+		var cardTex = this.loadTexture(cardImageUrl);
+		createCards(interactiveLayer, cardTex);
+		var noiseMap = this.noiseMap;
+		interactiveLayer.children
+			.filter(function(o) { return o instanceof XenoCard; })
+			.forEach(function(card) {
+				var forcefield = new ForcefieldEffect(loadShader, noiseMap);
+				scene.add(forcefield);
+				forcefield.position.copy(card.position);
+			});
+
+		var dragAndDrop = new DragAndDrop({prototype: this, dropZ: cardBoardZ, dragZ: cardDragZ});
 		dragAndDrop.attachToMouseHandler(interactiveLayer);
 		dragAndDrop.snapDropPosition = snapDropPosition;
 		interactiveLayer.children
 			.filter(function(o) { return o instanceof XenoCard; })
-			.forEach(function(card) { dragAndDrop.attachCard(card); })
-		scene.add(interactiveLayer);
-		initGUI(this);
+			.forEach(function(card) { dragAndDrop.attachCard(card); });
+
 	}
 	function init() {
-		console.clear();
+		var prototype = new THREEPrototype();
 		prototype.oninit = Prototype_init;
 		prototype.start();
 	}

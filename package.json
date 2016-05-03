@@ -4,8 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
+    "server": "http-server ./src/www -p 80 --cors",
+    "reloader": "nodemon src/server/reloaderserver.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^1.1.0"
+  }
 }

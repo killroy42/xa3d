@@ -45,17 +45,39 @@
 		this.cssBackground = opts.background || '#000';
 		this.fov = opts.fov || 50;
 		this.initialized = false;
+		this.cache = {};
 	}
-	Prototype.HTML_CSS = 'height: 100%;';
-	Prototype.BODY_CSS = 'height: 100%; margin: 0; overflow: hidden;';
+	Prototype.PATH_SHADER = '/shaders/';
+	Prototype.EXT_SHADER = '.glsl';
+	Prototype.CSS = ''+
+		'html { height: 100%; }\n'+
+		'body { height: 100%; margin: 0; overflow: hidden; }\n'+
+		'* {'+
+		'-webkit-touch-callout: none;'+
+		'-webkit-user-select: none;'+
+		'-khtml-user-select: none;'+
+		'-moz-user-select: none;'+
+		'-ms-user-select: none;'+
+		'user-select: none;'+
+		'outline: none;'+
+		'-webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */'+
+		'}\n';
 	Prototype.prototype.handleError = function Prototype_onGenericError(err) {
 		console.error('Error:', err);
 		throw err;
 	};
 	Prototype.prototype.getRootElement = function() {
-		document.documentElement.style.cssText = Prototype.HTML_CSS;
-		document.body.style.cssText = Prototype.BODY_CSS+
-			'background: '+this.cssBackground+';';
+		var head = document.head;
+		var headStyleTags = head.getElementsByTagName('style');
+		var styleTag = document.createElement('style');
+		styleTag.type = 'text/css';
+		if(headStyleTags.length > 0) {
+			head.insertBefore(styleTag, headStyleTags[0]);
+		} else {
+			head.appendChild(styleTag);
+		}
+		var cssText = Prototype.CSS + 'body { background: '+this.cssBackground+'; }';
+		styleTag.appendChild(document.createTextNode(cssText));
 		return document.body;
 	};
 	Prototype.prototype.createRenderer = function() {
@@ -95,9 +117,13 @@
 		var window = this.windowElement;
 		var camera = this.camera;
 		var renderer = this.renderer;
-		renderer.setSize(window.innerWidth, window.innerHeight);
-		camera.aspect = window.innerWidth / window.innerHeight;
+		var width = window.innerWidth, height = window.innerHeight;
+		renderer.setSize(width, height, true);
+		camera.aspect = width / height;
 		camera.updateProjectionMatrix();
+	};
+	Prototype.prototype.handleContextMenu = function(e) {
+		e.preventDefault();
 	};
 	Prototype.prototype.init = function() {
 		if(this.initialized) return;
@@ -113,20 +139,25 @@
 	};
 	Prototype.prototype.start = function() {
 		var self = this;
-		var boundResizeHandler = function() { return self.handleWindowResize(); };
+		var boundResizeHandler = function(e) { return self.handleWindowResize(e); };
+		var boundContextMenuHandler = function(e) { return self.handleContextMenu(e); };
 		var renderer, scene, camera, window, rafId;
-		function renderFrame() {
+		function renderFrame(time) {
 			rafId = window.requestAnimationFrame(renderFrame);
+			if(self.onrender) self.onrender(time);
 			renderer.render(scene, camera);
+			if(self.onupdate) self.onupdate(time);
 		}
 		function stop() {
 			window.removeEventListener('resize', boundResizeHandler);
+			window.removeEventListener('contextmenu', boundContextMenuHandler);
 			self.stop = Prototype.prototype.stop;
 			window.cancelAnimationFrame(rafId);
 		}
 		function start() {
 			self.stop = stop;
 			window.addEventListener('resize', boundResizeHandler);
+			window.addEventListener('contextmenu', boundContextMenuHandler);
 			rafId = window.requestAnimationFrame(renderFrame);
 		}
 		
@@ -143,13 +174,35 @@
 	Prototype.prototype.loadTexture = function(url) {
 		var self = this;
 		var boundErrorHandler = function(err) { return this.handleError(err); };
-		return this.textureLoader.load(url, undefined, undefined, boundErrorHandler);
+		var texture = this.textureLoader.load(url, undefined, undefined, boundErrorHandler);
+		//texture.minFilter = THREE.LinearFilter;
+		texture.anisotropy = this.renderer.getMaxAnisotropy();
+		return texture;
 	};
 	Prototype.prototype.getLoadTexture = function() {
 		var self = this;
-		return function(url) {
-			return self.loadTexture(url);
-		};
+		return function(url) { return self.loadTexture(url); };
+	};
+	Prototype.prototype.loadShader = function(name) {
+		var url = Prototype.PATH_SHADER + name + Prototype.EXT_SHADER;
+		//console.info('Prototype.loadShader("%s");', url);
+		if(this.cache[url] === undefined) {
+			this.cache[url] = fetch(url).then(function(res) { return res.text(); });
+		}
+		return this.cache[url];
+	};
+	Prototype.prototype.getLoadShader = function() {
+		var self = this;
+		return function(name) { return self.loadShader(name); };
+	};
+	Prototype.prototype.setCamera = function(position, target) {
+		var camera = this.camera;
+		var controls = this.controls;
+		camera.position.copy(position);
+		camera.lookAt(target);
+		controls.target0.copy(target);
+		controls.position0.copy(camera.position);
+		controls.reset();
 	};
 
 	

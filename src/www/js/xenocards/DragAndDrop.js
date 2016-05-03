@@ -1,5 +1,7 @@
 // DragAndDrop
 (function () {
+	/* jshint validthis: true */
+	'use strict';
 	var THREE = require('THREE');
 
 	function animatePosition(position, vector, duration, easing) {
@@ -44,12 +46,15 @@
 	DragAndDrop.prototype.attachMouseCursor = function(mouseHandler) {
 		var mouseCursor = this.createMouseCursor();
 		this.prototype.scene.add(mouseCursor);
+		function updatedragplaneHandler(e) {
+			mouseCursor.position.copy(e.intersection.point);
+		}
 		function mousemoveHandler(e) {
 			if(!e.intersection) return;
 			mouseCursor.position.copy(e.intersection.point);
 			if(e.delta) {
-				console.log('MouseCursor > drag > intersection:', e.intersection.point.toString());
-				console.log('MouseCursor > drag > delta:', e.delta.toString());
+				console.log('MouseCursor > %s > intersection:', e.type, e.intersection.point.toString());
+				console.log('MouseCursor > %s > delta:', e.type, e.delta.toString());
 				mouseCursor.position.add(e.delta);
 			}
 			var color = 0xffff00;
@@ -57,14 +62,16 @@
 			mouseCursor.setColor(color);
 		}
 		mouseHandler.addEventListener('mousemove', mousemoveHandler);
-		mouseHandler.addEventListener('drag', mousemoveHandler);
+		mouseHandler.addEventListener('updatedragplane', updatedragplaneHandler);
+		//mouseHandler.addEventListener('dragstart', mousemoveHandler);
+		//mouseHandler.addEventListener('drag', mousemoveHandler);
 	};
 	DragAndDrop.prototype.attachConstrolSwitcher = function(mouseHandler) {
 		var controls = this.prototype.controls;
 		function dragstartHandler(e) { controls.enabled = false; }
-		function dragendHandler(e) { controls.enabled = true; }
+		function dragfinishHandler(e) { controls.enabled = true; }
 		mouseHandler.addEventListener('dragstart', dragstartHandler);
-		mouseHandler.addEventListener('dragend', dragendHandler);
+		mouseHandler.addEventListener('dragfinish', dragfinishHandler);
 	};
 	DragAndDrop.prototype.createWireFrame = function(mesh) {
 		var wireframe = new THREE.EdgesHelper(mesh, 0x00ff00);
@@ -88,6 +95,7 @@
 		var scene = this.prototype.scene;
 		var wireframe;
 		function getZVector(e, card, destinationZ) {
+			//console.info('DragAndDrop > getZVector(e, card, destinationZ);');
 			var zVector = new THREE.Vector3();
 			var dragIntersection = mouseHandler.getIntersection(e, mouseHandler.dragPlane);
 			var start = camera.position;
@@ -123,7 +131,8 @@
 			animatePosition(mesh.position, liftVector);
 			scene.add(wireframe);
 		}
-		function cardDragEnd(e) {
+		function cardDragFinish(e) {
+			//console.info('DragAndDrop > cardDragFinish(e);');
 			scene.remove(wireframe);
 			var target = getDropTarget(e, this, dropZ);
 			var dropVector = target.clone();
@@ -134,9 +143,9 @@
 			animatePosition(mesh.position, dropVector);
 		}
 		function cardDrag(e) {
-			console.log('DragAndDrop > cardDrag(e);');
-			console.log(this._dragStartPosition.toString());
-			console.log(e.delta.toString());
+			//console.log('DragAndDrop > cardDrag(e);');
+			//console.log(this._dragStartPosition.toString());
+			//console.log(e.delta.toString());
 			this.position.addVectors(this._dragStartPosition, e.delta);
 			var target = getDropTarget(e, this, dropZ);
 			wireframe.position.copy(target);
@@ -144,12 +153,12 @@
 		this.attachCard = function(card) {
 			if(wireframe === undefined) wireframe = this.createWireFrame(card.mesh);
 			card.addEventListener('dragstart', cardDragStart);
-			card.addEventListener('dragend', cardDragEnd);
 			card.addEventListener('drag', cardDrag);
+			card.addEventListener('dragfinish', cardDragFinish);
 			card.detachDragAndDrop = function() {
 				card.removeEventListener('dragstart', cardDragStart);
-				card.removeEventListener('dragend', cardDragEnd);
 				card.removeEventListener('drag', cardDrag);
+				card.removeEventListener('dragfinish', cardDragFinish);
 				delete card.detachDragAndDrop;
 			};
 		};

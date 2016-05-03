@@ -1,0 +1,15 @@
+{
+	"restartable": "r",
+	"verbose": false,
+	"delay": 0,
+	"env": {
+		"NODE_ENV": "development"
+	},
+	"watch": [
+	],
+	"ext": "js json html glsl",
+	"ignore": [
+		".git",
+		"node_modules/**/node_modules"
+	]
+}
