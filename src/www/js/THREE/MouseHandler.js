@@ -12,11 +12,12 @@
 	var THREE = require('THREE');
 
 
-	function MouseHandler(domElement, camera) {
-		THREE.Object3D.call(this);
+	function MouseHandler(opts) {
+		//THREE.Object3D.call(this);
 		var self = this;
-		this.domElement = domElement || document;
-		this.camera = camera;
+		opts = opts || {};
+		this.domElement = opts.domElement || document;
+		this.camera = opts.camera;
 		this.boundHandlers = {};
 		this.raycaster = new THREE.Raycaster();
 		this.intersection = false;
@@ -47,6 +48,8 @@
 			timeoutId: undefined,
 		};
 		this.boundDragTimeout = function() { self.dragStart(); };
+		this.interactiveObjects = [];
+		if(opts.scene) this.watchChildren(opts.scene);
 	}
 	MouseHandler.CLICK_TIMEOUT = 1500;
 	MouseHandler.DRAG_TIMEOUT = 200;
@@ -66,9 +69,41 @@
 	MouseHandler.DRAGPLANE_GRID.rotateX(90*Math.PI/180);
 	MouseHandler.DRAGPLANE_GRID.material.transparent = true;
 	MouseHandler.DRAGPLANE_GRID.material.opacity = 0.1;
-	MouseHandler.prototype = Object.create(THREE.Object3D.prototype);
+	//MouseHandler.prototype = Object.create(THREE.Object3D.prototype);
+	MouseHandler.prototype = Object.create(null);
 	MouseHandler.prototype.constructor = THREE.MouseHandler;
 	THREE.EventDispatcher.prototype.apply(MouseHandler.prototype);
+	MouseHandler.prototype.add = function(object) {
+		var interactiveObjects = this.interactiveObjects;
+		if(object.receiveMouseEvents === true) interactiveObjects.push(object);
+		for(var i = 0, l = object.children.length; i < l; i++) {
+			this.add(object.children[i]);
+		}
+	};
+	MouseHandler.prototype.remove = function(object) {
+		//console.error('MouseHandler.remove();');
+		var interactiveObjects = this.interactiveObjects;
+		//interactiveObjects.push(object);
+		var index = interactiveObjects.indexOf(object);
+		if(index === -1) return;
+		interactiveObjects.splice(index, 1);
+		for(var i = 0, l = object.children.length; i < l; i++) {
+			this.remove(object.children[i]);
+		}
+	};
+	MouseHandler.prototype.watchChildren = function(root) {
+		var self = this;
+		var addFunc = root.add;
+		var removeFunc = root.remove;
+		root.add = function(object) {
+			self.add(object);
+			addFunc.call(root, object);
+		};
+		root.remove = function(object) {
+			self.remove(object);
+			removeFunc.call(root, object);
+		};
+	};
 	MouseHandler.prototype.enableDragPlane = function(position) {
 		//console.info('MouseHandler.enableDragPlane(%s);', position.toString());
 		this.add(this.dragPlane);
@@ -179,7 +214,7 @@
 			this.domElement.removeEventListener(eventName, this.boundHandlers[eventName]);
 		}
 	};
-	MouseHandler.prototype.getIntersection = function(mouseV2, object) {
+	MouseHandler.prototype.getIntersection = function(mouseV2, objects) {
 		var x = (mouseV2.x !== undefined)?mouseV2.x:mouseV2.clientX;
 		var y = (mouseV2.y !== undefined)?mouseV2.y:mouseV2.clientY;
 		var pointerVector = this.pointerVector;
@@ -187,10 +222,11 @@
 		var rect = this.domElement.getBoundingClientRect();
 		var normalizedX = (x - rect.left) / rect.width;
 		var normalizedY = (y - rect.top) / rect.height;
-		if(object === undefined) object = this;
+		if(objects === undefined) objects = this.interactiveObjects;
+		if(Array.isArray(objects) === false) objects = [objects];
 		pointerVector.set(normalizedX * 2 - 1, -normalizedY * 2 + 1);
 		raycaster.setFromCamera(pointerVector, this.camera);
-		var intersections = raycaster.intersectObject(object, true);
+		var intersections = raycaster.intersectObjects(objects, true);
 		return (intersections.length > 0) ? intersections[0] : false;
 	};
 	MouseHandler.prototype.triggerEvent = function(type, e, opts) {

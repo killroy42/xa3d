@@ -49,19 +49,6 @@
 	}
 	Prototype.PATH_SHADER = '/shaders/';
 	Prototype.EXT_SHADER = '.glsl';
-	Prototype.CSS = ''+
-		'html { height: 100%; }\n'+
-		'body { height: 100%; margin: 0; overflow: hidden; }\n'+
-		'* {'+
-		'-webkit-touch-callout: none;'+
-		'-webkit-user-select: none;'+
-		'-khtml-user-select: none;'+
-		'-moz-user-select: none;'+
-		'-ms-user-select: none;'+
-		'user-select: none;'+
-		'outline: none;'+
-		'-webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */'+
-		'}\n';
 	Prototype.prototype.handleError = function Prototype_onGenericError(err) {
 		console.error('Error:', err);
 		throw err;
@@ -76,8 +63,6 @@
 		} else {
 			head.appendChild(styleTag);
 		}
-		var cssText = Prototype.CSS + 'body { background: '+this.cssBackground+'; }';
-		styleTag.appendChild(document.createTextNode(cssText));
 		return document.body;
 	};
 	Prototype.prototype.createRenderer = function() {
@@ -104,8 +89,7 @@
 	Prototype.prototype.createControls = function() {
 		var controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 		controls.userPanSpeed = 0.1;
-		controls.target0.copy(new THREE.Vector3(0, 0, 0));
-		controls.reset();
+		this.setCamera(this.camera.position, this.cameraTarget);
 		return controls;
 	};
 	Prototype.prototype.createTextureLoader = function() {
@@ -133,7 +117,9 @@
 		this.rootElement.appendChild(this.renderer.domElement);
 		this.scene = this.createScene();
 		this.camera = this.createCamera();
-		this.controls = this.createControls();
+		if(THREE.OrbitControls) {
+			this.controls = this.createControls();
+		}
 		this.textureLoader = this.createTextureLoader();
 		if(typeof this.oninit === 'function') this.oninit();
 	};
@@ -174,8 +160,10 @@
 	Prototype.prototype.loadTexture = function(url) {
 		var self = this;
 		var boundErrorHandler = function(err) { return this.handleError(err); };
-		var texture = this.textureLoader.load(url, undefined, undefined, boundErrorHandler);
+		var resolverFunc;
+		var texture = this.textureLoader.load(url, function() { resolverFunc(); }, undefined, boundErrorHandler);
 		//texture.minFilter = THREE.LinearFilter;
+		texture.promise = new Promise(function(resolve, reject) { resolverFunc = resolve; });
 		texture.anisotropy = this.renderer.getMaxAnisotropy();
 		return texture;
 	};
@@ -197,10 +185,12 @@
 	};
 	Prototype.prototype.setCamera = function(position, target) {
 		var camera = this.camera;
-		var controls = this.controls;
+		this.cameraTarget = target || new THREE.Vector3(0, 0, 0);
 		camera.position.copy(position);
-		camera.lookAt(target);
-		controls.target0.copy(target);
+		camera.lookAt(this.cameraTarget);
+		var controls = this.controls;
+		if(controls === undefined) return;
+		controls.target0.copy(this.cameraTarget);
 		controls.position0.copy(camera.position);
 		controls.reset();
 	};

@@ -8,13 +8,18 @@
 		texture.repeat.y = 1/5;
 		var material = new THREE.MeshPhongMaterial({
 			color: 0xffffff,
-			map: texture,
+			//map: texture,
 			side: THREE.FrontSide
+		});
+		texture.promise.then(function() {
+			material.map = texture;
+			material.needsUpdate = true;
 		});
 		var cardMesh = new THREE.Mesh(geometry, material);
 		cardMesh.name = 'cardMesh';
 		cardMesh.receiveShadow = true;
 		cardMesh.castShadow = true;
+		cardMesh.receiveMouseEvents = true;
 		cardMesh.draggable = true;
 		var self = this;
 		var eventForwarder = function(e) { self.dispatchEvent(e); };
@@ -69,8 +74,73 @@
 		}
 		geometry.uvsNeedUpdate = true;
 	};
+	XenoCard.animatePosition = function(position, vector, duration, easing) {
+		duration = duration || 0.1;
+		easing = easing || Power4.easeOut;
+		//console.info('XenoCard.animatePosition(%s, %s, %s, easing);', position.toString(), vector.toString(), duration);
+		return TweenMax.to({t: 0}, duration, {
+			t: 1, ease: easing,
+			onUpdate: function() {
+				var progress = this.target.t;
+				position.copy(vector);
+				position.multiplyScalar(-(1-progress));
+			}
+		});
+	};
 	XenoCard.prototype = Object.create(THREE.Object3D.prototype);
 	XenoCard.prototype.constructor = THREE.XenoCard;
+	XenoCard.prototype.animateMesh = function(moveVector, snap) {
+		var mesh = this.mesh;
+		if(snap === undefined) snap = true;
+
+		//console.log(' mv:', moveVector.toString());
+		//console.log('pos:', this.position.toString());
+		//console.log('msh:', mesh.position.toString());
+
+		if(this.meshTween) {
+			this.meshTween.kill();
+		}
+		mesh.position.sub(moveVector);
+
+		var meshVector = mesh.position.clone().negate();
+		
+		//this.meshTween = XenoCard.animatePosition(mesh.position, meshVector, 5, Power0.easeNone);
+		if(snap) {
+			this.meshTween = XenoCard.animatePosition(mesh.position, moveVector, 0.1, Power4.easeOut);
+		} else {
+			this.meshTween = XenoCard.animatePosition(mesh.position, moveVector, 0.3, Power1.easeInOut);
+		}
+
+		//if(this.meshTween) {
+			//console.log(this.meshTween);
+			//this.meshTween.kill();
+/*
+start: 0
+p: 0 (0->0)
+m: 0
+
+p: 10 (0->10)
+m: -10
+
+p: 10 (5->10)
+m: -5
+
+p: 20 (5->20)
+m: -15
+
+
+*/
+
+		//}
+/*
+		if(moveVector !== undefined) {
+			mesh.position.sub(moveVector);
+			//mesh.position.negate();
+		} else {
+			moveVector = mesh.position.clone().negate();
+		}
+*/
+	};
 
 	
 	if(typeof module !== "undefined" && ('exports' in module)){

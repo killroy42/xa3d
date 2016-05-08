@@ -17,5 +17,7 @@ function exec(cmd) {
 console.info('Launching reloaderserver and HTTP server:');
 //exec(npmCmd+' run '+reloaderNpm);
 //exec(npmCmd+' run '+serverNpm);
-exec('http-server.cmd ./src/www -p 80 --cors');
-exec('nodemon.cmd src/server/reloaderserver.js');
+exec('http-server.cmd ./src/www -p 80 --cors --utc --silent');
+//exec('http-server.cmd ./src/www -a 127.0.0.1 -p 80 --cors --utc');
+exec('nodemon.cmd src/server/reloader/server.js');
+exec('nodemon.cmd src/server/objectserver/server.js');
