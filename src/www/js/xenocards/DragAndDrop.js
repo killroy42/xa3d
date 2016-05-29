@@ -3,13 +3,17 @@
 	/* jshint validthis: true */
 	'use strict';
 	var THREE = require('THREE');
+	var CardGlow = require('CardGlow');
+	var assetdata = require('assetdata');
+
+	var snapCardPosition = assetdata.snapCardPosition;
 
 
 	function DragAndDrop(opts) {
 		opts = opts || {};
 		this.dropZ = (opts.dropZ !== undefined)?opts.dropZ:10;
 		this.dragZ = (opts.dragZ !== undefined)?opts.dragZ:300;
-		this.prototype = opts.prototype;
+		this.app = opts.app;
 		this.attachToMouseHandler = function(mouseHandler) {
 			this.createCardAttacher(mouseHandler);
 		};
@@ -26,15 +30,17 @@
 		});
 		return wireframe;
 	};
-	DragAndDrop.prototype.snapDropPosition = function(position) {
-	};
 	DragAndDrop.prototype.createCardAttacher = function(mouseHandler) {
 		var self = this;
 		var dragZ = this.dragZ;
 		var dropZ = this.dropZ;
-		var camera = this.prototype.camera;
-		var scene = this.prototype.scene;
+		var camera = this.app.camera;
+		var scene = this.app.scene;
 		var wireframe;
+
+		var cardGlow = new CardGlow(self.glowFlowMaterial);
+		scene.add(cardGlow);
+
 		function getZVector(e, card, destinationZ) {
 			//console.info('DragAndDrop > getZVector(e, card, destinationZ);');
 			var zVector = new THREE.Vector3();
@@ -51,7 +57,7 @@
 		function getDropTarget(e, card, destinationZ) {
 			var target = card.position.clone();
 			target.add(getZVector(e, card, destinationZ));
-			self.snapDropPosition(target);
+			snapCardPosition(target);
 			return target;
 		}
 		function cardDragStart(e) {
@@ -87,14 +93,13 @@
 		}
 		function cardDrag(e) {
 			//console.log('DragAndDrop > cardDrag(e);');
-			//console.log(this._dragStartPosition.toString());
-			//console.log(e.delta.toString());
 			this.position.addVectors(this._dragStartPosition, e.delta);
 			var target = getDropTarget(e, this, dropZ);
 			wireframe.position.copy(target);
 		}
 		this.attachCard = function(card) {
 			if(wireframe === undefined) wireframe = this.createWireFrame(card.mesh);
+
 			card.addEventListener('dragstart', cardDragStart);
 			card.addEventListener('drag', cardDrag);
 			card.addEventListener('dragfinish', cardDragFinish);
@@ -104,6 +109,25 @@
 				card.removeEventListener('dragfinish', cardDragFinish);
 				delete card.detachDragAndDrop;
 			};
+			
+			card.addEventListener('mouseenter', function() {
+				cardGlow.position.copy(this.position);
+				cardGlow.hover();
+			});
+			card.addEventListener('mouseleave', cardGlow.unhover);
+			card.addEventListener('dragstart', function() {
+				cardGlow.position.copy(this.position);
+				cardGlow.dragstart();
+			});
+			card.addEventListener('drag', function() {
+				cardGlow.position.copy(this.position);
+			});
+			card.addEventListener('dragfinish', function() {
+				cardGlow.position.copy(this.position);
+				cardGlow.dragfinish();
+			});
+			card.addEventListener('mousedown', cardGlow.mousedown);
+			card.addEventListener('mouseup', cardGlow.mouseup);
 		};
 	};
 	

@@ -5,26 +5,36 @@
 	CodePen: http://codepen.io/killroy/pen/xVqNeL
 */
 
-(function(scope) {
+(function(scope, module, require) {
 	'use strict';
 	/*jslint evil: true */
+	var RE_MODULEFILE = /^.*\/([a-zA-Z_\-]+)(\.js)?$/;
 	var _exports = [];
 	var moduleUrls = {};
 	var _loadingFromUrl;
+	var i;
+	function findModule(name) {
+		// Retrieve module by index 0 = first, etc
+		if(moduleUrls[name] !== undefined) return moduleUrls[name];
+		if(_exports[name] !== undefined) return _exports[name];
+		// retrive module by function name: module.exports = function name()
+		var len = _exports.length;
+		for(i = 0; i < len; i++) if(_exports[i].name === name) return _exports[i];
+		// retrive module by exported key: module.exports[name] = exportedValue
+		for(i = 0; i < len; i++) if(_exports[i][name] !== undefined) return _exports[i][name];
+		if(scope[name] !== undefined) return scope[name];
+		return false;
+	}
 	var _module = Object.create({}, {
 		get: {
 			value: function(name) {
-				// Retrieve module by index 0 = first, etc
-				if(moduleUrls[name] !== undefined) return moduleUrls[name];
-				if(_exports[name] !== undefined) return _exports[name];
-				for(var i = 0; i < _exports.length; i++) {
-					var module = _exports[i];
-					// retrive module by function name: module.exports = function name()
-					if(module.name === name) return module;
-					// retrive module by exported key: module.exports[name] = exportedValue
-					if(module[name] !== undefined) return module[name];
+				var module;
+				module = findModule(name);
+				if(module === false && name.match(RE_MODULEFILE) !== null) {
+					module = findModule(name.replace(RE_MODULEFILE, '$1'));
 				}
-				if(scope[name] !== undefined) return scope[name];
+				if(module === false) throw new Error('Module "'+name+'" not found');
+				return module;
 			},
 			writeable: false,
 			enumerable: true,
@@ -61,9 +71,9 @@
 				var p;
 				url.forEach(function(url) {
 					if(p === undefined) {
-						p = moduleSystem.loadFromUrl(url);
+						p = _module.loadFromUrl(url);
 					} else {
-						p = p.then(function() { return moduleSystem.loadFromUrl(url); });
+						p = p.then(function() { return _module.loadFromUrl(url); });
 					}
 				});
 				return p;
@@ -71,7 +81,7 @@
 		}}
 	});
 	var _require = function require(name) {
-		return module.get(name);
+		return _module.get(name);
 	};
 
 	// Apply module properties to current scope
@@ -93,4 +103,4 @@
 		}
 	});
 
-})(this);
+})(this, typeof module === 'undefined'?undefined:module, typeof require === 'undefined'?undefined:require);

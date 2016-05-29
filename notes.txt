@@ -4,3 +4,12 @@ References:
 Visual effects:
 	1. Translucent shield: https://stemkoski.github.io/Three.js/Shader-Glow.html
 	2. Basic glowing mesh: http://jeromeetienne.github.io/threex.geometricglow/examples/geometricglowmesh.html
+
+
+Image compression/conversion:
+convert -strip -interlace Plane -gaussian-blur 0.05 -quality 85% dropship.png result.jpg
+convert -background #7f7f61 -flatten -strip -interlace Plane -quality 80% dropship.png result.jpg
+mogrify -background #7f7f61 -flatten -strip -format jpg -interlace Plane -quality 80% *.png
+
+
+mogrify  -resize 512x512! -background #7f7f61 -flatten -strip -format jpg -interlace Plane -quality 60 -path ../ *.png

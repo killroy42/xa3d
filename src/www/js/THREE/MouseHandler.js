@@ -69,15 +69,19 @@
 	MouseHandler.DRAGPLANE_GRID.rotateX(90*Math.PI/180);
 	MouseHandler.DRAGPLANE_GRID.material.transparent = true;
 	MouseHandler.DRAGPLANE_GRID.material.opacity = 0.1;
-	//MouseHandler.prototype = Object.create(THREE.Object3D.prototype);
-	MouseHandler.prototype = Object.create(null);
+	MouseHandler.prototype = Object.assign(Object.create(null), THREE.EventDispatcher.prototype);
 	MouseHandler.prototype.constructor = THREE.MouseHandler;
-	THREE.EventDispatcher.prototype.apply(MouseHandler.prototype);
 	MouseHandler.prototype.add = function(object) {
 		var interactiveObjects = this.interactiveObjects;
-		if(object.receiveMouseEvents === true) interactiveObjects.push(object);
+		if(object.receiveMouseEvents === true && interactiveObjects.indexOf(object) === -1) {
+			//console.info('MouseHandler.add("%s");', object.name, object.receiveMouseEvents);
+			interactiveObjects.push(object);
+		}
 		for(var i = 0, l = object.children.length; i < l; i++) {
 			this.add(object.children[i]);
+		}
+		if(object.childrenReceiveMouseEvents) {
+			this.watchChildren(object);
 		}
 	};
 	MouseHandler.prototype.remove = function(object) {
@@ -92,6 +96,7 @@
 		}
 	};
 	MouseHandler.prototype.watchChildren = function(root) {
+		//console.info('MouseHandler.watchChildren("%s");', root.name);
 		var self = this;
 		var addFunc = root.add;
 		var removeFunc = root.remove;

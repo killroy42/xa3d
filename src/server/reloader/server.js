@@ -1,25 +1,28 @@
+(function() {
 /*jslint node: true */
 'use strict';
 
-var WebSocketServer = require('ws').Server;
-var wss = new WebSocketServer({port: 7890});
+var ws = require('ws');
+var WebSocketServer = ws.Server;
+var DEFAULT_PORT = 7890;
 
-//wss.on('connection', function connection(ws) {});
 
-/*
-// Client:
+function getArgs() {
+	var argv = process.argv.join(' '), m;
+	var args = {
+		port: DEFAULT_PORT
+	};
+	m = argv.match(/-p ([0-9]+)/);
+	if(m) args.port = m[1];
+	return args;
+}
 
-var TIMEOUT = 300;
-var ws = new WebSocket('ws://127.0.0.1:8888/');
-ws.addEventListener('open', function() {
-	console.info('Socket open');
-});
-ws.addEventListener('close', function() {
-	console.info('Socket closed');
-	setTimeout(function() {
-		console.info('Reloading...');
-		document.location.reload(true);
-	}, TIMEOUT);
-});
+function main() {
+	var args = getArgs();
+	var wss = new WebSocketServer({port: args.port});
+	console.info('Reloader listening on "%s:%s"', wss.options.host, wss.options.port);
+}
 
-*/
+main();
+
+})();

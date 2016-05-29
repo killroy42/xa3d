@@ -1,18 +1,32 @@
-
 (function() {
 /*jslint node: true */
 'use strict';
 
 var http = require('http');
-var ObjectServer = require('./ObjectServer.js');
-
-var app = http.createServer();
-var port = 81;
-var cardServer = new ObjectServer();
+var NetServer = require('./NetServer.js');
+var DEFAULT_PORT = 81;
 
 
-app.listen(port, function () {
-	cardServer.listen(app);
-	console.log('Card server listining on port %s', port);
-});
+function getArgs() {
+	var argv = process.argv.join(' '), m;
+	var host;
+	var port = DEFAULT_PORT;
+	m = argv.match(/-p ([0-9]+)/);
+	if(m) port = m[1];
+	m = argv.match(/-h ([^\s]+)/);
+	if(m) host = m[1];
+	return {host: host, port: port};
+}
+
+function main() {
+	var args = getArgs();
+	var app = http.createServer();
+	var server = app.listen(args.port, args.host, function () {
+		console.info('Card server listening on "%s:%s"', server.address().address, server.address().port);
+		var netServer = new NetServer().listen(app);
+	});
+}
+
+main();
+
 })();

@@ -1,8 +1,8 @@
 (function() {
 var modules = [
-	'/vendors/three_r77dev.js',
+	'/vendors/THREE/three_r77dev.js',
 	'/js/THREE/Prototype.js',
-	'/vendors/OrbitControls.js',
+	'/vendors/THREE/controls/OrbitControls.js',
 	'/js/helpers/initLights.js'
 ];
 

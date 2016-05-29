@@ -9,6 +9,7 @@
 //
 
 uniform float time;
+uniform float frequency;
 varying vec2 vUv;
 
 vec4 permute( vec4 x ) {
@@ -88,7 +89,8 @@ float surface( vec3 coord ) {
 }
 
 void main( void ) {
-	vec3 coord = vec3( vUv, -time );
+	float t = time * frequency;
+	vec3 coord = vec3( vUv, -t );
 	float n = surface( coord );
 	gl_FragColor = vec4( vec3( n ), 1.0 );
 }

@@ -16,6 +16,8 @@
 		board.name = 'Board';
 		Promise.all([boardTex.promise, boardAlpha.promise])
 		.then(function() {
+			boardTex.minFilter = THREE.LinearFilter;
+			boardAlpha.minFilter = THREE.LinearFilter;
 			material.map = boardTex;
 			material.alphaMap = boardAlpha;
 			material.needsUpdate = true;

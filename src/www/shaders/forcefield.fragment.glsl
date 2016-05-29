@@ -9,7 +9,7 @@ varying vec3 vNormal;
 varying vec3 vNormel;
 void main() {
 
-	float height = 0.04;
+	float height = 0.01;
 	vec2 resolution = vec2(128.0, 128.0);
 	float val = texture2D(noiseMap, vUv).x;
 	float valU = texture2D(noiseMap, vUv + vec2(1.0 / resolution.x, 0.0)).x;

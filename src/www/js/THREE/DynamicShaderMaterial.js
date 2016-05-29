@@ -23,6 +23,9 @@
 	}
 	DynamicShaderMaterial.prototype = Object.create(THREE.ShaderMaterial.prototype);
 	DynamicShaderMaterial.prototype.constructor = DynamicShaderMaterial;
+	DynamicShaderMaterial.ANIMATE_TIME_FUNCTION = function DynamicShaderMaterial_onanimate(time) {
+		this.uniforms.time.value = time * 0.001;
+	};
 	DynamicShaderMaterial.prototype.onanimate = function() {};
 	DynamicShaderMaterial.prototype.animate = function(time) {
 		this.onanimate(time);

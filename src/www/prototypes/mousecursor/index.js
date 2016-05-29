@@ -1,14 +1,14 @@
 (function() {
 var THREE = require('enhanceTHREE')(require('THREE'));
-var DynamicShaderMaterial = require('DynamicShaderMaterial');
 var MaterialRenderer = require('MaterialRenderer');
+var DynamicMaterialManager = require('DynamicMaterialManager');
 var MouseHandler = require('MouseHandler');
 var XenoCard = require('XenoCard');
 var ForcefieldEffect = require('ForcefieldEffect');
 var MouseCursor = require('MouseCursor');
 var THREEPrototype = require('THREEPrototype');
+var createNoiseTexture = require('createNoiseTexture');
 var initLights = require('initLights');
-var initDynamicMaterials = require('initDynamicMaterials');
 var createBoard = require('createBoard');
 
 var boardImageUrl = '/images/xa_board_a_3.jpg';
@@ -55,14 +55,19 @@ function createCards(scene, cardTex) {
 
 		this.setCamera(new THREE.Vector3(0, -400, 1000), new THREE.Vector3(0, -90, 0));
 		initLights(this);
-		initDynamicMaterials(this);
 
 		scene.add(createBoard(boardTex, boardAlpha));
 				
 		createCards(scene, cardTex);
 		var cards = scene.children.filter(function(o) { return o instanceof XenoCard; });
 
-		var noiseMap = this.noiseMap;
+		var dMM = new DynamicMaterialManager(this.renderer);
+		var noiseMap = MaterialRenderer.createRenderTarget(512, 512);
+		var noiseTexture = createNoiseTexture(loadShader);
+		dMM.add('perlinNoise', noiseTexture, noiseMap);
+		this.onupdate = dMM.update;
+		this.onrender = dMM.render;
+
 		cards.forEach(function(card) {
 			var forcefield = new ForcefieldEffect(loadShader, noiseMap);
 			card.add(forcefield);

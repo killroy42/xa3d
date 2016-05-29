@@ -21,10 +21,37 @@
 			'z:'+this.z.toFixed(1)+'}';
 	}
 
+
+	function BufferGeometry_toGeometry() {
+		var attrib = this.getAttribute('position');
+		var positions = attrib.array;
+		var vertices = [];
+		var faces = [], i, n;
+		if(attrib === undefined) {
+			throw new Error('a given BufferGeometry object must have a position attribute.');
+		}
+		for(i = 0, n = positions.length; i < n; i += 3) {
+			var x = positions[i];
+			var y = positions[i + 1];
+			var z = positions[i + 2];
+			vertices.push(new THREE.Vector3(x, y, z));
+		}
+		for(i = 0, n = vertices.length; i < n; i += 3) {
+			faces.push(new THREE.Face3(i, i + 1, i + 2));
+		}
+		var geometry = new THREE.Geometry();
+		geometry.vertices = vertices;
+		geometry.faces = faces;
+		geometry.computeFaceNormals();
+		return geometry;
+	}
+
 	function enhanceTHREE(THREE) {
 		THREE.Vector2.prototype.toString = Vector2_toString;
 		THREE.Vector3.prototype.toString = Vector3_toString;
 		THREE.Euler.prototype.toString = Euler_toString;
+		THREE.Euler.prototype.toString = Euler_toString;
+		THREE.BufferGeometry.prototype.toGeometry = BufferGeometry_toGeometry;
 		return THREE;
 	}
 	
@@ -68,6 +95,7 @@
 	Prototype.prototype.createRenderer = function() {
 		var window = this.windowElement;
 		var renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+		//var renderer = new THREE.WebGLRenderer({antialias: true, alpha: true, logarithmicDepthBuffer: true});
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.setClearColor(0x000000, 0);
 		renderer.shadowMap.enabled = true;
@@ -80,13 +108,18 @@
 		return scene;
 	};
 	Prototype.prototype.createCamera = function() {
-		var camera = new THREE.PerspectiveCamera(this.fov, this.windowElement.innerWidth / this.windowElement.innerHeight, 1, 10000);
+		var camera = new THREE.PerspectiveCamera(
+			this.fov,
+			this.windowElement.innerWidth / this.windowElement.innerHeight,
+			10, 2000
+		);
 		camera.position.set(0, 0, 1000);
 		camera.up = new THREE.Vector3(0, 1, 0);
 		camera.lookAt(new THREE.Vector3(0, 0, 0));
 		return camera;
 	};
 	Prototype.prototype.createControls = function() {
+		if(THREE.OrbitControls === undefined) return;
 		var controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 		controls.userPanSpeed = 0.1;
 		this.setCamera(this.camera.position, this.cameraTarget);
@@ -117,9 +150,7 @@
 		this.rootElement.appendChild(this.renderer.domElement);
 		this.scene = this.createScene();
 		this.camera = this.createCamera();
-		if(THREE.OrbitControls) {
-			this.controls = this.createControls();
-		}
+		this.controls = this.createControls();
 		this.textureLoader = this.createTextureLoader();
 		if(typeof this.oninit === 'function') this.oninit();
 	};
@@ -127,31 +158,34 @@
 		var self = this;
 		var boundResizeHandler = function(e) { return self.handleWindowResize(e); };
 		var boundContextMenuHandler = function(e) { return self.handleContextMenu(e); };
-		var renderer, scene, camera, window, rafId;
+		var renderer, scene, camera, windowElement, rafId, frameTime;
+		function update() {
+			if(self.onupdate) self.onupdate(frameTime);
+			rafId = windowElement.requestAnimationFrame(renderFrame);
+		}
 		function renderFrame(time) {
-			rafId = window.requestAnimationFrame(renderFrame);
-			if(self.onrender) self.onrender(time);
+			frameTime = time;
+			if(self.onrender) self.onrender(frameTime);
 			renderer.render(scene, camera);
-			if(self.onupdate) self.onupdate(time);
+			setTimeout(update, 0);
 		}
 		function stop() {
-			window.removeEventListener('resize', boundResizeHandler);
-			window.removeEventListener('contextmenu', boundContextMenuHandler);
+			windowElement.removeEventListener('resize', boundResizeHandler);
+			windowElement.removeEventListener('contextmenu', boundContextMenuHandler);
 			self.stop = Prototype.prototype.stop;
-			window.cancelAnimationFrame(rafId);
+			windowElement.cancelAnimationFrame(rafId);
 		}
 		function start() {
 			self.stop = stop;
-			window.addEventListener('resize', boundResizeHandler);
-			window.addEventListener('contextmenu', boundContextMenuHandler);
-			rafId = window.requestAnimationFrame(renderFrame);
+			windowElement.addEventListener('resize', boundResizeHandler);
+			windowElement.addEventListener('contextmenu', boundContextMenuHandler);
+			rafId = windowElement.requestAnimationFrame(renderFrame);
 		}
-		
 		this.init();
 		renderer = this.renderer;
 		scene = this.scene;
 		camera = this.camera;
-		window = this.windowElement;
+		windowElement = this.windowElement;
 		start();
 	};
 	Prototype.prototype.stop = function() {
@@ -188,11 +222,12 @@
 		this.cameraTarget = target || new THREE.Vector3(0, 0, 0);
 		camera.position.copy(position);
 		camera.lookAt(this.cameraTarget);
+		camera.updateMatrix();
 		var controls = this.controls;
 		if(controls === undefined) return;
-		controls.target0.copy(this.cameraTarget);
-		controls.position0.copy(camera.position);
-		controls.reset();
+		if(controls.position0) controls.position0.copy(camera.position);
+		if(controls.target0) controls.target0.copy(this.cameraTarget);
+		if(controls.reset) controls.reset();
 	};
 
 	
