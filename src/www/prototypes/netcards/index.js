@@ -22,6 +22,7 @@ function initClient(app) {
 	var mouseHandler = app.mouseHandler;
 	//var client = new NetworkClient().connect(new WebSocketConnection().connect({port: 82}));
 	var client = new NetworkClient().connect(new WebSocketConnection());
+	client.connection.connect({port: 82});
 	var gui = new dat.GUI();
 	var guiOpts = {
 		'Connect': function() {
@@ -31,45 +32,79 @@ function initClient(app) {
 			client.connection.disconnect();
 		},
 		'Add netId': function() {
-			var netId = client.createNetId();
-			netId.on('ready', function() {
-				//console.info('netId.on(ready) id = %s', this.id);
-				this.send('Hello World');
-			});
-			netId.on('msg', logNetIdMsg);
+			client.createNetId();
+		},
+		'Remove first netId': function() {
+			var netId;
+			var ids = Object.keys(client.netIds);
+			for(var i = 0; i < ids.length; i++) {
+				netId = client.getNetId(ids[i]);
+				if(netId.isReady && netId.isOwner) break;
+			}
+			if(netId === undefined) {
+				console.log('No netIds to remove');
+				return;
+			}
+			console.log('Removing:', netId.serialize());
+			netId.destroy();
+		},
+		'Stress Test': function() {
+			setInterval(function() { console.clear(); }, 5000);
+			setInterval(function() {
+				switch(Math.floor(Math.random()*6)) {
+					case 0:
+						if(client.connection.isConnected === false) {
+							console.log('CONNECT');
+							client.connection.connect({port: 82});
+							break;
+						}
+						console.log('DISCONNECT');
+						client.connection.disconnect();
+						break;
+					case 1: case 2: case 3:
+						if(client.connection.isConnected === false) {
+							console.log('CONNECT');
+							client.connection.connect({port: 82});
+							break;
+						}
+						console.log('CREATE');
+						client.createNetId();
+						break;
+					case 4: case 5:
+						if(client.connection.isConnected === false) {
+							console.log('CONNECT');
+							client.connection.connect({port: 82});
+							break;
+						}
+						var netIds = Object.keys(client.netIds)
+						.map(function(id) { return client.getNetId(id); })
+						.filter(function(netId) { return netId.isReady && netId.isOwner; });
+						if(netIds.length > 0) {
+							console.log('DESTROY');
+							netIds[0].destroy();
+						}
+					break;
+				}
+			}, 100);
 		},
 	};
 	Object.keys(guiOpts).forEach(function(key) { gui.add(guiOpts, key); });
 	//gui.close();
 
-
-	client.connection.on('connected', function() {
-		//console.info('index.js > client.on(connected)');
-		/*
-		var netId1 = client.createNetId();
-		netId1.on('ready', function() {
-			console.info('netId.on(ready) id = %s', this.id);
-			this.send('Hello World');
-		});
-		netId1.on('msg', logNetIdMsg);
-		var netId2 = client.createNetId();
-		netId2.on('msg', logNetIdMsg);
-		*/
-	});
 	var lastReportString = '';
 	setInterval(function() {
 		reportString = 'Client['+client.id+']: '+
 			Object.keys(client.netIds)
 			.map(function(id) {
 				var netId = client.netIds[id];
-				return '('+netId.id+'/'+(netId.isProxy()?'P':'C')+')';
+				return '('+netId.id+'/'+(netId.isProxy?'P':'C')+')';
 			}).join(' ');
 		if(reportString !== lastReportString) {
 			//console.log('netIds.length:', Object.keys(client.netIds).length);
 			console.log(reportString);
 			lastReportString = reportString;
 		}
-	}, 100);
+	}, 10);
 }
 
 function Prototype_init() {

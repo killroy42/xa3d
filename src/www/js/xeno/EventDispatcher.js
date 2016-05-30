@@ -2,6 +2,10 @@
 /*jslint node: true */
 'use strict';
 
+/*
+Potential pit-falls:
+	- .once() uses property on listener object
+*/
 
 function EventDispatcher() {
 	var self = this;
@@ -14,6 +18,11 @@ function EventDispatcher() {
 		if(_listeners === undefined) _listeners = {};
 		if(_listeners[type] === undefined) _listeners[type] = [];
 		_listeners[type].push(listener);
+		return self;
+	}
+	function addEventListenerOnce(type, listener) {
+		addEventListener(type, listener);
+		listener.isOnceListner = true;
 		return self;
 	}
 	function removeEventListener(type, listener) {
@@ -43,13 +52,17 @@ function EventDispatcher() {
 		if(typeListeners === undefined) return false;
 		var len = typeListeners.length;
 		if(len === 0) return false;
-		var execListeners = [], i;
+		var execListeners = [], i, listener;
 		// Cache listeners array to avoid issues with removal
 		for(i = 0; i < len; i++) {
 			execListeners[i] = typeListeners[i];
 		}
 		for(i = 0; i < len; i++) {
-			execListeners[i].apply(self, args);
+			listener = execListeners[i];
+			listener.apply(self, args); // Execute event listener
+			if(listener.isOnceListener === true) {
+				removeEventListener(type, listener);
+			}
 		}
 		return true;
 	}
@@ -90,6 +103,7 @@ function EventDispatcher() {
 		dispatchEvent: { value: dispatchEvent, enumerable: true},
 		// jQuery naming convention
 		on: { value: addEventListener, enumerable: true},
+		once: { value: addEventListenerOnce, enumerable: true},
 		off: { value: removeEventListener, enumerable: true},
 		trigger: { value: dispatchEvent, enumerable: true},
 		hasEventListener: { value: hasEventListener, enumerable: true},

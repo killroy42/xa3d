@@ -11,6 +11,9 @@ function NetworkServer() {
 	this.connection = undefined;
 	this.clients = [];
 }
+NetworkServer.handleConnectionDisconnected = function(reason) {
+	this.client.server.handleClientDisconnect(this.client, reason);
+};
 NetworkServer.prototype = Object.create(null);
 NetworkServer.prototype.constructor = NetworkServer;
 NetworkServer.prototype.connect = function(connectionServer) {
@@ -20,7 +23,7 @@ NetworkServer.prototype.connect = function(connectionServer) {
 	return this;
 };
 NetworkServer.prototype.handleClientConnect = function(connection) {
-	console.info('NetworkServer.handleClientConnect(connection);');
+	//console.info('NetworkServer.handleClientConnect(connection);');
 	var self = this;
 	var client = new NetworkClient();
 	client.server = this;
@@ -31,20 +34,10 @@ NetworkServer.prototype.handleClientConnect = function(connection) {
 		connection.dispatchEvent('connected');
 	}
 	this.dispatchEvent('clientconnected', client);
-	connection.on('disconnect', function(reason) {
-		self.handleClientDisconnect(client, reason);
-	});
-	// Init proxies
-		var peers = this.getPeers(client);
-		peers.forEach(function(peer) {
-			Object.keys(peer.netIds).forEach(function(id) {
-				var netId = peer.netIds[id];
-				client.send('id.peer', netId.serialize());
-			});
-		});
+	connection.once('disconnected', NetworkServer.handleConnectionDisconnected);
 };
 NetworkServer.prototype.handleClientDisconnect = function(client, reason) {
-	console.info('NetworkServer.handleClientDisconnect(client, "%s");', reason);
+	//console.info('NetworkServer.handleClientDisconnect(client, "%s");', reason);
 	var idx = this.clients.indexOf(client);
 	this.clients.splice(idx, 1);
 };

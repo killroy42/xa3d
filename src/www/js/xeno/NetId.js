@@ -4,63 +4,35 @@
 var EventDispatcher = require('./EventDispatcher');
 
 
-function NetId(opts) {
+function NetId(client, id, isProxy) {
 	EventDispatcher.apply(this);
-	this.state = NetId.NEW;
-	opts = opts || {};
-	if(opts.id) this.id = opts.id;
-	if(opts.owner) this.owner = opts.owner;
-	if(opts.state) this.state = opts.state;
+	var isOwner = isProxy !== true;
+	this.state = NetId.READY;
+	this.client = client;
+	this.id = id;
+	Object.defineProperties(this, {
+		isProxy: { get: function() { return !isOwner; } },
+		isOwner: { get: function() { return isOwner; } },
+		isReady: { get: function() { return this.state === NetId.READY; } },
+	});
 }
-NetId.NEW = 'new';
-NetId.READY = 'ready';
-NetId.DESTROYED = 'destroyed';
+NetId.READY = 'READY';
+NetId.ISDESTROYING = 'ISDESTROYING';
+NetId.DESTROYED = 'DESTROYED';
 NetId.prototype = Object.create(null);
 NetId.prototype.constructor = NetId;
-// Setup
-	NetId.prototype.create = function(id) {
-		this.state = NetId.NEW;
-		this.id = id;
-		this.owner.send('id.new', this.serialize());
-		return this;
-	};
-	NetId.prototype.ready = function(id, ref) {
-		console.info('NetId.ready(%s, %s);', id, ref);
-		this.state = NetId.READY;
-		this.id = id;
-		this.owner.send('id.ready', {ref: ref, netid: this.serialize()});
-		this.owner.sendPeers('id.peer', this.serialize());
-		this.dispatchEvent('ready');
-		return this;
-	};
-	NetId.prototype.confirm = function(id) {
-		//console.info('NetId.confirm(%s);', id);
-		this.state = NetId.READY;
-		this.id = id;
-		this.dispatchEvent('ready');
-		return this;
-	};
-	NetId.prototype.destroy = function() {
-		//console.info('NetId.destroy();');
-		this.state = NetId.DESTROYED;
-		this.dispatchEvent('destroyed');
-		if(!this.isProxy()) {
-			this.owner.send('id.destroy', this.serialize());
-			if(this.owner.isServer()) {
-				this.owner.sendPeers('id.destroy', this.serialize());
-			}
-		}
-		return this;
-	};
 // Actions
-	NetId.prototype.send = function(msg) {
-		var debugLabel = this.owner.isClient()?'C -> S':'S -> C';
-		console.log('[%s] %s: %s', debugLabel, this.id, JSON.stringify(msg));
-		this.owner.send('id.msg', {id: this.id, msg: msg});
+	NetId.prototype.destroy = function() {
+		//console.error('NetId.destroy(); state = %s', this.state);
+		this.assertOwner();
+		this.assertState(NetId.READY);
+		this.state = NetId.ISDESTROYING;
+		this.dispatchEvent('requestdestroy');
 	};
-// Info
-	NetId.prototype.isProxy = function() {
-		return this.owner === undefined;
+	NetId.prototype.send = function(msg) {
+		var debugLabel = this.client.isClient()?'C -> S':'S -> C';
+		console.log('[%s] %s: %s', debugLabel, this.id, JSON.stringify(msg));
+		this.client.send('id.msg', {id: this.id, msg: msg});
 	};
 // Serialization
 	NetId.prototype.serialize = function() {
@@ -72,6 +44,14 @@ NetId.prototype.constructor = NetId;
 			state: this.state,
 			proxy: this.isProxy()
 		};
+	};
+// Checks
+	NetId.prototype.assertOwner = function() {
+		if(!this.isOwner) throw new Error('This operation requires NetID ownership.');
+	};
+
+	NetId.prototype.assertState = function(state) {
+		if(this.state !== state) throw new Error('Invalid NetId state: "'+this.state+'". Expected: "'+state+'"');
 	};
 
 

@@ -17,16 +17,20 @@ WebSocketConnection.prototype.connect = function(opts) {
 	var host = opts.host || document.location.host;
 	var port = opts.port || WebSocketConnection.DEFAULT_PORT;
 	var url = 'ws://'+host+':'+port;
+	if(this.socket !== undefined) throw new Error('Socket already connected');
 	var ws = new WebSocket(url);
-	//ws.addEventListener('open', this.bindHandler(this.HandleConnected));
+	//ws.addEventListener('open', function(e) { console.log(' >> ws.open'); });
+	//ws.addEventListener('close', function(e) { console.log(' >> ws.close'); });
+	//if(ws.on) ws.on('open', function(e) { console.log(' >> ws.on open'); });
+	//if(ws.on) ws.on('close', function(e) { console.log(' >> ws.on close'); });
 	this.attach(ws);
 	return this;
 };
-WebSocketConnection.prototype.disconnect = function() {
+WebSocketConnection.prototype.disconnect = function(reason) {
 	//console.info('WebSocketConnection.disconnect();');
 	Connection.prototype.disconnect.call(this);
+	if(this.socket === undefined) throw new Error('Socket not connected');
 	this.socket.close();
-	//this.socket = undefined;
 	return this;
 };
 WebSocketConnection.prototype.attach = function(ws) {
@@ -37,7 +41,6 @@ WebSocketConnection.prototype.attach = function(ws) {
 	var handleOpen = this.delegate('connected');
 	var handleMessage = this.delegate('message', function(e) { return e.data; });
 	var handleError = this.delegate('error');
-	//var handleClose = this.delegate('disconnect', function(e) { return e.reason; });
 	var handleClose = function(e) {
 		if(typeof ws.removeAllListeners === 'function') {
 			ws.removeAllListeners();
@@ -47,32 +50,23 @@ WebSocketConnection.prototype.attach = function(ws) {
 			ws.removeEventListener('error', handleError);
 			ws.removeEventListener('close', handleClose);
 		}
-		self.dispatchEvent('disconnect', e.reason);
+		self.socket = undefined;
+		self.isClient = false;
+		self.isServer = false;
+		self.isConnected = false;
+		self.dispatchEvent('disconnected', e.reason);
 	};
 	ws.addEventListener('open', handleOpen);
 	ws.addEventListener('message', handleMessage);
 	ws.addEventListener('error', handleError);
 	ws.addEventListener('close', handleClose);
-	/*
-	ws.addEventListener('error', function(e) {
-		console.error('WebSocketConnection.on(error):', e.type);
-		console.log(e);
-	});
-	ws.addEventListener('close', function(e) {
-		console.warn('WebSocketConnection.on(close):', e.type);
-		console.log('e.code:', e.code);
-		console.log('e.reason:', e.reason);
-	});
-	*/
 	return this;
 };
 WebSocketConnection.prototype.send = function(data) {
 	//console.info('WebSocketConnection.send(%s);', JSON.stringify(data));
-	//console.log(Object.keys(this.socket));
-	//console.log('readyState:', this.socket.readyState);
-	//console.log('_closeCode:', this.socket._closeCode);
-	if(this.socket.readyState !== 1) {
-		console.warn('E(Socket not open) @ WebSocketConnection.send("%s")', data);
+	if(this.socket === undefined || this.socket.readyState !== 1) {
+		console.error('E(Socket not open) @ WebSocketConnection.send("%s")', data);
+		if(this.socket) console.log('  readyState:', this.socket.readyState);
 		return;
 	}
 	this.socket.send(data);
