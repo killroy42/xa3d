@@ -5,7 +5,8 @@ var cardInfo = {
 	width: 168,
 	height: 230,
 	boardZ: 10,
-	dragZ: 300
+	dragZ: 300,
+	dragProxyZ: 100,
 };
 var boardTextureUrl = '/images/xa_board_a_3.jpg';
 var boardAlphaUrl = '/images/xa_board_alpha.png';

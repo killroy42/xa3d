@@ -38,6 +38,17 @@ function EventDispatcher() {
 		}
 		return self;
 	}
+	function applyEventListeners(listeners, remove) {
+		if(typeof listeners !== 'object') {
+			throw new Error('Invalid arguments to EventDispatcher.applyEventListeners(listeners, remove)');
+		}
+		var applyEventListener = addEventListener;
+		if(remove === true) applyEventListener = removeEventListener;
+		var keys = Object.keys(listeners);
+		for(var i = 0, l = keys.length; i < l; i++) applyEventListener(keys[i], listeners[keys[i]]);
+		return self;
+	}
+	function removeEventListeners(listeners) { applyEventListeners(listeners, true); }
 	function dispatchEvent(event) {
 		var type, args;
 		if(_listeners === undefined) return false;
@@ -106,6 +117,9 @@ function EventDispatcher() {
 		once: { value: addEventListenerOnce, enumerable: true},
 		off: { value: removeEventListener, enumerable: true},
 		trigger: { value: dispatchEvent, enumerable: true},
+		// Additional
+		addEventListeners: { value: applyEventListeners, enumerable: true},
+		removeEventListeners: { value: removeEventListeners, enumerable: true},
 		hasEventListener: { value: hasEventListener, enumerable: true},
 		getEventListeners: { value: getEventListeners, enumerable: true},
 		bindHandler: { value: bindHandler, enumerable: true},

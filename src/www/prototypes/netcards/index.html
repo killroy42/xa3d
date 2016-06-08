@@ -11,26 +11,46 @@
 	</head>
 	<body>
 		<script src="/js/dev/debug.js"></script>
+		<script src="/polyfills/promise.js"></script>
+		<script src="/polyfills/fetch.js"></script>
 		<script src="/js/dev/reloader.js"></script>
 		<script src="/js/core/module-loader.js"></script>
 		<script src="/vendors/THREE/three_r78dev.js"></script>
+		<script src="/vendors/THREE/loaders/OBJLoader.js"></script>
 		<script src="/vendors/THREE/controls/OrbitControls.js"></script>
-		<script src="/vendors/socket.io.js"></script>
+		<script src="/vendors/THREE/SubdivisionModifier.js"></script>
 		<script src="/vendors/TweenMax.min.js"></script>
-		<script src="/vendors/dat.gui.min.js"></script>
 		<script src="/vendors/portable-rng.js"></script>
 		<script src="/vendors/portable-uuid.js"></script>
+		<script src="/js/helpers/enhanceTHREE.js"></script>
+		<script src="/js/xeno/EventDispatcher.js"></script>
 		<script src="/js/THREE/MouseHandler.js"></script>
 		<script src="/js/THREE/Prototype.js"></script>
+		<script src="/js/helpers/GeometryHelpers.js"></script>
+		<script src="/js/helpers/AnimationHelpers.js"></script>
 		<script src="/js/helpers/initLights.js"></script>
-		<script src="/js/xenocards/createBoard.js"></script>
+		<script src="/js/xenocards/assetdata.js"></script>
 		<script src="/js/xenocards/MouseCursor.js"></script>
-		<script src="/js/xeno/EventDispatcher.js"></script>
+		<script src="/js/xenocards/ControlsSwitcher.js"></script>
+		<script src="/js/THREE/MaterialRenderer.js"></script>
+		<script src="/js/THREE/DynamicShaderMaterial.js"></script>
+		<script src="/js/THREE/DynamicMaterialManager.js"></script>
+		<script src="/js/xenocards/materials.js"></script>
+		<script src="/js/xenocards/XenoCard3D.js"></script>
+		<script src="/js/xenocards/createBoard.js"></script>
+		<script src="/js/xenocards/CardGlow.js"></script>
+		<script src="/js/xenocards/DragAndDrop.js"></script>
 		<script src="/js/xeno/Network.js"></script>
 		<script src="/js/xeno/Connection.js"></script>
 		<script src="/js/xeno/WebSocketConnection.js"></script>
 		<script src="/js/xeno/NetId.js"></script>
+		<script src="/js/xeno/BlueprintCore.js"></script>
 		<script src="/js/xeno/NetworkClient.js"></script>
+		<script src="/js/xeno/GameClient.js"></script>
+		<script src="/js/xeno/blueprints/BoxBlueprint.client.js"></script>
+		<script src="/js/xeno/blueprints/CardBlueprint.client.js"></script>
+		<script src="/js/xeno/blueprints/GameBlueprint.client.js"></script>
+		<script src="/js/xeno/blueprints/PlayerBlueprint.client.js"></script>
 		<script src="index.js"></script>
 	</body>
 </html>

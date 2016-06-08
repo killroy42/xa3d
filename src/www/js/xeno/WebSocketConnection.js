@@ -51,8 +51,6 @@ WebSocketConnection.prototype.attach = function(ws) {
 			ws.removeEventListener('close', handleClose);
 		}
 		self.socket = undefined;
-		self.isClient = false;
-		self.isServer = false;
 		self.isConnected = false;
 		self.dispatchEvent('disconnected', e.reason);
 	};

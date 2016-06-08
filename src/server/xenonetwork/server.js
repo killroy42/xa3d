@@ -5,7 +5,14 @@
 var jsDir = '../../www/js/';
 //var XENO = require(jsDir+'xeno/XENO');
 var WebSocketConnectionServer = require(jsDir+'xeno/WebSocketConnectionServer');
+var Network = require(jsDir+'xeno/Network');
 var NetworkServer = require(jsDir+'xeno/NetworkServer');
+var NetworkClient = require(jsDir+'xeno/NetworkClient');
+var LocalConnection = require(jsDir+'xeno/LocalConnection');
+var BoxBlueprint = require(jsDir+'xeno/blueprints/BoxBlueprint.server');
+var GameBlueprint = require(jsDir+'xeno/blueprints/GameBlueprint.server');
+var PlayerBlueprint = require(jsDir+'xeno/blueprints/PlayerBlueprint.server');
+var assetdata = require(jsDir+'xenocards/assetdata');
 
 var DEFAULT_PORT = 82;
 
@@ -21,35 +28,45 @@ function getArgs() {
 	return {host: host, port: port};
 }
 
+function createLocalClient(server) {
+	var client = new NetworkClient();
+	client.server = server;
+	client.id = Network.generateId();
+	server.clients.push(client);
+	var connection = new LocalConnection();
+	client.connect(connection);
+	connection.attach();
+	return client;
+}
+
 function main() {
 	var args = getArgs();
 	var opts = {host: args.host, port: args.port};
 
-	var server = new NetworkServer()
-		.connect(new WebSocketConnectionServer().listen(opts));
+	var server = new NetworkServer().connect(new WebSocketConnectionServer());
 
+	var context = {
+		assetdata: assetdata
+	};
+
+	GameBlueprint.context = context;
+	PlayerBlueprint.context = context;
+	
+	var localClient = createLocalClient(server);
+	localClient.registerBlueprint('BoxBlueprint', BoxBlueprint);
+	localClient.registerBlueprint('GameBlueprint', GameBlueprint);
+	localClient.registerBlueprint('PlayerBlueprint', PlayerBlueprint);
+	var Game = localClient.instantiateBlueprint('GameBlueprint');
+	Game.on('created', function() {
+		for(var i = 0; i < 14; i++) this.createCard();
+	});
+	context.game = Game;
+
+	server.connectionServer.listen(opts);
 	server.on('clientconnected', function(client) {
-		client.on('netidready', function(netId) {
-			netId.on('msg', function(msg) {
-				console.log('[S <- C id.msg] %s: "%s"', this.id, msg);
-				return;
-				var recvId = this.id;
-				this.send('Thanks!');
-				var owner = this.owner;
-				var peers = owner.server.clients.filter(function(peer) {
-					return peer !== owner;
-				});
-				//console.log(peers.length);
-				peers.forEach(function(peer) {
-					//console.log(Object.keys(peer.netIds));
-					var ids = Object.keys(peer.netIds);
-				
-				});	ids.forEach(function(id) {
-						var netId = peer.netIds[id];
-						netId.send('Did you hear?! The other player\'s netId "'+recvId+'" said: '+msg);
-					});
-			});
-		});
+		client.registerBlueprint('BoxBlueprint', BoxBlueprint);
+		client.registerBlueprint('GameBlueprint', GameBlueprint);
+		client.registerBlueprint('PlayerBlueprint', PlayerBlueprint);
 	});
 }
 

@@ -1,6 +1,8 @@
 (function() {
 	'use strict';
 	var DynamicShaderMaterial = require('DynamicShaderMaterial');
+	var MaterialRenderer = require('MaterialRenderer');
+	var DynamicMaterialManager = require('DynamicMaterialManager');
 
 
 	function createNoiseTexture(loadShader) {
@@ -87,6 +89,29 @@
 		});
 	}
 
+	function loadDynamicMaterials(app) {
+		var renderer = app.renderer;
+		var loadShader = app.getLoadShader();
+		var materials = {};
+		var dMM = new DynamicMaterialManager(renderer);
+		var noiseMap = MaterialRenderer.createRenderTarget(512, 512);
+		var noiseTexture = createNoiseTexture(loadShader);
+		dMM.add('perlinNoise', noiseTexture, noiseMap);
+		var glowFlowMap = MaterialRenderer.createRenderTarget(512, 512);
+		var glowFlowTexture = createGlowFlowTexture(loadShader);
+		dMM.add('glowFlowTexture', glowFlowTexture, glowFlowMap);
+		app.onupdate = dMM.update;
+		app.onrender = dMM.render;
+		return {
+			noiseMap: noiseMap,
+			noiseTexture: noiseTexture,
+			glowFlowMap: glowFlowMap,
+			createNormalMaterial: function(heightMap) { return createNormalMaterial(loadShader, heightMap); },
+			createForceFieldMaterial: function() { return createForceFieldMaterial(loadShader, noiseMap.texture); },
+			createGlowFlowMaterial: function() { return createGlowFlowMaterial(loadShader, glowFlowMap.texture, new THREE.Color(0xffff00)); },
+		};
+	}
+
 
 	// export in common js
 	if(typeof module !== 'undefined' && ('exports' in module)){
@@ -96,5 +121,6 @@
 		module.exports.createForceFieldMaterial = createForceFieldMaterial;
 		module.exports.createGlowFlowTexture = createGlowFlowTexture;
 		module.exports.createGlowFlowMaterial = createGlowFlowMaterial;
+		module.exports.loadDynamicMaterials = loadDynamicMaterials;
 	}
 })();

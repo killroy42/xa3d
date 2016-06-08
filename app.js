@@ -14,11 +14,9 @@ function exec(cmd) {
 	return p;
 }
 
+
 console.info('Launching reloaderserver and HTTP server:');
-//exec(npmCmd+' run '+reloaderNpm);
-//exec(npmCmd+' run '+serverNpm);
 exec('http-server.cmd ./src/www -p 80 --cors --utc --silent');
-//exec('http-server.cmd ./src/www -a 127.0.0.1 -p 80 --cors --utc');
 exec('nodemon.cmd src/server/reloader/server.js -- -p 7890');
 //exec('nodemon.cmd src/server/objectserver/server.js -- -p 81');
 exec('nodemon.cmd src/server/xenonetwork/server.js -- -p 82');

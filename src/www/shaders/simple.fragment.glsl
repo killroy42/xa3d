@@ -1,6 +1,6 @@
 uniform vec3 glowColor;
 uniform float alpha;
-uniform sampler2D textureMap;
+//uniform sampler2D textureMap;
 uniform sampler2D alphaMap;
 varying vec2 vUv;
 void main() {

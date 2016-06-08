@@ -8,12 +8,12 @@
 */
 (function() {
 	'use strict';
-
 	var THREE = require('THREE');
+	var EventDispatcher = require('../xeno/EventDispatcher');
 
 
 	function MouseHandler(opts) {
-		//THREE.Object3D.call(this);
+		EventDispatcher.apply(this);
 		var self = this;
 		opts = opts || {};
 		this.domElement = opts.domElement || document;
@@ -69,13 +69,15 @@
 	MouseHandler.DRAGPLANE_GRID.rotateX(90*Math.PI/180);
 	MouseHandler.DRAGPLANE_GRID.material.transparent = true;
 	MouseHandler.DRAGPLANE_GRID.material.opacity = 0.1;
-	MouseHandler.prototype = Object.assign(Object.create(null), THREE.EventDispatcher.prototype);
+	//MouseHandler.prototype = Object.assign(Object.create(null), THREE.EventDispatcher.prototype);
+	MouseHandler.prototype = Object.create(null);
 	MouseHandler.prototype.constructor = THREE.MouseHandler;
 	MouseHandler.prototype.add = function(object) {
 		var interactiveObjects = this.interactiveObjects;
 		if(object.receiveMouseEvents === true && interactiveObjects.indexOf(object) === -1) {
 			//console.info('MouseHandler.add("%s");', object.name, object.receiveMouseEvents);
 			interactiveObjects.push(object);
+			this.dispatchEvent('add', object);
 		}
 		for(var i = 0, l = object.children.length; i < l; i++) {
 			this.add(object.children[i]);
@@ -101,12 +103,12 @@
 		var addFunc = root.add;
 		var removeFunc = root.remove;
 		root.add = function(object) {
-			self.add(object);
 			addFunc.call(root, object);
+			self.add(object);
 		};
 		root.remove = function(object) {
-			self.remove(object);
 			removeFunc.call(root, object);
+			self.remove(object);
 		};
 	};
 	MouseHandler.prototype.enableDragPlane = function(position) {

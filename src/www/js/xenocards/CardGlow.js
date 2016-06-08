@@ -6,7 +6,6 @@
 
 	var cardOutline = assetdata.cardOutline;
 
-
 	function CardGlow(cardShape, material) {
 		var self = this;
 		if(cardShape instanceof THREE.Material) {
@@ -65,6 +64,11 @@
 				scale: 'normal',
 				color: 'green',
 			},
+			hoverProxy: {
+				alpha: 'show',
+				scale: 'small',
+				color: 'yellow',
+			},
 			unhover: {
 				alpha: 'hide',
 				scale: 'tiny',
@@ -81,7 +85,7 @@
 		this.to('hidden');
 	}
 	CardGlow.prototype = Object.create(THREE.Mesh.prototype);
-	CardGlow.prototype.constructor = THREE.CardGlow;
+	CardGlow.prototype.constructor = CardGlow;
 	CardGlow.prototype.to = function(state) {
 		var props = this.properties;
 		var anim = this.animations[state];

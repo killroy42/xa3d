@@ -8,7 +8,7 @@ var NetworkClient = require('./NetworkClient');
 
 function NetworkServer() {
 	EventDispatcher.apply(this);
-	this.connection = undefined;
+	this.connectionServer = undefined;
 	this.clients = [];
 }
 NetworkServer.handleConnectionDisconnected = function(reason) {
@@ -43,6 +43,13 @@ NetworkServer.prototype.handleClientDisconnect = function(client, reason) {
 };
 NetworkServer.prototype.getPeers = function(client) {
 	return this.clients.filter(function(peer) { return peer !== client; });
+};
+NetworkServer.prototype.findNetId = function(id) {
+	var clients = this.clients;
+	for(var i = 0, l = clients.length; i < l; i++) {
+		var netIds = clients[i].netIds;
+		if(netIds[id] !== undefined) return netIds[id];
+	}
 };
 
 

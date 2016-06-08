@@ -7,7 +7,7 @@ var EventDispatcher = require('./EventDispatcher');
 function Connection() {
 	EventDispatcher.apply(this);
 	this.isConnected = false;
-	this.isClient = false;
+	this.isClient = undefined;
 	this.isServer = undefined;
 }
 Connection.prototype = Object.create(null);
@@ -22,8 +22,6 @@ Connection.prototype.connect = function() {
 Connection.prototype.disconnect = function() {
 	//console.error('Connection.disconnect();');
 	this.assertConnected();
-	this.isClient = false;
-	this.isServer = false;
 	this.isConnected = false;
 	return this;
 };

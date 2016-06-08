@@ -1,5 +1,9 @@
 (function () {
 	var THREE = require('THREE');
+	var EventDispatcher = require('../xeno/EventDispatcher');
+	var AnimationHelpers = require('AnimationHelpers');
+
+	var animatePosition = AnimationHelpers.animatePosition;
 
 
 	function XenoCard3D() {
@@ -23,10 +27,30 @@
 	XenoCard3D.GEOMETRY_OFFSET = new THREE.Vector3(0, 3, 0);
 	XenoCard3D.PORTRAIT_SCALE = 0.37;
 	XenoCard3D.FORWARDED_EVENTS = ['mousemove', 'mousedown', 'mouseup', 'click', 'dragstart', 'dragfinish', 'drag', 'mouseenter', 'mouseleave'];
+	XenoCard3D.animateMesh = function(mesh, moveVector, snap, done) {
+		if(snap !== false) snap = true;
+		//console.info('XenoCard3D.animateMesh(mesh, %s, %s, done);', moveVector.toString(), snap);
+		var duration = 0.1;
+		var easing = Power4.easeOut;
+		if(snap === false) {
+			duration = 0.3;
+			easing = Power4.easeInOut;
+		}
+		if(mesh.meshTween) {
+			mesh.meshTween.kill();
+			moveVector.sub(mesh.position);
+			mesh.position.set(0, 0, 0);
+			easing = Power4.easeOut;
+		}
+		mesh.position.sub(moveVector);
+		var meshVector = mesh.position.clone().negate();
+		mesh.meshTween = animatePosition(mesh.position, moveVector, duration, easing, done);
+	};
 	XenoCard3D.prototype = Object.create(null);
 	XenoCard3D.prototype.constructor = XenoCard3D;
 	XenoCard3D.prototype.createCard = function(portraitTex) {
 		var card = new THREE.Object3D();
+		EventDispatcher.apply(card);
 		card.name = 'card';
 		//card.receiveMouseEvents = true;
 		card.childrenReceiveMouseEvents = true;
@@ -46,26 +70,24 @@
 			body.add(face);
 			body.add(text);
 			body.add(portrait);
-
 			var collider = new THREE.Mesh(res.body, new THREE.MeshBasicMaterial({color: 0x000000, visible: false}));
 			collider.name = 'card.collider';
 			collider.receiveMouseEvents = true;
 			collider.draggable = true;
 			card.collider = collider;
-
-			var eventForwarder = function(e) {
-				//console.log('XenoCard3D forwarding event:', e.type);
-				card.dispatchEvent(e);
-			};
+			var eventForwarder = function(e) { card.dispatchEvent(e); };
 			XenoCard3D.FORWARDED_EVENTS.forEach(function(eventName) {
 				collider.addEventListener(eventName, eventForwarder);
 			});
-
 			card.add(card.mesh);
 			card.add(card.collider);
-
 			card.dispatchEvent({type: 'meshReady'});
 		});
+		card.animateVector = function(moveVector, snap) {
+			return XenoCard3D.animateMesh(this.mesh, moveVector, snap, function() {
+				//console.info('createCard > animateVector > done!');
+			});
+		};
 		return card;
 	};
 	XenoCard3D.prototype.loadAssets = function() {
@@ -168,7 +190,6 @@
 		portGeo.uvsNeedUpdate = true;
 		return portGeo;
 	};
-
 
 
 	if(typeof module !== "undefined" && ('exports' in module)){

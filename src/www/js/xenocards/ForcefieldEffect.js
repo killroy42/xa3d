@@ -3,15 +3,16 @@
 	var assetdata = require('assetdata');
 	var GeometryHelpers = require('GeometryHelpers');
 	
-	var createForceFieldMaterial = require('createForceFieldMaterial');
+	//var createForceFieldMaterial = require('createForceFieldMaterial');
 
 	var cardOutline = assetdata.cardOutline;
 	var normalizeUVs = GeometryHelpers.normalizeUVs;
 	var convexHull = GeometryHelpers.convexHull;
 
-	function ForcefieldEffect(loadShader, noiseMap) {
+	//function ForcefieldEffect(loadShader, noiseMap) {
+	function ForcefieldEffect(material) {
 		var geometry = this.createGeometry();
-		var material = createForceFieldMaterial(loadShader, noiseMap);
+		//var material = createForceFieldMaterial(loadShader, noiseMap);
 		THREE.Mesh.call(this, geometry, material);
 		this.type = 'ForcefieldEffect';
 	}

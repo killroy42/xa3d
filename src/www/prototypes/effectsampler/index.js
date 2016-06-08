@@ -10,19 +10,13 @@ var THREEPrototype = require('THREEPrototype');
 var GeometryHelpers = require('GeometryHelpers');
 var MouseHandler = require('MouseHandler');
 var MouseCursor = require('MouseCursor');
-//var XenoCard = require('XenoCard');
 var ForcefieldEffect = require('ForcefieldEffect');
 var CardGlow = require('CardGlow');
 var initLights = require('initLights');
 var createBoard = require('createBoard');
 var assetdata = require('assetdata');
 var XenoCard3D = require('XenoCard3D');
-
-var createNoiseTexture = require('createNoiseTexture');
-var createNormalMaterial = require('createNormalMaterial');
-var createForceFieldMaterial = require('createForceFieldMaterial');
-var createGlowFlowTexture = require('createGlowFlowTexture');
-var createGlowFlowMaterial = require('createGlowFlowMaterial');
+var loadDynamicMaterials = require('loadDynamicMaterials');
 
 var getRandomPortraitUrl = assetdata.getRandomPortraitUrl;
 var snapCardPosition = assetdata.snapCardPosition;
@@ -38,17 +32,16 @@ function makeEffectNone() {
 	};
 }
 
-function makeEffectForceField(loadShader, noiseMap) {
+function makeEffectForceField(forcefieldMaterial) {
 	return function(card) {
-		var forcefield = new ForcefieldEffect(loadShader, noiseMap);
+		var forcefield = new ForcefieldEffect(forcefieldMaterial);
 		card.add(forcefield);
 	};
 }
 
-function makeEffectCardGlow(loadShader, glowFlowMap, color, scale) {
+function makeEffectCardGlow(createGlowFlowMaterial, color, scale) {
 	return function(card) {
-		var glowFlowMaterial = createGlowFlowMaterial(loadShader, glowFlowMap, new THREE.Color(0xffff00));
-		var cardGlow = new CardGlow(glowFlowMaterial);
+		var cardGlow = new CardGlow(createGlowFlowMaterial());
 		cardGlow.hover();
 		cardGlow.properties.color.to(color, 0);
 		cardGlow.properties.scale.to(scale, 0);
@@ -62,10 +55,9 @@ function makeEffectCardGlow(loadShader, glowFlowMap, color, scale) {
 	};
 }
 
-function makeEffectCardGlowInteractive(loadShader, glowFlowMap) {
+function makeEffectCardGlowInteractive(createGlowFlowMaterial) {
 	return function(card) {
-		var glowFlowMaterial = createGlowFlowMaterial(loadShader, glowFlowMap, new THREE.Color(0xffff00));
-		var cardGlow = new CardGlow(glowFlowMaterial);
+		var cardGlow = new CardGlow(createGlowFlowMaterial());
 		cardGlow.hover();
 		cardGlow.properties.color.to('green', 0);
 		card.add(cardGlow);
@@ -101,6 +93,10 @@ function makeEffectCardGlowInteractive(loadShader, glowFlowMap) {
 		var loadTexture = this.getLoadTexture();
 		var loadShader = this.getLoadShader();
 		var xenoCard3D = new XenoCard3D();
+		var materialLoader = loadDynamicMaterials(this);
+		var forcefieldMaterial = materialLoader.createForceFieldMaterial();
+		var createGlowFlowMaterial = materialLoader.createGlowFlowMaterial;
+
 		// Camera & Lights
 			this.setCamera(new THREE.Vector3(0, -300, 600), new THREE.Vector3(0, -40, 0));
 			initLights(this);
@@ -108,24 +104,13 @@ function makeEffectCardGlowInteractive(loadShader, glowFlowMap) {
 			var boardTex = loadTexture(boardTextureUrl);
 			var boardAlpha = loadTexture(boardAlphaUrl);
 			scene.add(createBoard(boardTex, boardAlpha));
-		// Materials
-			var dMM = new DynamicMaterialManager(this.renderer);
-			var noiseMap = MaterialRenderer.createRenderTarget(512, 512);
-			var noiseTexture = createNoiseTexture(loadShader);
-			dMM.add('perlinNoise', noiseTexture, noiseMap);
-			var glowFlowMap = MaterialRenderer.createRenderTarget(512, 512);
-			var glowFlowTexture = createGlowFlowTexture(loadShader);
-			dMM.add('glowFlowTexture', glowFlowTexture, glowFlowMap);
-			this.onupdate = dMM.update;
-			this.onrender = dMM.render;
 		// Effects
-			//var cardTex = loadTexture(cardImageUrl);
 			[
-				makeEffectForceField(loadShader, noiseMap),
-				makeEffectCardGlowInteractive(loadShader, glowFlowMap),
-				makeEffectCardGlow(loadShader, glowFlowMap, 'red', 'small'),
-				makeEffectCardGlow(loadShader, glowFlowMap, 'red', 'normal'),
-				makeEffectCardGlow(loadShader, glowFlowMap, 'red', 'big'),
+				makeEffectForceField(forcefieldMaterial),
+				makeEffectCardGlowInteractive(createGlowFlowMaterial),
+				makeEffectCardGlow(createGlowFlowMaterial, 'red', 'small'),
+				makeEffectCardGlow(createGlowFlowMaterial, 'red', 'normal'),
+				makeEffectCardGlow(createGlowFlowMaterial, 'red', 'big'),
 			].forEach(function(initEffect, idx, arr) {
 				var x = (idx - 0.5 * (arr.length - 1)) * 168;
 				var card = xenoCard3D.createCard(loadTexture(getRandomPortraitUrl()));
@@ -135,7 +120,7 @@ function makeEffectCardGlowInteractive(loadShader, glowFlowMap) {
 			});
 			[0x3dc2ff, 0xe3ae00, 0x199f02, 0x6c324d, 0xf0bb99,0xed3a38]
 			.map(function(colorHex) {
-				return makeEffectCardGlow(loadShader, glowFlowMap, new THREE.Color(colorHex), 'small');
+				return makeEffectCardGlow(createGlowFlowMaterial, new THREE.Color(colorHex), 'small');
 			})
 			.forEach(function(initEffect, idx, arr) {
 				var x = (idx - 0.5 * (arr.length - 1)) * 168;

@@ -1,115 +1,61 @@
 (function() {
 var THREE = require('enhanceTHREE')(require('THREE'));
-var io = require('lookup');
 var THREEPrototype = require('THREEPrototype');
 var MouseHandler = require('MouseHandler');
 var MouseCursor = require('MouseCursor');
+var ControlsSwitcher = require('ControlsSwitcher');
 var initLights = require('initLights');
 var createBoard = require('createBoard');
+var assetdata = require('assetdata');
+//var DragAndDrop = require('DragAndDrop');
 var WebSocketConnection = require('WebSocketConnection');
 var NetworkClient = require('NetworkClient');
+var GameClient = require('GameClient');
+var BoxBlueprint = require('BoxBlueprint');
+var CardBlueprint = require('CardBlueprint');
+var GameBlueprint = require('GameBlueprint');
+var PlayerBlueprint = require('PlayerBlueprint');
+var XenoCard3D = require('XenoCard3D');
+//var CardGlow = require('CardGlow');
+var loadDynamicMaterials = require('loadDynamicMaterials');
 
-var boardImageUrl = '/images/xa_board_a_3.jpg';
-var boardAlphaUrl = '/images/xa_board_alpha.png';
+var getRandomPortraitUrl = assetdata.getRandomPortraitUrl;
+var cardInfo = assetdata.cardInfo;
+var cardW = cardInfo.width, cardH = cardInfo.height;
+var cardBoardZ = cardInfo.boardZ, cardDragZ = cardInfo.dragZ;
+var boardTextureUrl = assetdata.boardTextureUrl;
+var boardAlphaUrl = assetdata.boardAlphaUrl;
 
 
-function logNetIdMsg(msg) {
-	console.log('[C <- S id.msg] %s: "%s"', this.id, msg);
-}
-
-function initClient(app) {
-	var scene = app.scene;
-	var mouseHandler = app.mouseHandler;
-	//var client = new NetworkClient().connect(new WebSocketConnection().connect({port: 82}));
-	var client = new NetworkClient().connect(new WebSocketConnection());
-	client.connection.connect({port: 82});
-	var gui = new dat.GUI();
-	var guiOpts = {
-		'Connect': function() {
-			client.connection.connect({port: 82});
+function createCardGlowListeners(scene, glowFlowMaterial) {
+	var cardGlow = new CardGlow(glowFlowMaterial);
+	scene.add(cardGlow);
+	return {
+		mouseenter: function() {
+			cardGlow.position.copy(this.position);
+			cardGlow.hover();
 		},
-		'Disconnect': function() {
-			client.connection.disconnect();
+		mouseleave: cardGlow.unhover,
+		dragstart: function() {
+			cardGlow.position.copy(this.position);
+			cardGlow.dragstart();
 		},
-		'Add netId': function() {
-			client.createNetId();
+		drag: function() {
+			cardGlow.position.copy(this.position);
 		},
-		'Remove first netId': function() {
-			var netId;
-			var ids = Object.keys(client.netIds);
-			for(var i = 0; i < ids.length; i++) {
-				netId = client.getNetId(ids[i]);
-				if(netId.isReady && netId.isOwner) break;
-			}
-			if(netId === undefined) {
-				console.log('No netIds to remove');
-				return;
-			}
-			console.log('Removing:', netId.serialize());
-			netId.destroy();
+		dragfinish: function() {
+			cardGlow.position.copy(this.position);
+			cardGlow.dragfinish();
 		},
-		'Stress Test': function() {
-			setInterval(function() { console.clear(); }, 5000);
-			setInterval(function() {
-				switch(Math.floor(Math.random()*6)) {
-					case 0:
-						if(client.connection.isConnected === false) {
-							console.log('CONNECT');
-							client.connection.connect({port: 82});
-							break;
-						}
-						console.log('DISCONNECT');
-						client.connection.disconnect();
-						break;
-					case 1: case 2: case 3:
-						if(client.connection.isConnected === false) {
-							console.log('CONNECT');
-							client.connection.connect({port: 82});
-							break;
-						}
-						console.log('CREATE');
-						client.createNetId();
-						break;
-					case 4: case 5:
-						if(client.connection.isConnected === false) {
-							console.log('CONNECT');
-							client.connection.connect({port: 82});
-							break;
-						}
-						var netIds = Object.keys(client.netIds)
-						.map(function(id) { return client.getNetId(id); })
-						.filter(function(netId) { return netId.isReady && netId.isOwner; });
-						if(netIds.length > 0) {
-							console.log('DESTROY');
-							netIds[0].destroy();
-						}
-					break;
-				}
-			}, 100);
-		},
+		mousedown: cardGlow.mousedown,
+		mouseup: cardGlow.mouseup,
 	};
-	Object.keys(guiOpts).forEach(function(key) { gui.add(guiOpts, key); });
-	//gui.close();
-
-	var lastReportString = '';
-	setInterval(function() {
-		reportString = 'Client['+client.id+']: '+
-			Object.keys(client.netIds)
-			.map(function(id) {
-				var netId = client.netIds[id];
-				return '('+netId.id+'/'+(netId.isProxy?'P':'C')+')';
-			}).join(' ');
-		if(reportString !== lastReportString) {
-			//console.log('netIds.length:', Object.keys(client.netIds).length);
-			console.log(reportString);
-			lastReportString = reportString;
-		}
-	}, 10);
 }
 
 function Prototype_init() {
+	var scene = this.scene;
 	var loadTexture = this.getLoadTexture();
-	var boardTex = loadTexture(boardImageUrl);
+	var boardTex = loadTexture(boardTextureUrl);
 	var boardAlpha = loadTexture(boardAlphaUrl);
 	var mouseHandler = this.mouseHandler = new MouseHandler({
 		domElement: this.renderer.domElement,
@@ -117,10 +63,35 @@ function Prototype_init() {
 		scene: this.scene
 	});
 	var pointer = new MouseCursor({scene: this.scene}).attach(mouseHandler);
+	var controlsSwitcher = new ControlsSwitcher(this.controls).attach(mouseHandler);
+	var xenoCard3D = new XenoCard3D();
+	var materials = loadDynamicMaterials(this);
+
 	this.setCamera(new THREE.Vector3(0, -400, 1000), new THREE.Vector3(0, -90, 0));
 	initLights(this);
 	this.scene.add(createBoard(boardTex, boardAlpha));
-	initClient(this);
+	
+	var gameClient = new GameClient();
+	var context = {
+		app: this,
+		materials: materials,
+		scene: scene,
+		loadTexture: loadTexture,
+		xenoCard3D: xenoCard3D
+	};
+
+	BoxBlueprint.context = context;
+	CardBlueprint.context = context;
+	GameBlueprint.context = context;
+	PlayerBlueprint.context = context;
+	gameClient.netClient.registerBlueprint('BoxBlueprint', BoxBlueprint);
+	gameClient.netClient.registerBlueprint('CardBlueprint', CardBlueprint);
+	gameClient.netClient.registerBlueprint('GameBlueprint', GameBlueprint);
+	gameClient.netClient.registerBlueprint('PlayerBlueprint', PlayerBlueprint);
+	gameClient.connect({port: 82});
+	gameClient.connection.on('connected', function() {
+		var player = gameClient.netClient.instantiateBlueprint('PlayerBlueprint');
+	});
 }
 
 document.addEventListener('DOMContentLoaded', function init() {

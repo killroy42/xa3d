@@ -2,18 +2,31 @@
 'use strict';
 
 var EventDispatcher = require('./EventDispatcher');
+var Network = require('./Network');
 
 
 function NetId(client, id, isProxy) {
+	//console.info('new NetId(client, %s, %s);', id, isProxy === true);
 	EventDispatcher.apply(this);
 	var isOwner = isProxy !== true;
-	this.state = NetId.READY;
+	var state = NetId.READY;
 	this.client = client;
 	this.id = id;
 	Object.defineProperties(this, {
 		isProxy: { get: function() { return !isOwner; } },
 		isOwner: { get: function() { return isOwner; } },
 		isReady: { get: function() { return this.state === NetId.READY; } },
+		state: {
+			get: function() {
+				return state;
+			},
+			set: function(val) {
+				state = val;
+				if(state === NetId.ISDESTROYING) this.dispatchEvent('requestdestroy');
+				else if(state === NetId.DESTROYED) this.dispatchEvent('destroyed');
+				return state;
+			}
+		},
 	});
 }
 NetId.READY = 'READY';
@@ -27,12 +40,14 @@ NetId.prototype.constructor = NetId;
 		this.assertOwner();
 		this.assertState(NetId.READY);
 		this.state = NetId.ISDESTROYING;
-		this.dispatchEvent('requestdestroy');
 	};
 	NetId.prototype.send = function(msg) {
-		var debugLabel = this.client.isClient()?'C -> S':'S -> C';
-		console.log('[%s] %s: %s', debugLabel, this.id, JSON.stringify(msg));
-		this.client.send('id.msg', {id: this.id, msg: msg});
+		//var debugLabel = this.client.isClient?'C -> S':'S -> C';
+		//console.log('[%s] %s: %s', debugLabel, this.id, JSON.stringify(msg));
+		this.client.send(Network.MSG_NETID_MSG, {id: this.id, msg: msg});
+	};
+	NetId.prototype.sendToPeers = function(msg) {
+		this.client.send(Network.MSG_NETID_MSG_PEERS, {id: this.id, msg: msg});
 	};
 // Serialization
 	NetId.prototype.serialize = function() {

@@ -50,6 +50,33 @@
 	};
 
 
+	function animatePosition(position, vector, duration, easing, done) {
+		if(duration === undefined) duration = 0.1;
+		if(easing === undefined) easing = Power4.easeOut;
+		/*
+		return TweenMax.to({t: 0}, duration, {
+			t: 1, ease: easing,
+			onUpdate: function() {
+				var progress = this.target.t;
+				position.copy(vector);
+				position.multiplyScalar(-(1-progress));
+			},
+			onComplete: function() {
+				if(typeof done === 'function') done();
+			}
+		});
+		*/
+		var anim = {
+			x: position.x+vector.x,
+			y: position.y+vector.y,
+			z: position.z+vector.z,
+			ease: easing
+		};
+		if(typeof done === 'function') anim.onComplete = done;
+		return TweenMax.to(position, duration, anim);
+	}
+
+
 	function AnimationHelpers(){}
 	AnimationHelpers.prototype = Object.create(null);
 	AnimationHelpers.prototype.constructor = AnimationHelpers;
@@ -58,5 +85,6 @@
 	if(typeof module !== "undefined" && ('exports' in module)){
 		module.exports = AnimationHelpers;
 		module.exports.PropertyAnimator = PropertyAnimator;
+		module.exports.animatePosition = animatePosition;
 	}
 })();
