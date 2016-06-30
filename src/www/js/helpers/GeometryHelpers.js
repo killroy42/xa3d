@@ -127,6 +127,161 @@ function normalizeUVs(geometry, min, max, offset) {
 	geometry.uvsNeedUpdate = true;
 }
 
+
+function geometryToJson(geo) {
+	var json = {};
+	var decimals = 5;
+	function v2j(v) {
+		if(v.z !== undefined)	return [Number(v.x.toFixed(decimals)),Number(v.y.toFixed(decimals)),Number(v.z.toFixed(decimals))];
+		return [Number(v.x.toFixed(decimals)),Number(v.y.toFixed(decimals))];
+	}
+	json.uuid = geo.uuid;
+	json.type = geo.type;
+	var vs = geo.vertices;
+	json.faces = geo.faces.map(function(f) {
+		return [
+			v2j(vs[f.a]),
+			v2j(vs[f.b]),
+			v2j(vs[f.c]),
+			f.materialIndex,
+			/*
+			v2j(f.vertexNormals[0]),
+			v2j(f.vertexNormals[1]),
+			v2j(f.vertexNormals[2]),
+			v2j(f.normal),
+			*/
+		];
+	});
+	json.uvs = geo.faceVertexUvs.map(function(uvLayer) {
+		return uvLayer.map(function(uvs) {
+			return [v2j(uvs[0]), v2j(uvs[1]), v2j(uvs[2])];
+		});
+	});
+	return json;
+}
+
+function geometryFromJson(json) {
+	var geo = new THREE.Geometry();
+	geo.uuid = json.uuid;
+	geo.type = json.type;
+	json.faces
+	.forEach(function(f) {
+		if(f[0][2] === undefined) f[0][2] = 0;
+		if(f[1][2] === undefined) f[1][2] = 0;
+		if(f[2][2] === undefined) f[2][2] = 0;
+		geo.vertices.push(new THREE.Vector3(f[0][0], f[0][1], f[0][2]));
+		geo.vertices.push(new THREE.Vector3(f[1][0], f[1][1], f[1][2]));
+		geo.vertices.push(new THREE.Vector3(f[2][0], f[2][1], f[2][2]));
+		var vi = geo.vertices.length - 3;
+		var face = new THREE.Face3(vi, vi+1, vi+2);
+		face.materialIndex = f[3];
+		/*
+		face.vertexNormals = [
+			new THREE.Vector3(f[3][0],f[3][1],f[3][2]),
+			new THREE.Vector3(f[4][0],f[4][1],f[4][2]),
+			new THREE.Vector3(f[5][0],f[5][1],f[5][2]),
+		];
+		face.normal = new THREE.Vector3(f[6][0],f[6][1],f[6][2]);
+		*/
+		geo.faces.push(face);
+	});
+	geo.faceVertexUvs = json.uvs.map(function(uvs) {
+		return uvs.map(function(uv) {
+			return [
+				new THREE.Vector2(uv[0][0],uv[0][1]),
+				new THREE.Vector2(uv[1][0],uv[1][1]),
+				new THREE.Vector2(uv[2][0],uv[2][1]),
+			];
+		});
+	});
+	geo.verticesNeedUpdate = true;
+	geo.elementsNeedUpdate = true;
+	geo.uvsNeedUpdate = true;
+	geo.normalsNeedUpdate = true;
+	geo.colorsNeedUpdate = true;
+	geo.groupsNeedUpdate = true;
+	geo.computeBoundingBox();
+	geo.computeFaceNormals();
+	geo.computeVertexNormals();
+	return geo;
+}
+
+function geometryToObj(geo) {
+	console.log(geo.vertices.length);
+	console.log(geo.faces.length);
+	var objVertices = geo.vertices
+		.map(function(v) { return 'v '+v.x+' '+v.y+' '+v.z+'\r\n'; })
+		.join('');
+	var objFaces = geo.faces
+		.map(function(f) { return 'f '+(f.a+1)+' '+(f.b+1)+' '+(f.c+1)+'\r\n'; })
+		.join('');
+	return objVertices+objFaces;
+	/*
+	var faces = geo.faces;
+	var verts = [];
+	var vIndex = {};
+	var i, vi, v, vKey;
+	i = faces.length; while(i--) {
+		for(vi = 0; vi < 3; vi++) {
+			v = faces[i][vi];
+			if(v[2] === undefined) v[2] = 0; // Fix exporter bug
+			vKey = JSON.stringify(v);
+			if(vIndex[vKey] === undefined) {
+				verts.push(v);
+				vIndex[vKey] = verts.length;
+			}
+		}
+	}
+	var objVerts = verts
+		.map(function(v) {
+			return 'v '+v[0]+' '+v[1]+' '+v[2]+'\r\n';
+		})
+		.join('');
+	var objFaces = faces
+		.map(function(f) {
+			var a = JSON.stringify(f[0]);
+			var b = JSON.stringify(f[1]);
+			var c = JSON.stringify(f[2]);
+			return 'f '+vIndex[a]+' '+vIndex[b]+' '+vIndex[c]+'\r\n';
+		})
+		.join('');
+	return objVerts+objFaces;
+	*/
+}
+
+function jsonToObj(json) {
+	var faces = json.faces;
+	var verts = [];
+	var vIndex = {};
+	var i, vi, v, vKey;
+	i = faces.length; while(i--) {
+		for(vi = 0; vi < 3; vi++) {
+			v = faces[i][vi];
+			if(v[2] === undefined) v[2] = 0; // Fix exporter bug
+			vKey = JSON.stringify(v);
+			if(vIndex[vKey] === undefined) {
+				verts.push(v);
+				vIndex[vKey] = verts.length;
+			}
+		}
+	}
+	var objVerts = verts
+		.map(function(v) {
+			return 'v '+v[0]+' '+v[1]+' '+v[2]+'\r\n';
+		})
+		.join('');
+	var objFaces = faces
+		.map(function(f) {
+			var a = JSON.stringify(f[0]);
+			var b = JSON.stringify(f[1]);
+			var c = JSON.stringify(f[2]);
+			return 'f '+vIndex[a]+' '+vIndex[b]+' '+vIndex[c]+'\r\n';
+		})
+		.join('');
+	return objVerts+objFaces;
+}
+
+
 // Convex hull algorithm: convexHull(pointset, concavity, format);
 var convexHull = (function() {
 	// intersect
@@ -421,6 +576,10 @@ if(typeof module !== "undefined" && ('exports' in module)){
 	module.exports.radialSort = radialSort;
 	module.exports.optimizeOutline = optimizeOutline;
 	module.exports.normalizeUVs = normalizeUVs;
+	module.exports.geometryToJson = geometryToJson;
+	module.exports.geometryFromJson = geometryFromJson;
+	module.exports.geometryToObj = geometryToObj;
+	module.exports.jsonToObj = jsonToObj;
 	module.exports.convexHull = convexHull;
 }
 })();

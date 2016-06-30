@@ -4,16 +4,18 @@
 var EventDispatcher = require('./EventDispatcher');
 var Network = require('./Network');
 var NetId = require('./NetId');
-var BlueprintCore = require('./BlueprintCore');
+var BlueprintManager = require('./BlueprintManager');
 
 
-function NetworkClient() {
+function NetworkClient(opts) {
 	EventDispatcher.apply(this);
+	opts = opts || {};
 	this.connection = undefined;
 	this.netIds = {};
 	this.id = NetworkClient.NOID;
 	this.pendingNetIdCreate = {};
-	this.blueprints = {};
+	//this.blueprints = {};
+	this.blueprints = opts.blueprints || new BlueprintManager();
 	Object.defineProperties(this, {
 		isServer: { get: function() { return this.connection.isServer; } },
 		isClient: { get: function() { return this.connection.isClient; } },
@@ -54,22 +56,17 @@ NetworkClient.prototype.constructor = NetworkClient;
 		for(var i = 0, l = peers.length; i < l; i++) peers[i].sendData(data);
 	};
 // Blueprints
-	NetworkClient.prototype.registerBlueprint = function(name, blueprint) {
-		this.blueprints[name] = BlueprintCore.createBlueprint(name, blueprint);
+	NetworkClient.prototype.registerBlueprint = function(name, blueprint, context) {
+		this.blueprints.register(name, blueprint, context);
 	};
 	NetworkClient.prototype.instantiateBlueprint = function(name, state, netId) {
+		// FIXIT: netId could be a promise!
 		if(state instanceof NetId) {
 			netId = state;
 			state = {};
 		}
-		if(state === undefined) state = {};
 		if(netId === undefined) netId = this.createNetId(); // optionally create new NetId
-		//console.info('NetworkClient.instantiateBlueprint("%s", {%s}, netId);', name, Object.keys(state).join(','));
-		if(this.blueprints[name] === undefined) {
-			this.blueprints[name] = BlueprintCore.createBlueprint(name);
-		}
-		var Blueprint = this.blueprints[name];
-		return new Blueprint(netId, state);
+		return this.blueprints.instantiate(netId, name, state);
 	};
 // NetId
 	NetworkClient.prototype.createNetId = function(ref, id) {

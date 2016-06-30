@@ -1,0 +1,28 @@
+{
+  "name": "portable-events",
+  "version": "1.0.1",
+  "description": "Simple, node/browser compatible generic event system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/killroy42/portable-events.git"
+  },
+  "keywords": [
+    "events",
+    "browser",
+    "node"
+  ],
+  "author": {
+    "name": "Sven Neumann",
+    "email": "killroy@gmail.com",
+    "url": "http://svenneumann.com/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/killroy42/portable-events/issues"
+  },
+  "homepage": "https://github.com/killroy42/portable-events#readme"
+}

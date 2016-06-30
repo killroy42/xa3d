@@ -9,7 +9,7 @@
 		this.cssBackground = opts.background || '#000';
 		this.fov = opts.fov || 50;
 		this.initialized = false;
-		this.cache = {};
+		this._resCache = {};
 	}
 	Prototype.PATH_SHADER = '/shaders/';
 	Prototype.EXT_SHADER = '.glsl';
@@ -21,8 +21,7 @@
 		var head = document.head;
 		var headStyleTags = head.getElementsByTagName('style');
 		var styleTag = document.createElement('style');
-		styleTag.type = 'text/css';
-		if(headStyleTags.length > 0) {
+		styleTag.type = 'text/css'; if(headStyleTags.length > 0) {
 			head.insertBefore(styleTag, headStyleTags[0]);
 		} else {
 			head.appendChild(styleTag);
@@ -134,6 +133,20 @@
 	Prototype.prototype.stop = function() {
 		console.warn('Currently not animating.');
 	};
+	Prototype.prototype.fetchResource = function(url) {
+		this._resCache[url] = fetch(url);
+		return this._resCache[url];
+	};
+	Prototype.prototype.loadResourceArrayBuffer = function(url) {
+		this._resCache[url] = this.fetchResource(url)
+		.then(function(res) { return res.arrayBuffer(); });
+		return this._resCache[url];
+	};
+	Prototype.prototype.loadResource = function(url) {
+		this._resCache[url] = this.fetchResource(url)
+		.then(function(res) { return res.text(); });
+		return this._resCache[url];
+	};
 	Prototype.prototype.loadTexture = function(url) {
 		var self = this;
 		var boundErrorHandler = function(err) { return this.handleError(err); };
@@ -150,11 +163,7 @@
 	};
 	Prototype.prototype.loadShader = function(name) {
 		var url = Prototype.PATH_SHADER + name + Prototype.EXT_SHADER;
-		//console.info('Prototype.loadShader("%s");', url);
-		if(this.cache[url] === undefined) {
-			this.cache[url] = fetch(url).then(function(res) { return res.text(); });
-		}
-		return this.cache[url];
+		return this.loadResource(url);
 	};
 	Prototype.prototype.getLoadShader = function() {
 		var self = this;

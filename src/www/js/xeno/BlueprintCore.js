@@ -6,11 +6,12 @@ var EventDispatcher = require('./EventDispatcher');
 
 var PeerType = Network.PeerType;
 
+
 function BlueprintCore(netId, state) {
 	//console.info('new BlueprintCore(netId, %s);', JSON.stringify(state));
 	EventDispatcher.apply(this);
 	var self = this;
-	this.state = state;
+	this.state = state || {};
 	this.peerType = PeerType.DISCONNECTED;
 	Object.defineProperties(this, {
 		isClient: {get: function() { return this.peerType === PeerType.CLIENT; }},
@@ -20,7 +21,7 @@ function BlueprintCore(netId, state) {
 	Promise.resolve(netId)
 	.then(function(netId) { self.initialize(netId); });
 }
-BlueprintCore.createBlueprint = function(name, blueprint) {
+BlueprintCore.createBlueprint = function(name, blueprint, context) {
 	if(blueprint === undefined) blueprint = {name: name};
 	//console.info('BlueprintCore.createBlueprint("%s", blueprint{%s});', name, Object.keys(blueprint).join(', '));
 	var Blueprint = function() {
@@ -31,6 +32,7 @@ BlueprintCore.createBlueprint = function(name, blueprint) {
 	Object.keys(blueprint).forEach(function(key) {
 		prototypeProperties[key] = { value: blueprint[key], enumerable: true };
 	});
+	if(context !== undefined) prototypeProperties.context = { value: context, enumerable: true };
 	var prototype = Object.create(BlueprintCore.prototype, prototypeProperties);
 	Object.defineProperties(Blueprint, {
 		name: { value: blueprint.name, enumerable: true },

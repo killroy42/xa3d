@@ -12,7 +12,7 @@ function WebSocketConnectionServer() {
 	ConnectionServer.apply(this);
 	this.stats = {
 		collectInterval: 50,
-		reportInterval: 500,
+		reportInterval: 5000,
 		count: 20+1,
 		intervals: [],
 		getTime: function() {

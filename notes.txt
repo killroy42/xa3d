@@ -13,3 +13,21 @@ mogrify -background #7f7f61 -flatten -strip -format jpg -interlace Plane -qualit
 
 
 mogrify  -resize 512x512! -background #7f7f61 -flatten -strip -format jpg -interlace Plane -quality 60 -path ../ *.png
+
+display -size 200x100 -depth 32 -define quantum:format=floating-point -define quantum:scale=65536.0 -endian lsb out.rgb
+
+
+gm convert -depth 32 -define quantum:format=floating-point -define quantum:scale=255.0 -endian lsb -size 200x200+0 gray:map.raw -quality 100 map.jpg
+
+gm convert -depth 32 -define quantum:format=floating-point -endian lsb -size 200x200+0 gray:map.raw -quality 100 map.jpg
+gm convert -depth 32 -define quantum:format=floating-point -endian lsb -size 200x200+0 gray:map.raw -quality 100 map.png
+
+gm convert -depth 32 -define quantum:format=floating-point -endian lsb -size 200x200+0 -equalize gray:map.raw map.png
+gm convert -depth 32 -define quantum:format=floating-point -endian lsb -size 200x200+0 -equalize gray:map.raw -depth 32 gray:map.tif
+
+
+gm convert -depth 32 -define quantum:format=floating-point -endian lsb -size 200x200+0 gray:map04.raw -quality 100 map04.jpg
+
+gm convert -depth 8 -size 200x200+0 gray:map04.raw -quality 100 map04.jpg
+
+

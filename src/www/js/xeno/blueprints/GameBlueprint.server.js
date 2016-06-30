@@ -60,6 +60,9 @@ var blueprint = {
 		var netId = this.netId;
 		var snapCardPosition = self.context.assetdata.snapCardPosition;
 		var cards = this.cards = [];
+		for(var i = 0; i < 14; i++) {
+			this.createCard();
+		}
 	},
 	OnDestroy: function() {
 		console.info('GameBlueprint.server.OnDestroy();');

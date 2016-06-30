@@ -76,7 +76,7 @@ function createCardGlowListeners(scene, glowFlowMaterial) {
 		var noiseMap = materialLoader.noiseMap.texture;
 		var glowFlowMaterial = materialLoader.createGlowFlowMaterial();
 
-		document.documentElement.style.cursor = 'none';
+		//document.documentElement.style.cursor = 'none';
 
 		this.setCamera(new THREE.Vector3(0, -400, 1000), new THREE.Vector3(0, -90, 0));
 		initLights(this);
