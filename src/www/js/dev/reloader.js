@@ -12,4 +12,8 @@
 			}, RELOADER_TIMEOUT);
 		});
 	});
+	ws.addEventListener('error', function(err) {
+		console.error('Error in reloader websocket');
+		console.log(err);
+	});
 })();
