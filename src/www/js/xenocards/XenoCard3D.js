@@ -2,8 +2,15 @@
 	var THREE = require('THREE');
 	var EventDispatcher = require('../xeno/EventDispatcher');
 	var AnimationHelpers = require('AnimationHelpers');
+	var GeometryHelpers = require('GeometryHelpers');
+	var assetdata = require('assetdata');
 
 	var animatePosition = AnimationHelpers.animatePosition;
+	var getSpacedPointsWithCorners = GeometryHelpers.getSpacedPointsWithCorners;
+	var extrudeProfileOnPath = GeometryHelpers.extrudeProfileOnPath;
+	var getProfileShape = assetdata.CardIcon.getProfileShape;
+	var getDiscShape = assetdata.CardIcon.getDiscShape;
+	var getShieldShape = assetdata.CardIcon.getShieldShape;
 
 
 	function XenoCard3D() {
@@ -21,6 +28,9 @@
 	XenoCard3D.TEXTURE_BODY_URL = '/models/card/body.jpg';
 	XenoCard3D.TEXTURE_FACE_URL = '/models/card/face.jpg';
 	XenoCard3D.TEXTURE_TEXT_URL = '/models/card/text.jpg';
+	XenoCard3D.TEXTURE_COSTICON_URL = '/images/icon_cost_tex_128.png';
+	XenoCard3D.TEXTURE_ATTACKICON_URL = '/images/icon_attack_tex_128.png';
+	XenoCard3D.TEXTURE_HEALTHICON_URL = '/images/icon_health_tex_128.png';
 	XenoCard3D.CARD_WIDTH = 168;
 	XenoCard3D.CARD_HEIGHT = 230;
 	XenoCard3D.GEOMETRY_SCALE = 0.95;
@@ -81,6 +91,25 @@
 			});
 			card.add(card.mesh);
 			card.add(card.collider);
+			// Icons
+				textures.costIcon.magFilter = THREE.NearestFilter;
+				textures.costIcon.minFilter = THREE.LinearMipMapLinearFilter;
+				var costMesh = new THREE.Mesh(res.costIcon, new THREE.MeshPhongMaterial({color: 0xffffff, map: textures.costIcon}));
+				costMesh.name = 'cost';
+				costMesh.position.set(-60, 90, -3);
+				card.add(costMesh);
+				textures.attackIcon.magFilter = THREE.NearestFilter;
+				textures.attackIcon.minFilter = THREE.LinearMipMapLinearFilter;
+				var attackMesh = new THREE.Mesh(res.attackIcon, new THREE.MeshPhongMaterial({color: 0xffffff, map: textures.attackIcon}));
+				attackMesh.name = 'attack';
+				attackMesh.position.set(-60, -90, -3);
+				card.add(attackMesh);
+				textures.healthIcon.magFilter = THREE.NearestFilter;
+				textures.healthIcon.minFilter = THREE.LinearMipMapLinearFilter;
+				var healthMesh = new THREE.Mesh(res.healthIcon, new THREE.MeshPhongMaterial({color: 0xffffff, map: textures.healthIcon}));
+				healthMesh.name = 'health';
+				healthMesh.position.set(60, -90, -3);
+				card.add(healthMesh);
 			card.dispatchEvent({type: 'meshReady'});
 		});
 		card.animateVector = function(moveVector, snap) {
@@ -98,20 +127,44 @@
 		var self = this;
 		return this.loadModels()
 		.then(function(res) {
-			var bodyGeo = res[0].children[0].geometry;
-			var faceGeo = res[1].children[0].geometry;
-			var textGeo = res[2].children[0].geometry;
-			var scale = self.computeCardGeometryScale(bodyGeo);
-			var offset = XenoCard3D.GEOMETRY_OFFSET;
-			bodyGeo.scale(scale, scale, scale).translate(offset.x, offset.y, offset.z);
-			faceGeo.scale(scale, scale, scale).translate(offset.x, offset.y, offset.z);
-			textGeo.scale(scale, scale, scale).translate(offset.x, offset.y, offset.z);
-			var portraitGeo = self.generatePortraitGeometry(faceGeo);
+			// Card
+				var bodyGeo = res[0].children[0].geometry;
+				var faceGeo = res[1].children[0].geometry;
+				var textGeo = res[2].children[0].geometry;
+				var scale = self.computeCardGeometryScale(bodyGeo);
+				var offset = XenoCard3D.GEOMETRY_OFFSET;
+				bodyGeo.scale(scale, scale, scale).translate(offset.x, offset.y, offset.z);
+				faceGeo.scale(scale, scale, scale).translate(offset.x, offset.y, offset.z);
+				textGeo.scale(scale, scale, scale).translate(offset.x, offset.y, offset.z);
+				var portraitGeo = self.generatePortraitGeometry(faceGeo);
+			// Icons
+				// Profile
+					var profileShape = getProfileShape();
+					var profileGeo = profileShape.createGeometry(getSpacedPointsWithCorners(profileShape, 1));
+					profileGeo.rotateX(90 * Math.PI / 180);
+					profileGeo.rotateZ(90 * Math.PI / 180);
+				// Cost
+					var costShape = getDiscShape(16);
+					var costOutlineGeo = costShape.createGeometry(getSpacedPointsWithCorners(costShape, 16));
+					var costGeo = extrudeProfileOnPath(profileGeo.vertices, costOutlineGeo.vertices);
+				// Attack
+					var attackShape = getDiscShape(14);
+					var attackOutlineGeo = attackShape.createGeometry(getSpacedPointsWithCorners(attackShape, 16));
+					var attackGeo = extrudeProfileOnPath(profileGeo.vertices, attackOutlineGeo.vertices);
+				// HP
+					var healthScale = 13 / 20;
+					var healthShape = getShieldShape();
+					var healthOutlineGeo = healthShape.createGeometry(getSpacedPointsWithCorners(healthShape, 16));
+					healthOutlineGeo.scale(healthScale, healthScale, healthScale);
+					var healthGeo = extrudeProfileOnPath(profileGeo.vertices, healthOutlineGeo.vertices);
 			return {
 				body: bodyGeo,
 				face: faceGeo,
 				text: textGeo,
 				portrait: portraitGeo,
+				costIcon: costGeo,
+				attackIcon: attackGeo,
+				healthIcon: healthGeo,
 			};
 		});
 	};
@@ -120,6 +173,9 @@
 			body: this.textureLoader.load(XenoCard3D.TEXTURE_BODY_URL),
 			face: this.textureLoader.load(XenoCard3D.TEXTURE_FACE_URL),
 			text: this.textureLoader.load(XenoCard3D.TEXTURE_TEXT_URL),
+			costIcon: this.textureLoader.load(XenoCard3D.TEXTURE_COSTICON_URL),
+			attackIcon: this.textureLoader.load(XenoCard3D.TEXTURE_ATTACKICON_URL),
+			healthIcon: this.textureLoader.load(XenoCard3D.TEXTURE_HEALTHICON_URL),
 		};
 		return this.textures;
 	};
