@@ -54,6 +54,48 @@ function snapCardPosition(position) {
 	return position;
 }
 
+function CardIcon() {}
+CardIcon.getProfileShape = function() {
+	var shape = new THREE.Shape();
+	//shape.moveTo(0, 20);
+	//shape.lineTo(10, 10);
+	//shape.lineTo(10, 10);
+	//shape.lineTo(5, 0);
+	
+	shape.moveTo(0, 8);
+	shape.lineTo(1, 9);
+	shape.lineTo(3, 8);
+	// Angelled edge
+		shape.lineTo(2, 0);
+	// Bevelled edge
+		//shape.lineTo(4, 7);
+		//shape.lineTo(4, 1);
+		//shape.lineTo(3, 0);
+	// Pointed edge
+		//shape.bezierCurveTo(  3,  6,  3,  6,  4,  4);
+		//shape.bezierCurveTo(  3,  2,  3,  2,  3,  0);
+	// Curved edge
+		//shape.bezierCurveTo(  4,  6,  4,  5,  4,  4);
+		//shape.bezierCurveTo(  4,  3,  4,  2,  3,  0);
+	return shape;
+};
+CardIcon.getDiscShape = function(radius) {
+	var shape = new THREE.Shape();
+	// Works in r78
+	//shape.absellipse(0, 0, radius, radius, 0.5 * Math.PI, 0.5 * Math.PI, true);
+	// For r79dev
+	shape.absellipse(0, 0, radius, radius, 0.5 * Math.PI, 2.5 * Math.PI + Number.EPSILON*2.1, true);
+	return shape;
+};
+CardIcon.getShieldShape = function() {
+	var shape = new THREE.Shape();
+	shape.moveTo( 0,  20);
+	shape.bezierCurveTo(  5,  15,  15,  16,  20,  16);
+	shape.bezierCurveTo( 20,   0,  15, -16,   0, -20);
+	shape.bezierCurveTo(-15, -16, -20,   0, -20,  16);
+	shape.bezierCurveTo(-15,  16,  -5,  15,   0,  20);
+	return shape;
+};
 
 if(typeof module !== "undefined" && ('exports' in module)){
 	module.exports = {};
@@ -66,5 +108,6 @@ if(typeof module !== "undefined" && ('exports' in module)){
 	module.exports.getRandomPortraitUrl = getRandomPortraitUrl;
 	module.exports.snapCardPosition = snapCardPosition;
 	module.exports.cardOutline = cardOutline;
+	module.exports.CardIcon = CardIcon;
 }
 })();
