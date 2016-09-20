@@ -63,13 +63,13 @@
 				var z = positions[i + 2];
 				vertices.push(new THREE.Vector3(x, y, z));
 			}
-			console.log('toGeometry > vertices:', vertices.length);
+			//console.log('toGeometry > vertices:', vertices.length);
 			geometry.vertices = vertices;
 		// Generate faces
 			for(i = 0, n = vertices.length; i < n; i += 3) {
 				faces.push(new THREE.Face3(i, i + 1, i + 2));
 			}
-			console.log('toGeometry > faces:', faces.length);
+			//console.log('toGeometry > faces:', faces.length);
 			geometry.faces = faces;
 		// Process UVs
 			if(uvAttr !== undefined) {

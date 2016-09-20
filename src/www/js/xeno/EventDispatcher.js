@@ -85,7 +85,7 @@ function EventDispatcher() {
 	function hasEventListener(type, listener) {
 		if(_listeners === undefined) return false;
 		if(_listeners[type] !== undefined) return false;
-		if(listeners[type].indexOf(listener) === -1) return false;
+		if(_listeners[type].indexOf(listener) === -1) return false;
 		return true;
 	}
 	function bindHandler(func) {

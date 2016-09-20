@@ -62,9 +62,11 @@ WebSocketConnectionServer.prototype.listen = function(opts) {
 		self.handleConnection(new WebSocketConnection().attach(socket));
 	});
 	stats.startCollecting();
+	/*
 	setInterval(function reportStats() {
 		console.log('%s msg/s', (stats.getTotal() / stats.getTotalTime() * 1000).toFixed(1));
 	}, stats.reportInterval);
+	*/
 	return this;
 };
 

@@ -31,7 +31,7 @@
 	}
 
 
-	if(typeof module !== "undefined" && ('exports' in module)){
+	if(typeof module !== 'undefined' && ('exports' in module)){
 		module.exports = {};
 		module.exports.createBoard = createBoard;
 	}

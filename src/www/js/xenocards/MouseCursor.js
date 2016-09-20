@@ -29,9 +29,12 @@
 			return this;
 		};
 	}
-	MouseCursor.COLOR_IDLE = 0x0000ff;
-	MouseCursor.COLOR_CLICK = 0xffff00;
-	MouseCursor.COLOR_DRAGGABLE = 0x00ff00;
+	MouseCursor._COLOR_IDLE = 0x0000ff;
+	MouseCursor._COLOR_CLICK = 0xffff00;
+	MouseCursor._COLOR_DRAGGABLE = 0x00ff00;
+	MouseCursor.COLOR_IDLE = MouseCursor._COLOR_IDLE;
+	MouseCursor.COLOR_CLICK = MouseCursor._COLOR_CLICK;
+	MouseCursor.COLOR_DRAGGABLE = MouseCursor._COLOR_DRAGGABLE;
 	MouseCursor.prototype.createCursor = function() {
 		var cursor = new THREE.Mesh(
 			new THREE.BoxGeometry(10, 10, 10),
@@ -64,7 +67,7 @@
 	};
 
 
-	if(typeof module !== "undefined" && ('exports' in module)){
+	if(typeof module !== 'undefined' && ('exports' in module)){
 		module.exports = {};
 		module.exports.MouseCursor = MouseCursor;
 	}

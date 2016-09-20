@@ -232,11 +232,12 @@ function CardMover(opts) {
 			card.add(forcefield);
 		});
 
-		var dragAndDrop = new DragAndDrop({prototype: this, dropZ: cardBoardZ, dragZ: cardDragZ});
+		var dragAndDrop = new DragAndDrop({app: this, dropZ: cardBoardZ, dragZ: cardDragZ});
 		dragAndDrop.attachToMouseHandler(mouseHandler);
 		dragAndDrop.snapDropPosition = snapDropPosition;
-		cards.forEach(function(card) { dragAndDrop.attachCard(card); });
-
+		cards.forEach((card) => 
+			card.addEventListener('meshReady', () => dragAndDrop.attachCard(card))
+		);
 	}
 	function init() {
 		var prototype = new THREEPrototype();

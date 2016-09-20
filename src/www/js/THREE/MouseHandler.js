@@ -73,6 +73,7 @@
 	MouseHandler.prototype = Object.create(null);
 	MouseHandler.prototype.constructor = THREE.MouseHandler;
 	MouseHandler.prototype.add = function(object) {
+		//console.info('MouseHandler.add(object);', object.name, object.receiveMouseEvents);
 		var interactiveObjects = this.interactiveObjects;
 		if(object.receiveMouseEvents === true && interactiveObjects.indexOf(object) === -1) {
 			//console.info('MouseHandler.add("%s");', object.name, object.receiveMouseEvents);
@@ -237,6 +238,7 @@
 		return (intersections.length > 0) ? intersections[0] : false;
 	};
 	MouseHandler.prototype.triggerEvent = function(type, e, opts) {
+		//console.info('MouseHandler.triggerEvent(%s, e, opts);', type, opts);
 		//if(!type.match(/mouse(move|enter|leave)/)) console.info('MouseHandler.triggerEvent("%s", e, opts);', type);
 		opts = opts || {};
 		if(this.intersection && opts.intersection === undefined) opts.intersection = this.intersection;
@@ -246,6 +248,7 @@
 			event.buttons = e.buttons;
 			event.clientX = e.clientX;
 			event.clientY = e.clientY;
+			event.originalEvent = e;
 		}
 		for(var key in opts) event[key] = opts[key];
 		this.dispatchEvent(event);
@@ -277,7 +280,7 @@
 		if(click.intersection.object === this.intersection.object) this.triggerEvent('click', e);
 	};
 	MouseHandler.prototype.mousedownHandler = function(e) {
-		//console.info('MouseHandler.mousedownHandler(e);');
+		//console.info('MouseHandler.mousedownHandler(e);', e);
 		var self = this;
 		this.mousedownTime = performance.now();
 		this.update(e);
@@ -301,7 +304,7 @@
 
 
 	// export in common js
-	if(typeof module !== "undefined" && ('exports' in module)){
+	if(typeof module !== 'undefined' && ('exports' in module)){
 		module.exports = MouseHandler;
 	}
 })();

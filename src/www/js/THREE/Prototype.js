@@ -32,11 +32,13 @@
 		var window = this.windowElement;
 		var renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
 		//var renderer = new THREE.WebGLRenderer({antialias: true, alpha: true, logarithmicDepthBuffer: true});
-		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.setClearColor(0x000000, 0);
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 		renderer.domElement.tabIndex = -1;
+		renderer.domElement.style.position = 'relative';
 		return renderer;
 	};
 	Prototype.prototype.createScene = function() {
@@ -49,6 +51,7 @@
 			this.windowElement.innerWidth / this.windowElement.innerHeight,
 			1, 2000
 		);
+		console.log('fov:', camera.fov);
 		camera.position.set(0, 0, 1000);
 		camera.up = new THREE.Vector3(0, 1, 0);
 		camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -60,8 +63,8 @@
 		controls.userPanSpeed = 0.1;
 		this.setCamera(this.camera.position, this.cameraTarget);
 		return controls;
-	};
-	Prototype.prototype.createTextureLoader = function() {
+	}
+;	Prototype.prototype.createTextureLoader = function() {
 		var textureLoader = new THREE.TextureLoader();
 		textureLoader.crossOrigin = 'Anonymous';
 		return textureLoader;
@@ -175,6 +178,7 @@
 		camera.position.copy(position);
 		camera.lookAt(this.cameraTarget);
 		camera.updateMatrix();
+		camera.near = 0.1;
 		var controls = this.controls;
 		if(controls === undefined) return;
 		if(controls.position0) controls.position0.copy(camera.position);
@@ -183,7 +187,7 @@
 	};
 
 	
-	if(typeof module !== "undefined" && ('exports' in module)){
+	if(typeof module !== 'undefined' && ('exports' in module)){
 		module.exports = {};
 		module.exports.THREEPrototype = Prototype;
 	}

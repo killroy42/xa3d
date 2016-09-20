@@ -2,9 +2,6 @@
 var child_process = require('child_process');
 
 var npmCmd = (require('os').platform() === 'win32')?'npm.cmd':'npm';
-var npmCmd = (require('os').platform() === 'win32')?'npm.cmd':'npm';
-var reloaderNpm = 'reloader';
-var serverNpm = 'server';
 
 function exec(cmd) {
 	cmd = cmd.split(/\s+/);
@@ -16,7 +13,7 @@ function exec(cmd) {
 
 function runDelayed(cmd, delay, pause) {
 	if(delay === undefined) delay = 200;
-	if(pause === undefined) pause = 200;
+	if(pause === undefined) pause = 0;
 	return function() {
 		return new Promise(function(resolve, reject) {
 			var logText = 'Executing: '+cmd;

@@ -57,11 +57,13 @@ function Prototype_init() {
 	initLights(this);
 	var xenoCard3D = new XenoCard3D();
 	var tex = loadTexture('/images/testuv.jpg');
+	var tex2 = loadTexture('/images/testuv2.jpg');
 	var costtex = loadTexture('/images/icon_cost_tex_128.png');
 	var healthtex = loadTexture('/images/icon_health_tex_128.png');
 	var attacktex = loadTexture('/images/icon_attack_tex_128.png');
 
 	document.body.style.background = '#000';
+
 
 	costtex.magFilter = THREE.NearestFilter;
 	costtex.minFilter = THREE.LinearMipMapLinearFilter;
@@ -128,6 +130,39 @@ function Prototype_init() {
 			color:0xffffff,
 			map: tex
 		});
+
+		var squareShape = new THREE.Shape();
+		squareShape.moveTo( -20,  -20);
+		squareShape.lineTo( -20, 20);
+		squareShape.lineTo(   0, 20);
+		//shape.moveTo( 0,  20);
+		squareShape.bezierCurveTo(  5,  15,  15,  16,  20,  16);
+		squareShape.bezierCurveTo( 20,   0,  15, -16,   0, -20);
+		//shape.bezierCurveTo(-15, -16, -20,   0, -20,  16);
+		//shape.bezierCurveTo(-15,  16,  -5,  15,   0,  20);
+		//squareShape.lineTo(20, 20);
+		squareShape.lineTo(-20, -20);
+
+		var squareProfileShape = new THREE.Shape();
+		squareProfileShape.moveTo( 0, 0);
+		squareProfileShape.lineTo( 4, -1);
+		var squareProfileGeo = squareProfileShape.createGeometry(getSpacedPointsWithCorners(squareProfileShape, 2));
+		squareProfileGeo.rotateX(90 * Math.PI / 180);
+		squareProfileGeo.rotateZ(90 * Math.PI / 180);
+
+		var squareOutlineGeo = shieldShape.createGeometry(getSpacedPointsWithCorners(squareShape, 256));
+		//squareOutlineGeo.vertices.forEach(function(v, idx, arr) { v.z += Math.sin(idx/arr.length * 10 * 2 * Math.PI)*3; });
+		var squareExtrusion = createExtrusion(squareProfileGeo, squareOutlineGeo);
+		squareExtrusion.position.set(160, 0, 0);
+		scene.add(squareExtrusion);
+		var squareMesh = squareExtrusion.children[1];
+		squareMesh.material = new THREE.MeshPhongMaterial({
+			color:0xffffff,
+			map: tex2
+		});
+		//var wf = createWireframe(squareMesh);
+		//scene.add(wf);
+		//wf.position.set(160, 0, 0);
 
 
 		/*

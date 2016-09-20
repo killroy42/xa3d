@@ -57,7 +57,6 @@ function createCards(scene, cardTex) {
 		initLights(this);
 
 		scene.add(createBoard(boardTex, boardAlpha));
-				
 		createCards(scene, cardTex);
 		var cards = scene.children.filter(function(o) { return o instanceof XenoCard; });
 
