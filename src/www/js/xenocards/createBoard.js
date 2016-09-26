@@ -14,6 +14,7 @@
 		var board = new THREE.Object3D();
 		var boardMesh = new THREE.Mesh(new THREE.PlaneGeometry(1440, 1060), material);
 		board.name = 'Board';
+		boardMesh.name = 'board_collider';
 		Promise.all([boardTex.promise, boardAlpha.promise])
 		.then(function() {
 			boardTex.minFilter = THREE.LinearFilter;

@@ -22,6 +22,12 @@
 			'z:'+this.z.toFixed(1)+'}';
 	}
 
+	function Matrix4_toString() {
+		return 'Matrix4{'+
+			[...this.elements].map((el, idx) => ((idx % 4)?'':'\n')+el.toFixed(2)).join(', ')
+			+'}';
+	}
+
 	function Face3_flip() {
 		var b = this.b;
 		this.b = this.c;
@@ -40,7 +46,6 @@
 			];
 		}
 	}
-
 
 	function BufferGeometry_toGeometry() {
 		var posAttr = this.getAttribute('position');
@@ -123,13 +128,14 @@
 		THREE.Vector2.prototype.toString = Vector2_toString;
 		THREE.Vector3.prototype.toString = Vector3_toString;
 		THREE.Euler.prototype.toString = Euler_toString;
+		THREE.Matrix4.prototype.toString = Matrix4_toString;
 		THREE.Face3.prototype.flip = Face3_flip;
 		THREE.BufferGeometry.prototype.toGeometry = BufferGeometry_toGeometry;
 		return THREE;
 	}
 	
 	
-	if(typeof module !== "undefined" && ('exports' in module)){
+	if(typeof module !== 'undefined' && ('exports' in module)){
 		module.exports = enhanceTHREE;
 	}
 })();

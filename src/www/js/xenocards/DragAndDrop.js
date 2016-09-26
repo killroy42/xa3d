@@ -3,6 +3,7 @@
 	/* jshint validthis: true */
 	'use strict';
 	var THREE = require('THREE');
+	const {Matrix4, EdgesGeometry, LineSegments, LineBasicMaterial} = require('THREE');
 	var EventDispatcher = require('../xeno/EventDispatcher');
 	var assetdata = require('assetdata');
 
@@ -21,8 +22,9 @@
 	DragAndDrop.prototype = Object.create(null);
 	DragAndDrop.prototype.constructor = DragAndDrop;
 	DragAndDrop.prototype.createWireFrame = function(mesh) {
-		var wireframe = new THREE.EdgesHelper(mesh, 0x00ff00);
-		wireframe.matrix = new THREE.Matrix4();
+		//var wireframe = new THREE.EdgesHelper(mesh, 0x00ff00);
+		var wireframe = new LineSegments(new EdgesGeometry(mesh.geometry), new LineBasicMaterial({ color: 0x00ff00}));
+		wireframe.matrix = new Matrix4();
 		wireframe.matrixAutoUpdate = true;
 		wireframe.updateMatrixWorld();
 		wireframe.scale.set(1.5, 1.5, 1.5);

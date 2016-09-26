@@ -1,7 +1,8 @@
 (function() {
 /* jshint validthis: true */
 'use strict';
-var THREE = require('THREE');
+const THREE = require('THREE');
+const {Vector2, Vector3, Face3, Box3, Geometry} = require('THREE');
 
 // Geometry
 	function extrudePath(points, segments, uvRepeat, scale) {
@@ -14,14 +15,14 @@ var THREE = require('THREE');
 			points = points.slice();
 		}
 		points.push(points[0]); // Close curve
-		var geo = new THREE.Geometry();
+		var geo = new Geometry();
 		var len = points.length;
 		var uvSeg = (1 / (points.length - 1)) * uvRepeat;
 		var uvx1 = 0, uvx2 = 0;
 		for(var i = 0, l = points.length; i < l; i++) {
 			var p = points[i];
-			geo.vertices.push(new THREE.Vector3(p.x, p.y, 0.0));
-			geo.vertices.push(new THREE.Vector3(p.x * scale, p.y * scale, 1.0));
+			geo.vertices.push(new Vector3(p.x, p.y, 0.0));
+			geo.vertices.push(new Vector3(p.x * scale, p.y * scale, 1.0));
 			if(i > 0) {
 				var a = i * 2 - 2;
 				var b = i * 2;
@@ -29,14 +30,14 @@ var THREE = require('THREE');
 				var d = i * 2 - 1;
 				var uvx = (i - 1) * uvSeg % 1;
 				var uvs = [
-					new THREE.Vector2(uvx, 0.0),
-					new THREE.Vector2(uvx + uvSeg, 0.0),
-					new THREE.Vector2(uvx + uvSeg, 1.0),
-					new THREE.Vector2(uvx, 1.0),
+					new Vector2(uvx, 0.0),
+					new Vector2(uvx + uvSeg, 0.0),
+					new Vector2(uvx + uvSeg, 1.0),
+					new Vector2(uvx, 1.0),
 				];
 				uvx1 = uvx2;
-				geo.faces.push(new THREE.Face3(a, d, b));
-				geo.faces.push(new THREE.Face3(b, d, c));
+				geo.faces.push(new Face3(a, d, b));
+				geo.faces.push(new Face3(b, d, c));
 				geo.faceVertexUvs[0].push([uvs[0], uvs[3], uvs[1]]);
 				geo.faceVertexUvs[0].push([uvs[1], uvs[3], uvs[2]]);
 			}
@@ -161,36 +162,36 @@ var THREE = require('THREE');
 			- Accept Shapes/CurvePaths directly
 			- Don't scale UVs along profile. Reuse reference profile
 		*/
-		var upVector = new THREE.Vector3(0, 1, 0);
-		var backVector = new THREE.Vector3(0, 0, -1);
+		var upVector = new Vector3(0, 1, 0);
+		var backVector = new Vector3(0, 0, -1);
 		var outlineCount = outlineVs.length;
 		var profileCount = profileVs.length;
 		var profileVertices, verticeIndices, outlineLengths, profileLengths, uvs;
-		var geo = new THREE.Geometry();
+		var geo = new Geometry();
 		var uvLayer = 0;
 		function capFront() {
 			var i, a, b, c = geo.vertices.length;
 			// Calculate bounds
-				var bounds = new THREE.Box3();
+				var bounds = new Box3();
 				for(i = 0; i < outlineCount; i++) {
 					a = (i + 1) * profileCount - 1;
 					bounds.expandByPoint(geo.vertices[a]);
 				}
-				geo.vertices.push(bounds.center());
+				geo.vertices.push(bounds.getCenter());
 			// Faces and UVs
-				var size = bounds.size();
-				var center = bounds.center();
-				var uvOffset = new THREE.Vector2(0.5, 0.5);
-				var centerOffset = new THREE.Vector2(center.x, - center.y);
-				var uvScale = new THREE.Vector2(1 / size.x, 1 / size.y);
+				var size = bounds.getSize();
+				var center = bounds.getCenter();
+				var uvOffset = new Vector2(0.5, 0.5);
+				var centerOffset = new Vector2(center.x, - center.y);
+				var uvScale = new Vector2(1 / size.x, 1 / size.y);
 				if(sharedUVs) {
 					uvScale.multiplyScalar(0.5);
-					uvOffset.add(new THREE.Vector2(-0.25, 0.25));
+					uvOffset.add(new Vector2(-0.25, 0.25));
 				}
 				for(i = 0; i < outlineCount; i++) {
 					a = (i + 1) * profileCount - 1;
 					b = (((i + 1) % outlineCount) + 1) * profileCount - 1;
-					geo.faces.push(new THREE.Face3(a, c, b));
+					geo.faces.push(new Face3(a, c, b));
 					geo.faceVertexUvs[uvLayer][geo.faces.length - 1] = [
 						geo.vertices[a].clone().add(centerOffset).multiply(uvScale).add(uvOffset),
 						geo.vertices[c].clone().add(centerOffset).multiply(uvScale).add(uvOffset),
@@ -201,26 +202,26 @@ var THREE = require('THREE');
 		function capBack() {
 			var i, a, b, c = geo.vertices.length;
 			// Calculate bounds
-				var bounds = new THREE.Box3();
+				var bounds = new Box3();
 				for(i = 0; i < outlineCount; i++) {
 					a = i * profileCount;
 					bounds.expandByPoint(geo.vertices[a]);
 				}
-				geo.vertices.push(bounds.center());
+				geo.vertices.push(bounds.getCenter());
 			// Faces and UVs
-				var size = bounds.size();
-				var center = bounds.center();
-				var uvOffset = new THREE.Vector2(0.5, 0.5);
-				var centerOffset = new THREE.Vector2(center.x, - center.y);
-				var uvScale = new THREE.Vector2(-1 / size.x, 1 / size.y);
+				var size = bounds.getSize();
+				var center = bounds.getCenter();
+				var uvOffset = new Vector2(0.5, 0.5);
+				var centerOffset = new Vector2(center.x, - center.y);
+				var uvScale = new Vector2(-1 / size.x, 1 / size.y);
 				if(sharedUVs) {
 					uvScale.multiplyScalar(0.5);
-					uvOffset.add(new THREE.Vector2(0.25, 0.25));
+					uvOffset.add(new Vector2(0.25, 0.25));
 				}
 				for(i = 0; i < outlineCount; i++) {
 					a = i * profileCount;
 					b = ((i + 1) % outlineCount) * profileCount;
-					geo.faces.push(new THREE.Face3(a, b, c));
+					geo.faces.push(new Face3(a, b, c));
 					geo.faceVertexUvs[uvLayer][geo.faces.length - 1] = [
 						geo.vertices[a].clone().add(centerOffset).multiply(uvScale).add(uvOffset),
 						geo.vertices[b].clone().add(centerOffset).multiply(uvScale).add(uvOffset),
@@ -359,6 +360,47 @@ var THREE = require('THREE');
 		geo.computeFaceNormals();
 		return geo;
 	}
+
+// Shapes
+	const getCornerPoints = (x1, y1, x2, y2) => {
+		const offset = 1 - (4/3)*Math.tan(Math.PI/8);
+		return {
+			a: {x: -x1, y: -y1},
+			b: {x: -x1 * offset, y: -y1 * offset},
+			c: {x: x2 * offset, y: y2 * offset},
+			d: {x: x2, y: y2},
+		};
+	};
+	const makeRect = (w, h, r) => {
+		const w2 = w * 0.5;
+		const h2 = h * 0.5;
+		const tl = getCornerPoints(  0, -r,  r,  0);
+		const tr = getCornerPoints(  r,  0,  0,  r);
+		const br = getCornerPoints(  0,  r, -r,  0);
+		const bl = getCornerPoints( -r,  0,  0, -r);
+		return [
+			Object.assign({x: -w2, y: -h2}, tl),
+			Object.assign({x:  w2, y: -h2}, tr),
+			Object.assign({x:  w2, y:  h2}, br),
+			Object.assign({x: -w2, y:  h2}, bl),
+		];
+	};
+	const makeRoundedRectShape = (xo, yo, w, h, r) => {
+		const shape = new THREE.Shape();
+		var corners = makeRect(w, h, r);
+		const {x, y, a} = corners[0];
+		shape.moveTo(xo + x + a.x, yo + y + a.y);
+		corners.forEach(({x, y, a, b, c, d}) => {
+			shape.lineTo(xo + x + a.x, yo + y + a.y);
+			shape.bezierCurveTo(
+				xo + x + b.x, yo + y + b.y,
+				xo + x + c.x, yo + y + c.y,
+				xo + x + d.x, yo + y + d.y
+			);
+		});
+		shape.lineTo(xo + x + a.x, yo + y + a.y);
+		return shape;
+	};
 
 // models
 	function geometryToJson(geo) {
@@ -803,7 +845,7 @@ GeometryHelpers.prototype = Object.create(null);
 GeometryHelpers.prototype.constructor = GeometryHelpers;
 
 
-if(typeof module !== "undefined" && ('exports' in module)){
+if(typeof module !== 'undefined' && ('exports' in module)){
 	module.exports = GeometryHelpers;
 	module.exports.extrudePath = extrudePath;
 	module.exports.radialSort = radialSort;
@@ -816,5 +858,6 @@ if(typeof module !== "undefined" && ('exports' in module)){
 	module.exports.geometryToObj = geometryToObj;
 	module.exports.jsonToObj = jsonToObj;
 	module.exports.convexHull = convexHull;
+	module.exports.makeRoundedRectShape = makeRoundedRectShape;
 }
 })();
