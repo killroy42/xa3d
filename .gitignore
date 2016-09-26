@@ -4,6 +4,7 @@
 
 node_modules/
 src/www/vendors/
+npm-debug.log.*
 
 #################
 ## Eclipse
