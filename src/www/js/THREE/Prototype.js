@@ -10,6 +10,10 @@
 		this.fov = opts.fov || 50;
 		this.initialized = false;
 		this._resCache = {};
+		this.onrender = undefined;
+		this._renderHandlers = []
+		this.handleWindowResize = this.handleWindowResize.bind(this);
+		this.handleContextMenu = this.handleContextMenu.bind(this);
 	}
 	Prototype.PATH_SHADER = '/shaders/';
 	Prototype.EXT_SHADER = '.glsl';
@@ -70,10 +74,10 @@
 		return textureLoader;
 	};
 	Prototype.prototype.handleWindowResize = function() {
-		var window = this.windowElement;
-		var camera = this.camera;
-		var renderer = this.renderer;
-		var width = window.innerWidth, height = window.innerHeight;
+		const window = this.windowElement;
+		const camera = this.camera;
+		const renderer = this.renderer;
+		const width = window.innerWidth, height = window.innerHeight;
 		renderer.setSize(width, height, true);
 		camera.aspect = width / height;
 		camera.updateProjectionMatrix();
@@ -99,10 +103,17 @@
 		this.textureLoader = this.createTextureLoader();
 		if(typeof this.oninit === 'function') this.oninit();
 	};
+	Prototype.prototype.addRenderHandler = function(handler) {
+		const {_renderHandlers} = this;
+		_renderHandlers.push(handler);
+	};
+	Prototype.prototype.removeRenderHandler = function(handler) {
+		const {_renderHandlers} = this;
+		_renderHandlers.splice(_renderHandlers.indexOf(handler), 1);
+	};
 	Prototype.prototype.start = function() {
+		const {_renderHandlers} = this;
 		var self = this;
-		var boundResizeHandler = function(e) { return self.handleWindowResize(e); };
-		var boundContextMenuHandler = function(e) { return self.handleContextMenu(e); };
 		var renderer, scene, camera, windowElement, rafId, frameTime;
 		function update() {
 			if(self.onupdate) self.onupdate(frameTime);
@@ -111,19 +122,20 @@
 		function renderFrame(time) {
 			frameTime = time;
 			if(self.onrender) self.onrender(frameTime);
+			_renderHandlers.forEach(handler => handler(frameTime));
 			renderer.render(scene, camera);
 			setTimeout(update, 0);
 		}
 		function stop() {
-			windowElement.removeEventListener('resize', boundResizeHandler);
-			windowElement.removeEventListener('contextmenu', boundContextMenuHandler);
+			windowElement.removeEventListener('resize', self.handleWindowResize);
+			windowElement.removeEventListener('contextmenu', self.handleContextMenu);
 			self.stop = Prototype.prototype.stop;
 			windowElement.cancelAnimationFrame(rafId);
 		}
 		function start() {
 			self.stop = stop;
-			windowElement.addEventListener('resize', boundResizeHandler);
-			windowElement.addEventListener('contextmenu', boundContextMenuHandler);
+			windowElement.addEventListener('resize', self.handleWindowResize);
+			windowElement.addEventListener('contextmenu', self.handleContextMenu);
 			rafId = windowElement.requestAnimationFrame(renderFrame);
 		}
 		this.init();

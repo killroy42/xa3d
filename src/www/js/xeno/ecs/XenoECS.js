@@ -6,10 +6,16 @@ const EventDispatcher = require('EventDispatcher');
 class Entity {
 	constructor() {
 		EventDispatcher.apply(this);
-		this._id = Entity.nextId++;
+		this._id = Entity.getId();
 		this._Components = [];
 		this._tags = [];
 		this._manager = undefined;
+		Object.defineProperties(this, {
+			id: {get: () => this._id},
+		});
+	}
+	getManager() {
+		return this._manager;
 	}
 	addComponent(Component) {
 		this._manager.entityAddComponent(this, Component);
@@ -25,16 +31,18 @@ class Entity {
 		return this;
 	}
 	getComponent(Component) {
+		if(typeof Component === 'string') Component = this._Components.find(({name}) => Component === name);
 		if(!this.hasComponent(Component)) throw new Error('Entity does not have component:', Component);
 		return this[Component.getPropertyName()];
 	}
 	hasComponent(Component) {
+		if(typeof Component === 'string') Component = this._Components.find(({name}) => Component === name);
 		return this._Components.indexOf(Component) !== -1;
 	}
 	hasAllComponents(Components) {
-		for(var i = 0; i < Components.length; i++) {
-			if(!this.hasComponent(Components[i])) return false;
-		}
+		for(var i = 0; i < Components.length; i++)
+			if(!this.hasComponent(Components[i]))
+				return false;
 		return true;
 	}
 	addTag(tag) {
@@ -55,29 +63,27 @@ class Entity {
 	destroy() {
 		this._manager.removeEntity(this);
 	}
-	__add(component) {
-		const {_components} = this;
-		const componentKey = component.getKey();
-		if(this[componentKey] !== undefined) throw new Error('Component name collision: '+componentKey);
-		_components.push(component);
-		component.attach(this);
-		this[componentKey] = component;
-		return this;
-	}
-	__remove(component) {
-		const {_components} = this;
-		delete this[component.getKey()];
-		const idx = _components.indexOf(component);
-		_components.splice(idx, 1);
-		component.detach(this);
-		return this;
+	update(...args) {
+		//console.trace('Entity.update(%s);', JSON.stringify(...args));
+		this._Components.forEach((Component) => {
+			const c = this.getComponent(Component);
+			if(c.OnUpdate) c.OnUpdate(...args);
+		});
 	}
 }
-Entity.nextId = 0;
+var __nextEntityId = 0;
+Object.defineProperties(Entity, {
+	getId: {value: () => __nextEntityId++}
+});
 
 class Component {
 	constructor() {
 		this._entity = null;
+		this._registeredListeners = [];
+	}
+	_OnAttachComponent(entity) {
+	}
+	_OnDetachComponent(entity) {
 	}
 	getEntity() {
 		return this._entity;
@@ -87,6 +93,9 @@ class Component {
 	}
 	getComponent(Component) {
 		return this.getEntity().getComponent(Component);
+	}
+	registerEventListener(target, eventName, handler) {
+		this._registeredListeners.push({target, eventName, handler});
 	}
 }
 Component.getPropertyName = function getPropertyName() {
@@ -129,11 +138,12 @@ class EntityManager {
 		EventDispatcher.apply(this);
 		this._entities = [];
 	}
-	createEntity() {
+	createEntity(components = []) {
 		const {_entities} = this;
 		const entity = new Entity();
 		entity._manager = this;
 		_entities.push(entity);
+		components.forEach(Component => entity.addComponent(Component));
 		return entity;
 	}
 	removeEntity(entity) {
@@ -146,10 +156,12 @@ class EntityManager {
 	entityAddComponent(entity, Component) {
 		if(entity.hasComponent(Component)) return this;
 		entity._Components.push(Component);
+		//console.trace(Component);
 		const cName = Component.getPropertyName();
 		const component = new Component();
 		entity[cName] = component;
 		component._entity = entity;
+		component._OnAttachComponent(entity);
 		if(component.OnAttachComponent) component.OnAttachComponent(entity);
 		this.dispatchEvent({type: EntityManager.EVENT_ADDCOMPONENT, entity, Component});
 		return this;
@@ -159,6 +171,7 @@ class EntityManager {
 		const cName = Component.getPropertyName();
 		const component = entity[cName];
 		this.dispatchEvent({type: EntityManager.EVENT_REMOVECOMPONENT, entity, Component});
+		component._OnDetachComponent(entity);
 		if(component.OnDetachComponent) component.OnDetachComponent(entity);
 		entity._Components.splice(entity._Components.indexOf(Component), 1);
 		delete entity[cName];
@@ -166,8 +179,15 @@ class EntityManager {
 	}
 	queryComponents(Components) {
 		if(!Array.isArray(Components)) Components = [Components];
+		//console.info('EntityManager.queryComponents(Components);', Components);
 		const res = this._entities.filter(entity => entity.hasAllComponents(Components));
 		return res;
+	}
+	findComponent(Component) {
+		//console.info('EntityManager.findComponent("%s");', Component.name || Component);
+		const entity = this.queryComponents(Component)[0];
+		if(entity === undefined) return undefined;
+		return entity.getComponent(Component);
 	}
 	queryTags(tags) {
 		if(!Array.isArray(tags)) tags = [tags];

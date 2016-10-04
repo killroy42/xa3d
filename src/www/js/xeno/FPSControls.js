@@ -146,10 +146,11 @@ class FPSControls {
 		element.innerHTML = 'FPS';
 		element.style.cssText = `
 			position: absolute;
-			width: 3em; height: 2em;
+			width: auto; height: 1em;
 			margin: 0.2em;
-			font: bold 2em Arial;
-			line-height: 2em;
+			padding: 0.2em 0.4em;
+			font: bold 1.5em Arial;
+			line-height: 1em;
 			text-align: center;
 			left: 0; top: 0;
 			border: 2px solid white;

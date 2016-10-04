@@ -257,7 +257,7 @@ const SAVED_PLACES_KEY = 'savedPlaces';
 			floor.name = 'floor';
 			floor.rotateX(-90 * Math.PI / 180);
 			floor.renderOrder  = -1;
-			//floor.receiveMouseEvents = true;
+			floor.receiveMouseEvents = true;
 			scene.add(floor);
 			const floorGrid = new GridHelper(gridSize / 2, gridSize, colors.grey700, colors.grey800);
 			floorGrid.name = 'floorGrid';

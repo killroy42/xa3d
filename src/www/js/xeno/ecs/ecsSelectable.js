@@ -51,6 +51,7 @@ class Selected extends System {
 		this.select(target);
 	}
 	select(target) {
+		console.info('Selected.select(target);');
 		if(target !== this._selected) {
 			if(this._selected !== undefined) this.dispatchEvent(Selected.EVENT_DESELECT, {target: this._selected});
 			this._selected = target;
