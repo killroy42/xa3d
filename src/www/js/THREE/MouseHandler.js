@@ -49,7 +49,8 @@
 		};
 		this.boundDragTimeout = function() { self.dragStart(); };
 		this.interactiveObjects = [];
-		if(opts.scene) this.watchChildren(opts.scene);
+		//if(opts.scene) this.watchChildren(opts.scene);
+		this.patchObject3D();
 	}
 	MouseHandler.CLICK_TIMEOUT = 1500;
 	MouseHandler.DRAG_TIMEOUT = 200;
@@ -72,8 +73,72 @@
 	//MouseHandler.prototype = Object.assign(Object.create(null), THREE.EventDispatcher.prototype);
 	MouseHandler.prototype = Object.create(null);
 	MouseHandler.prototype.constructor = THREE.MouseHandler;
+
+	MouseHandler.prototype.patchObject3D = function() {
+		const object3d_prototype = THREE.Object3D.prototype;
+		const mouseHandler = this;
+		const Object3D_add = object3d_prototype.add;
+		const Object3D_remove = object3d_prototype.remove;
+		Object.defineProperties(object3d_prototype, {
+			receiveMouseEvents: {
+				get: function() {
+					//console.error('GET Object3D.receiveMouseEvents: ', this.__receiveMouseEvents);
+					return this.__receiveMouseEvents;
+				},
+				set: function(val) {
+					if(val === this.__receiveMouseEvents) return val;
+					//console.error('SET Object3D.receiveMouseEvents: ', val, this);
+					this.__receiveMouseEvents = val;
+					if(val) {
+						mouseHandler.addInteractiveObject(this);
+					} else {
+						mouseHandler.removeInteractiveObject(this);
+					}
+					return val;
+				},
+			},
+			add: {value: function(object) {
+				//console.error('Object3D.add(object);');
+				Object3D_add.call(this, object);
+				mouseHandler.addBranch(object);
+				return this;
+			}},
+			remove: {value:  function(object) {
+				//console.error('Object3D.remove(object);', object.name);
+				Object3D_remove.call(this, object);
+				mouseHandler.removeBranch(object);
+				return this;
+			}},
+		});
+	};
+	MouseHandler.prototype.addInteractiveObject = function(object) {
+		const {interactiveObjects} = this;
+		if(interactiveObjects.indexOf(object) === -1) {
+			//console.warn('adding interactive object', object.name);
+			interactiveObjects.push(object);
+		}
+	};
+	MouseHandler.prototype.removeInteractiveObject = function(object) {
+		const {interactiveObjects} = this;
+		const index = interactiveObjects.indexOf(object);
+		if(index !== -1) {
+			//console.warn('removing interactive object', object.name);
+			interactiveObjects.splice(index, 1);
+		}
+	};
+	MouseHandler.prototype.addBranch = function(object) {
+		const {children} = object;
+		if(object.receiveMouseEvents) this.addInteractiveObject(object);
+		var i = children.length; while(i--) this.addBranch(children[i]);
+	};
+	MouseHandler.prototype.removeBranch = function(object) {
+		const {interactiveObjects} = this;
+		const {children} = object;
+		this.removeInteractiveObject(object);
+		var i = children.length; while(i--) this.removeBranch(children[i]);
+	};
 	MouseHandler.prototype.add = function(object) {
-		//console.info('MouseHandler.add(object);', object.name, object.receiveMouseEvents);
+		console.info('MouseHandler.add(object);', object.name, object.receiveMouseEvents);
 		var interactiveObjects = this.interactiveObjects;
 		if(object.receiveMouseEvents === true && interactiveObjects.indexOf(object) === -1) {
 			//console.info('MouseHandler.add("%s");', object.name, object.receiveMouseEvents);
@@ -99,10 +164,12 @@
 		}
 	};
 	MouseHandler.prototype.watchChildren = function(root) {
-		//console.info('MouseHandler.watchChildren("%s");', root.name);
+		console.info('MouseHandler.watchChildren("%s");', root.name);
+		console.log(root);
 		var self = this;
 		var addFunc = root.add;
 		var removeFunc = root.remove;
+		//console.error('assign root.add:', root, root.add);
 		root.add = function(object) {
 			addFunc.call(root, object);
 			self.add(object);
@@ -296,6 +363,7 @@
 		this.clickFinish(e);
 	};
 	MouseHandler.prototype.mousemoveHandler = function(e) {
+		//console.info('MouseHandler.mousemoveHandler(e);');
 		if(Math.abs(e.movementX + e.movementY) < 1) return;
 		this.update(e);
 		this.triggerEvent(e.type, e);

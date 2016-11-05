@@ -2,18 +2,22 @@
 /*jslint node: true */
 'use strict';
 
-var jsDir = '../../www/js/';
+require('nodejs-dashboard');
+const jsDir = '../../www/js/';
 //var XENO = require(jsDir+'xeno/XENO');
-var WebSocketConnectionServer = require(jsDir+'xeno/WebSocketConnectionServer');
-var Network = require(jsDir+'xeno/Network');
-var NetworkServer = require(jsDir+'xeno/NetworkServer');
-var NetworkClient = require(jsDir+'xeno/NetworkClient');
-var BoxBlueprint = require(jsDir+'xeno/blueprints/BoxBlueprint.server');
-var GameBlueprint = require(jsDir+'xeno/blueprints/GameBlueprint.server');
-var PlayerBlueprint = require(jsDir+'xeno/blueprints/PlayerBlueprint.server');
-var assetdata = require(jsDir+'xenocards/assetdata');
+const assetdata = require(jsDir+'xenocards/assetdata');
+const {
+	WebSocketConnectionServer,
+	NetworkServer,
+} = require(jsDir+'networking');
+const BoxBlueprint = require(jsDir+'networking/blueprints/BoxBlueprint.server');
+const GameBlueprint = require(jsDir+'networking/blueprints/GameBlueprint.server');
+const PlayerBlueprint = require(jsDir+'networking/blueprints/PlayerBlueprint.server');
+const UserBlueprint = require(jsDir+'networking/blueprints/UserBlueprint.server');
+const EditorBlueprint = require(jsDir+'networking/blueprints/EditorBlueprint.server');
+const NetObjectBlueprint = require(jsDir+'networking/blueprints/NetObjectBlueprint.server');
 
-var DEFAULT_PORT = 82;
+const DEFAULT_PORT = 82;
 
 
 function getArgs() {
@@ -37,6 +41,9 @@ function main() {
 		BoxBlueprint: BoxBlueprint,
 		GameBlueprint: GameBlueprint,
 		PlayerBlueprint: PlayerBlueprint,
+		EditorBlueprint: EditorBlueprint,
+		UserBlueprint: UserBlueprint,
+		NetObjectBlueprint: NetObjectBlueprint,
 	};
 	server.blueprints.register(blueprints, context);
 	server.connect(wsConnServer, function(client) {
@@ -44,6 +51,7 @@ function main() {
 	});
 	var localClient = server.createLocalClient();
 	context.game = localClient.instantiateBlueprint('GameBlueprint');
+	context.editor = localClient.instantiateBlueprint('EditorBlueprint');
 }
 
 main();

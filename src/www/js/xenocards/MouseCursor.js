@@ -51,9 +51,11 @@
 		return cursor;
 	};
 	MouseCursor.prototype.updateCursor = function(e) {
+		//console.info('MouseCursor.updateCursor(e);');
 		if(!e.intersection) return;
 		var cursor = this.cursor;
 		var color = MouseCursor.COLOR_IDLE;
+		//console.log(e.intersection.point);
 		cursor.position.copy(e.intersection.point);
 		if(e.delta) cursor.position.add(e.delta);
 		if(e.intersection.object.draggable) {

@@ -117,6 +117,8 @@ function EventDispatcher() {
 		once: { value: addEventListenerOnce, enumerable: true},
 		off: { value: removeEventListener, enumerable: true},
 		trigger: { value: dispatchEvent, enumerable: true},
+		// More aliases
+		emit: { value: dispatchEvent, enumerable: true},
 		// Additional
 		addEventListeners: { value: applyEventListeners, enumerable: true},
 		removeEventListeners: { value: removeEventListeners, enumerable: true},

@@ -3,26 +3,32 @@
 'use strict';
 const EventDispatcher = require('EventDispatcher');
 
+const getComponentPropertyName = ({name}) => name.charAt(0).toLowerCase() + name.slice(1);
+
 class Entity {
-	constructor() {
+	constructor(entities, id) {
 		EventDispatcher.apply(this);
-		this._id = Entity.getId();
-		this._Components = [];
-		this._tags = [];
-		this._manager = undefined;
 		Object.defineProperties(this, {
-			id: {get: () => this._id},
+			id: {value: id, writable: false, enumerable: true},
+			_manager: {value: entities, writable: false, enumerable: true},
+			entities: {value: entities, writable: false, enumerable: true},
+			_Components: {value: [], writable: false, enumerable: true},
+			_tags: {value: [], writable: false, enumerable: true},
 		});
 	}
 	getManager() {
-		return this._manager;
+		return this.entities;
 	}
 	addComponent(Component) {
-		this._manager.entityAddComponent(this, Component);
+		this.entities.entityAddComponent(this, Component);
+		return this;
+	}
+	addComponents(Components) {
+		this.entities.entityAddComponents(this, Components);
 		return this;
 	}
 	removeComponent(Component) {
-		this._manager.entityRemoveComponent(this, Component);
+		this.entities.entityRemoveComponent(this, Component);
 		return this;
 	}
 	removeAllComponents() {
@@ -30,14 +36,22 @@ class Entity {
 		while(_Components.length > 0) this.removeComponent(_Components[_Components.length - 1]);
 		return this;
 	}
-	getComponent(Component) {
+	parseComponent(Component) {
 		if(typeof Component === 'string') Component = this._Components.find(({name}) => Component === name);
+		return Component;
+	}
+	getComponent(Component) {
+		Component = this.parseComponent(Component);
 		if(!this.hasComponent(Component)) throw new Error('Entity does not have component:', Component);
-		return this[Component.getPropertyName()];
+		return this[getComponentPropertyName(Component)];
 	}
 	hasComponent(Component) {
-		if(typeof Component === 'string') Component = this._Components.find(({name}) => Component === name);
+		Component = this.parseComponent(Component);
 		return this._Components.indexOf(Component) !== -1;
+	}
+	requireComponent(Component) {
+		if(!this.hasComponent(Component)) this.addComponent(Component);
+		return this.getComponent(Component);
 	}
 	hasAllComponents(Components) {
 		for(var i = 0; i < Components.length; i++)
@@ -61,7 +75,7 @@ class Entity {
 		return true;
 	}
 	destroy() {
-		this._manager.removeEntity(this);
+		this.entities.removeEntity(this);
 	}
 	update(...args) {
 		//console.trace('Entity.update(%s);', JSON.stringify(...args));
@@ -70,26 +84,30 @@ class Entity {
 			if(c.OnUpdate) c.OnUpdate(...args);
 		});
 	}
+	toString() {
+		const {id, _Components} = this;
+		return `Entity(${id})[${
+			_Components
+				.map(C => this.getComponent(C))
+				.join(', ')
+		}]`;
+	}
 }
-var __nextEntityId = 0;
-Object.defineProperties(Entity, {
-	getId: {value: () => __nextEntityId++}
-});
 
-class Component {
+class __Component {
 	constructor() {
 		this._entity = null;
 		this._registeredListeners = [];
-	}
-	_OnAttachComponent(entity) {
-	}
-	_OnDetachComponent(entity) {
+		Object.defineProperties(this, {
+			entities: {get: () => this.entity.entities},
+			entity: {get: () => this._entity}
+		});
 	}
 	getEntity() {
 		return this._entity;
 	}
 	getManager() {
-		return this.getEntity()._manager;
+		return this.getEntity().entities;
 	}
 	getComponent(Component) {
 		return this.getEntity().getComponent(Component);
@@ -98,9 +116,8 @@ class Component {
 		this._registeredListeners.push({target, eventName, handler});
 	}
 }
-Component.getPropertyName = function getPropertyName() {
-	const {name} = this;
-	return name.charAt(0).toLowerCase() + name.slice(1);
+__Component.getPropertyName = function getPropertyName() {
+	return getComponentPropertyName(this);
 };
 
 class System {
@@ -129,49 +146,94 @@ class System {
 	}
 }
 System.getPropertyName = function getPropertyName() {
-	const {name} = this;
-	return name.charAt(0).toLowerCase() + name.slice(1);
+	return getComponentPropertyName(this);
 };
 
 class EntityManager {
 	constructor() {
 		EventDispatcher.apply(this);
 		this._entities = [];
+		this._components = {};
+		this.__nextEntityId = 0;
+		Object.defineProperties(this, {
+			all: {value: this._entities, writable: false, enumerable: true},
+		});
 	}
-	createEntity(components = []) {
+	getNextEntityId() {
+		return this.__nextEntityId++;
+	}
+	registerComponent(component) {
+		if(Array.isArray(component)) return this.registerComponents(component);
+		if(this._components[component.name] !== undefined) {
+			console.warn('Component "%s" already registered', component.name);
+		}
+		this._components[component.name] = component;
+		return this;
+	}
+	registerComponents(components) {
+		components.forEach((component) => this.registerComponent(component));
+		return this;
+	}
+	createEntity(Components = []) {
 		const {_entities} = this;
-		const entity = new Entity();
-		entity._manager = this;
+		const entity = new Entity(this, this.getNextEntityId());
 		_entities.push(entity);
-		components.forEach(Component => entity.addComponent(Component));
+		this.entityAddComponents(entity, Components);
 		return entity;
 	}
 	removeEntity(entity) {
 		const {_entities} = this;
 		entity.removeAllComponents();
 		_entities.splice(_entities.indexOf(entity), 1);
-		entity._manager = null;
+		entity.entities = null;
 		return this;
 	}
+	getComponent(Component) {
+		//console.info('Component.getComponent(Component);');
+		/*
+		if(!(Component.prototype instanceof Component)) {
+			component = this._components[Component];
+		}
+		*/
+		if(this._components[Component] !== undefined) {
+			Component = this._components[Component];
+		}
+		if(Component === undefined) throw new Error('Invalid component:', Component);
+		return Component;
+	}
+	instantiateComponent(entity, Component) {
+		return Object.defineProperties(new Component(), {
+			entities: {value: this, writable: false, enumerable: true},
+			entity: {value: entity, writable: false, enumerable: true},
+			_entity: {value: entity, writable: false, enumerable: true},
+			toString: {value: 
+				(Component.prototype.toString && Component.prototype.toString !== Object.prototype.toString)
+					?Component.prototype.toString
+					:() => `${Component.name}`
+			},
+		});
+	}
 	entityAddComponent(entity, Component) {
+		//console.info('EntityManager.entityAddComponent(entity, Component);');
+		Component = this.getComponent(Component);
 		if(entity.hasComponent(Component)) return this;
-		entity._Components.push(Component);
-		//console.trace(Component);
-		const cName = Component.getPropertyName();
-		const component = new Component();
+		const cName = getComponentPropertyName(Component);
+		const component = this.instantiateComponent(entity, Component);
 		entity[cName] = component;
-		component._entity = entity;
-		component._OnAttachComponent(entity);
 		if(component.OnAttachComponent) component.OnAttachComponent(entity);
+		entity._Components.push(Component);
 		this.dispatchEvent({type: EntityManager.EVENT_ADDCOMPONENT, entity, Component});
+		return this;
+	}
+	entityAddComponents(entity, Components) {
+		Components.forEach(Component => this.entityAddComponent(entity, Component));
 		return this;
 	}
 	entityRemoveComponent(entity, Component) {
 		if(!entity.hasComponent(Component)) return this;
-		const cName = Component.getPropertyName();
+		const cName = getComponentPropertyName(Component);
 		const component = entity[cName];
 		this.dispatchEvent({type: EntityManager.EVENT_REMOVECOMPONENT, entity, Component});
-		component._OnDetachComponent(entity);
 		if(component.OnDetachComponent) component.OnDetachComponent(entity);
 		entity._Components.splice(entity._Components.indexOf(Component), 1);
 		delete entity[cName];
@@ -205,12 +267,32 @@ class EntityManager {
 EntityManager.EVENT_ADDCOMPONENT = 'addcomponent';
 EntityManager.EVENT_REMOVECOMPONENT = 'removecomponent';
 
+const createComponent = (name, Class, prototype = {}) => {
+	var constructorFunctionBody = `return function ${name}(){}`;
+	if(prototype.hasOwnProperty('constructor')
+			&& typeof prototype.constructor === 'function') {
+		constructorFunctionBody = prototype.constructor
+			.toString()
+			.replace(
+				/^\w*function[^(]*\(/i,
+				`return function ${name}(`
+			);
+	}
+	const constructor = new Function(constructorFunctionBody)();
+	constructor.prototype = Object.assign(Object.create(Class.prototype),
+		{OnAttachComponent: function(entity) { Class.call(this); }},
+		prototype,
+		{constructor}
+	);
+	return constructor;
+};
+
 if(typeof module !== 'undefined' && ('exports' in module)){
 	const XenoECS = {
 		Entity,
-		Component,
 		System,
 		EntityManager,
+		createComponent,
 	};
 	module.exports = XenoECS;
 	module.exports.XenoECS = XenoECS;

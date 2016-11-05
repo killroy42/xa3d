@@ -1,6 +1,5 @@
 (() => {
 
-const EventDispatcher = require('EventDispatcher');
 const {
 	Vector3, Matrix4, Quaternion, Box3,
 	Object3D,
@@ -9,12 +8,40 @@ const {
 	Mesh,
 	BoxHelper,
 } = require('THREE');
-const {Entity, Component, System, EntityManager} = require('XenoECS');
+const {Entity, System, EntityManager} = require('XenoECS');
 const {colors} = require('assetdata');
 
-class SceneComponent extends Component {
+const propValGetter = (target, prop) => ({get: () => target[prop], enumerable: true});
+const propFuncGetter = (target, prop) => ({value: (...args) => target[prop](...args), enumerable: true});
+const propGetter = (target, prop) => (typeof target[prop] === 'function')?propFuncGetter(target, prop):propValGetter(target, prop);
+
+class Wrapper {
 	constructor() {
-		super();
+		this._readyEvent = 'wrapperReady';
+		this._target = undefined;
+	}
+	set(target, readyEvent = this._readyEvent) {
+		this._target = target;
+		const propDef = {};
+		for(var prop in target) switch(prop) {
+			case 'constructor': break;
+			default:
+				//console.log('prop:', prop);
+				if(this[prop] !== undefined) {
+					console.log('prop:', prop);
+					console.log(this[prop]);
+					console.log(target[prop]);
+					throw new Error('Wrapper: property collission for "'+prop+'"');
+				}
+				propDef[prop] = propGetter(target, prop);
+		}
+		Object.defineProperties(this, propDef);
+		this.entity.dispatchEvent(this._readyEvent, this);
+	}
+}
+
+class SceneComponent {
+	constructor() {
 		this._object3d = undefined;
 		Object.defineProperties(this, {
 			name: {get: () => this._object3d.name, set: (val) => this._object3d.name = val},
@@ -220,12 +247,22 @@ ControlView.DEFAULT_SIZE = new Vector3(1, 0.1, 1);
 ControlView.DDEFAULT_COLOR = 0xffff00;
 ControlView.DELETE_COLOR = 0xff0000;
 
+
+class App extends Wrapper {
+	constructor() {
+		super();
+		this._readyEvent = 'appready';
+	}
+}
+
 if(typeof module !== 'undefined' && ('exports' in module)){
 	module.exports = {
 		Transform,
 		SceneComponent,
 		Collider,
 		ControlView,
+		Wrapper,
+		App,
 	};
 	module.exports.components = module.exports;
 }

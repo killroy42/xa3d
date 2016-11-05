@@ -11,7 +11,7 @@
 		this.initialized = false;
 		this._resCache = {};
 		this.onrender = undefined;
-		this._renderHandlers = []
+		this._renderHandlers = [];
 		this.handleWindowResize = this.handleWindowResize.bind(this);
 		this.handleContextMenu = this.handleContextMenu.bind(this);
 	}
@@ -25,7 +25,8 @@
 		var head = document.head;
 		var headStyleTags = head.getElementsByTagName('style');
 		var styleTag = document.createElement('style');
-		styleTag.type = 'text/css'; if(headStyleTags.length > 0) {
+		styleTag.type = 'text/css';
+		if(headStyleTags.length > 0) {
 			head.insertBefore(styleTag, headStyleTags[0]);
 		} else {
 			head.appendChild(styleTag);
@@ -101,6 +102,7 @@
 		this.camera = this.createCamera();
 		this.controls = this.createControls();
 		this.textureLoader = this.createTextureLoader();
+		document.body.addEventListener('touchmove', (event) => event.preventDefault(), false);
 		if(typeof this.oninit === 'function') this.oninit();
 	};
 	Prototype.prototype.addRenderHandler = function(handler) {
@@ -147,6 +149,7 @@
 	};
 	Prototype.prototype.stop = function() {
 		console.warn('Currently not animating.');
+		console.warn('Currently not animating.');
 	};
 	Prototype.prototype.fetchResource = function(url) {
 		this._resCache[url] = fetch(url);
@@ -163,18 +166,21 @@
 		return this._resCache[url];
 	};
 	Prototype.prototype.loadTexture = function(url) {
-		var self = this;
-		var boundErrorHandler = function(err) { return this.handleError(err); };
+		//console.info('Prototype.loadTexture("%s");', url);
+		const {renderer, textureLoader} = this;
 		var resolverFunc;
-		var texture = this.textureLoader.load(url, function() { resolverFunc(); }, undefined, boundErrorHandler);
+		const texture = textureLoader.load(
+			url,
+			() => resolverFunc(),
+			undefined,
+			(err) => this.handleError(err));
 		//texture.minFilter = THREE.LinearFilter;
-		texture.promise = new Promise(function(resolve, reject) { resolverFunc = resolve; });
-		texture.anisotropy = this.renderer.getMaxAnisotropy();
+		texture.promise = new Promise((resolve, reject) => resolverFunc = resolve);
+		texture.anisotropy = renderer.getMaxAnisotropy();
 		return texture;
 	};
 	Prototype.prototype.getLoadTexture = function() {
-		var self = this;
-		return function(url) { return self.loadTexture(url); };
+		return (url) => this.loadTexture(url);
 	};
 	Prototype.prototype.loadShader = function(name) {
 		var url = Prototype.PATH_SHADER + name + Prototype.EXT_SHADER;

@@ -1,5 +1,6 @@
 (function() {
-const THREE = require('THREE');
+const {Vector3, Object3D} = require('THREE');
+const EventDispatcher = require('EventDispatcher');
 
 // Constants
 	const KEY = {
@@ -29,19 +30,21 @@ const THREE = require('THREE');
 
 class FPSControls {
 	constructor() {
+		EventDispatcher.apply(this);
 		this.enabled = false;
-		this.pitchObject = new THREE.Object3D();
-		this.yawObject = new THREE.Object3D();
+		this.pitchObject = new Object3D();
+		this.yawObject = new Object3D();
 		this.yawObject.add(this.pitchObject);
 		this.keyMappings = DEFAULT_KEYMAPPINGS;
 		this.keys = {};
 		this.prevTime = performance.now();
-		this.direction = new THREE.Vector3();
-		this.acceleration = new THREE.Vector3(100, 100, 100);
-		this.inertia = new THREE.Vector3(20, 20, 20);
-		this.velocity = new THREE.Vector3();
-		this.velocityDelta = new THREE.Vector3();
-		this.sprintSpeed = 3;
+		//this.direction = new Vector3();
+		//this.acceleration = new Vector3(100, 100, 100);
+		//this.inertia = new Vector3(20, 20, 20);
+		//this.velocity = new Vector3();
+		//this.velocityDelta = new Vector3();
+		//this.sprintSpeed = 3;
+		this.update = this.createUpdate();
 	}
 	attachToDom(parent) {
 		const PI_2 = Math.PI / 2;
@@ -104,7 +107,6 @@ class FPSControls {
 			document.addEventListener('keyup', keyUpHandler, false);
 			//window.addEventListener('deviceorientation', deviceOrientationHandler, true);
 			//window.addEventListener('devicemotion', deviceMotionHandler, true);
-
 			yawObject.position.copy(camera.position);
 			yawObject.rotation.y = camera.rotation.y;
 			pitchObject.rotation.x = camera.rotation.x;
@@ -112,7 +114,6 @@ class FPSControls {
 			camera.position.set(0, 0, 0);
 			scene.add(yawObject);
 			pitchObject.add(camera);
-
 			element.style.display = 'none';
 			this.enabled = true;
 		};
@@ -122,13 +123,11 @@ class FPSControls {
 			document.removeEventListener('mousemove', mouseMoveHandler, false);
 			document.removeEventListener('keydown', keyDownHandler, false);
 			document.removeEventListener('keyup', keyUpHandler, false);
-
 			camera.position.copy(yawObject.position);
 			camera.rotation.x = pitchObject.rotation.x;
 			camera.rotation.y = yawObject.rotation.y;
 			scene.remove(yawObject);
 			pitchObject.remove(camera);
-
 			//window.removeEventListener('deviceorientation', deviceOrientationHandler, true);
 			//window.removeEventListener('devicemotion', deviceMotionHandler, true);
 			element.style.display = '';
@@ -172,44 +171,67 @@ class FPSControls {
 		//this.attachToScene(scene);
 		this.attachToDom(domElement);
 	}
-	update(time) {
-		if(this.enabled) {
-			const keys = this.keys;
-			const direction = this.direction;
-			const acceleration = this.acceleration;
-			const inertia = this.inertia;
-			const velocity = this.velocity;
-			const velocityDelta = this.velocityDelta;
-			const pitchObject = this.pitchObject;
-			const yawObject = this.yawObject;
-			const sprintSpeed = this.sprintSpeed;
-			const delta = (time - this.prevTime) / 1000;
-			// Dampening
-				velocity.x -= velocity.x * inertia.x * delta;
-				velocity.y -= velocity.y * inertia.y * delta;
-				velocity.z -= velocity.z * inertia.z * delta;
-			// Accelaration
-				var pitch = pitchObject.rotation.x;
-				velocityDelta.set(0, 0, 0);
-				var sprintMultiplier = keys[KEY.SPRINT]?sprintSpeed:1;
-				if(keys[KEY.FORWARD]) {
-					velocityDelta.z -= Math.cos(pitch) * acceleration.z * sprintMultiplier;
-					velocityDelta.y += Math.sin(pitch) * acceleration.y * sprintMultiplier;
+	createUpdate() {
+		const sprintSpeed = 3;
+		const minVelocity = 1e-4;
+		const acceleration = new Vector3(100, 100, 100);
+		const inertia = new Vector3(20, 20, 20);
+		const velocity = new Vector3();
+		const velocityDelta = new Vector3();
+		const {pitchObject, yawObject} = this;
+		var prevPitch = 0, nextPitch = 0;
+		var prevYaw = 0, nextYaw = 0;
+		return (time) => {
+			if(this.enabled) {
+				const keys = this.keys;
+				//const direction = this.direction;
+				//const acceleration = this.acceleration;
+				//const inertia = this.inertia;
+				//const velocity = this.velocity;
+				//const velocityDelta = this.velocityDelta;
+				//const pitchObject = this.pitchObject;
+				//const yawObject = this.yawObject;
+				//const sprintSpeed = this.sprintSpeed;
+				const delta = (time - this.prevTime) / 1000;
+				// Dampening
+					velocity.x -= velocity.x * inertia.x * delta;
+					velocity.y -= velocity.y * inertia.y * delta;
+					velocity.z -= velocity.z * inertia.z * delta;
+				// Accelaration
+					nextPitch = pitchObject.rotation.x;
+					nextYaw = yawObject.rotation.y;
+					const cosPitch = Math.cos(nextPitch);
+					const sinPitch = Math.sin(nextPitch);
+					velocityDelta.set(0, 0, 0);
+					const sprintMultiplier = keys[KEY.SPRINT]?sprintSpeed:1;
+					if(keys[KEY.FORWARD]) {
+						velocityDelta.z -= cosPitch * acceleration.z * sprintMultiplier;
+						velocityDelta.y += sinPitch * acceleration.y * sprintMultiplier;
+					}
+					if(keys[KEY.BACKWARD]) {
+						velocityDelta.z += cosPitch * acceleration.z * sprintMultiplier;
+						velocityDelta.y -= sinPitch * acceleration.y * sprintMultiplier;
+					}
+					if(keys[KEY.LEFT]) velocityDelta.x -= acceleration.x * sprintMultiplier;
+					if(keys[KEY.RIGHT]) velocityDelta.x += acceleration.x * sprintMultiplier;
+					if(keys[KEY.UP]) velocityDelta.y += acceleration.y * sprintMultiplier;
+					if(keys[KEY.DOWN]) velocityDelta.y -= acceleration.y * sprintMultiplier;
+				velocity.add(velocityDelta.multiplyScalar(delta));
+				//console.log(delta, velocity.length(), velocity.length() < minVelocity, velocity.length() > Number.EPSILON);
+				if(velocity.length() <= minVelocity) {
+					velocity.set(0, 0, 0);
 				}
-				if(keys[KEY.BACKWARD]) {
-					velocityDelta.z += Math.cos(pitch) * acceleration.z * sprintMultiplier;
-					velocityDelta.y -= Math.sin(pitch) * acceleration.y * sprintMultiplier;
+				yawObject.translateX(velocity.x * delta);
+				yawObject.translateY(velocity.y * delta);
+				yawObject.translateZ(velocity.z * delta);
+				if(velocity.length() > 0 || nextYaw !== prevYaw || nextPitch !== prevPitch) {
+					this.dispatchEvent('change', {fpsControl: this, position: yawObject.position, pitch: nextPitch, yaw: nextYaw});
 				}
-				if(keys[KEY.LEFT]) velocityDelta.x -= acceleration.x * sprintMultiplier;
-				if(keys[KEY.RIGHT]) velocityDelta.x += acceleration.x * sprintMultiplier;
-				if(keys[KEY.UP]) velocityDelta.y += acceleration.y * sprintMultiplier;
-				if(keys[KEY.DOWN]) velocityDelta.y -= acceleration.y * sprintMultiplier;
-			velocity.add(velocityDelta.multiplyScalar(delta));
-			yawObject.translateX(velocity.x * delta);
-			yawObject.translateY(velocity.y * delta);
-			yawObject.translateZ(velocity.z * delta);
-		}
-		this.prevTime = time;
+				prevYaw = nextYaw;
+				prevPitch = nextPitch;
+			}
+			this.prevTime = time;
+		};
 	}
 }
 
