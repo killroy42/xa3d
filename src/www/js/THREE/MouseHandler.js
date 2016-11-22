@@ -71,7 +71,7 @@
 	MouseHandler.DRAGPLANE_GRID.material.transparent = true;
 	MouseHandler.DRAGPLANE_GRID.material.opacity = 0.1;
 	//MouseHandler.prototype = Object.assign(Object.create(null), THREE.EventDispatcher.prototype);
-	MouseHandler.prototype = Object.create(null);
+	MouseHandler.prototype = Object.create(Object.prototype);
 	MouseHandler.prototype.constructor = THREE.MouseHandler;
 
 	MouseHandler.prototype.patchObject3D = function() {
@@ -223,7 +223,8 @@
 		if(this.intersection === false) return;
 		if(this.intersection.object.draggable !== true) return;
 		if(e.button !== this.drag.button) return;
-		//console.info('MouseHandler.dragPrepare(e);');
+		console.info('MouseHandler.dragPrepare(e);');
+		console.log(this.intersection.object);
 		this.state = MouseHandler.STATE_TIMEOUT;
 		var drag = this.drag;
 		drag.event = e;

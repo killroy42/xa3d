@@ -3,7 +3,40 @@
 'use strict';
 const EventDispatcher = require('EventDispatcher');
 
-const getComponentPropertyName = ({name}) => name.charAt(0).toLowerCase() + name.slice(1);
+
+const componentToJSON = function() {
+	return {_component: this.constructor.name};
+};
+
+const wrapToJson = (instance) => {
+	const {toJSON} = instance;
+	return () => Object.assign(componentToJSON.call(instance), toJSON.call(instance));
+};
+
+const componentFromJSON = function(json) {
+	return this;
+};
+
+const componentToString = function() {
+	//console.info('componentToString();', this.constructor.name);
+	const json = this.toJSON();
+	const componentName = json._component;
+	delete json._component;
+	return `${componentName}[${JSON.stringify(json)}]`;
+};
+
+const getComponentName = (Component) => {
+	if(typeof Component === 'string') return Component;
+	if(typeof Component.name === 'string') return Component.name;
+	return Component.toString().replace(/.*?class (\w+).*/, '$1');
+};
+
+const getComponentPropertyName = (Component) => {
+	const name = getComponentName(Component);
+	return name.charAt(0).toLowerCase() + name.slice(1);
+};
+
+
 
 class Entity {
 	constructor(entities, id) {
@@ -13,14 +46,16 @@ class Entity {
 			_manager: {value: entities, writable: false, enumerable: true},
 			entities: {value: entities, writable: false, enumerable: true},
 			_Components: {value: [], writable: false, enumerable: true},
+			_components: {value: {}, writable: false, enumerable: true},
 			_tags: {value: [], writable: false, enumerable: true},
 		});
 	}
 	getManager() {
+
 		return this.entities;
 	}
-	addComponent(Component) {
-		this.entities.entityAddComponent(this, Component);
+	addComponent(Component, opts) {
+		this.entities.entityAddComponent(this, Component, opts);
 		return this;
 	}
 	addComponents(Components) {
@@ -36,22 +71,53 @@ class Entity {
 		while(_Components.length > 0) this.removeComponent(_Components[_Components.length - 1]);
 		return this;
 	}
-	parseComponent(Component) {
-		if(typeof Component === 'string') Component = this._Components.find(({name}) => Component === name);
-		return Component;
-	}
 	getComponent(Component) {
-		Component = this.parseComponent(Component);
-		if(!this.hasComponent(Component)) throw new Error('Entity does not have component:', Component);
-		return this[getComponentPropertyName(Component)];
+		//console.info('Entity.getComponent(Component);', Component.name || Component);
+		const {_Components, _components} = this;
+		if(_Components.length === 0) return undefined;
+		const component = _components[getComponentName(Component)];
+		if(component !== undefined) return component;
+		if(typeof Component.isPrototypeOf !== 'function') return undefined;
+		const ClassMatch = _Components.find(C => Component.isPrototypeOf(C));
+		if(ClassMatch === undefined) return undefined;
+		return _components[ClassMatch.name];
 	}
 	hasComponent(Component) {
-		Component = this.parseComponent(Component);
-		return this._Components.indexOf(Component) !== -1;
+		return this.getComponent(Component) !== undefined;
+		//console.group('Entity.hasComponent');
+		//console.info('Entity.hasComponent(Component);', Component.name || Component);
+		//const component = this.getComponent(Component);
+		/*
+		const {_Components, _components} = this;
+		const name = Component.name || Component;
+		console.error('Case A:', _components[name] !== undefined);
+		if(_components[name] !== undefined) return true;
+		_Components.forEach(C => {
+			console.error(C);
+			console.log(C === Component);
+			console.log(Component.isPrototypeOf);
+			console.log(Component.isPrototypeOf(C));
+		});
+			//(C === Component) ||
+			//(Component.isPrototypeOf && Component.isPrototypeOf(C))
+		//);
+		*/
+		//console.groupEnd('Entity.hasComponent');
+		//return false;
+		//throw new Error('hasComponent not implemented');
+		//Component = this.resolveComponent(Component);
+		//if(Component === undefined) return false;
+		//return this._components[Component.name] !== undefined;
+		//return this._Components[Component];
+		//return this.getComponentClass(Component) !== undefined;
 	}
 	requireComponent(Component) {
+		//console.group('Entity.requireComponent');
+		//console.info('Entity.requireComponent(Component);', Component.name || Component);
 		if(!this.hasComponent(Component)) this.addComponent(Component);
-		return this.getComponent(Component);
+		const component = this.getComponent(Component);
+		//console.groupEnd('Entity.requireComponent');
+		return component;
 	}
 	hasAllComponents(Components) {
 		for(var i = 0; i < Components.length; i++)
@@ -84,40 +150,35 @@ class Entity {
 			if(c.OnUpdate) c.OnUpdate(...args);
 		});
 	}
+	componentToString(Component) {
+		return (Component.prototype.toString &&
+			Component.prototype.toString !== Object.prototype.toString)
+				?this.getComponent(Component).toString()
+				:Component.name;
+	}
+	fromJSON(json) {
+		this.addComponents(json.components);
+	}
+	toJSON() {
+		const {id, _components} = this;
+		const components = {};
+		Object.keys(_components).forEach(name => {
+			components[name] = _components[name].toJSON();
+			delete components[name]._component;
+		});
+		return {id, components};
+	}
 	toString() {
 		const {id, _Components} = this;
-		return `Entity(${id})[${
+		return `Entity(${id})\n${
 			_Components
-				.map(C => this.getComponent(C))
-				.join(', ')
-		}]`;
+				.map(C => `  * ${this.getComponent(C).toString()}`)
+				.join('\n')
+		}`;
 	}
 }
-
-class __Component {
-	constructor() {
-		this._entity = null;
-		this._registeredListeners = [];
-		Object.defineProperties(this, {
-			entities: {get: () => this.entity.entities},
-			entity: {get: () => this._entity}
-		});
-	}
-	getEntity() {
-		return this._entity;
-	}
-	getManager() {
-		return this.getEntity().entities;
-	}
-	getComponent(Component) {
-		return this.getEntity().getComponent(Component);
-	}
-	registerEventListener(target, eventName, handler) {
-		this._registeredListeners.push({target, eventName, handler});
-	}
-}
-__Component.getPropertyName = function getPropertyName() {
-	return getComponentPropertyName(this);
+Entity.isEntity = (entity) => {
+	
 };
 
 class System {
@@ -153,7 +214,7 @@ class EntityManager {
 	constructor() {
 		EventDispatcher.apply(this);
 		this._entities = [];
-		this._components = {};
+		this._Components = {};
 		this.__nextEntityId = 0;
 		Object.defineProperties(this, {
 			all: {value: this._entities, writable: false, enumerable: true},
@@ -162,19 +223,33 @@ class EntityManager {
 	getNextEntityId() {
 		return this.__nextEntityId++;
 	}
-	registerComponent(component) {
-		if(Array.isArray(component)) return this.registerComponents(component);
-		if(this._components[component.name] !== undefined) {
-			console.warn('Component "%s" already registered', component.name);
+	registerComponent(Component) {
+		//console.info('EntityManager.registerComponent(Component);', getComponentName(Component));
+		const {_Components} = this;
+		if(Array.isArray(Component)) return this.registerComponents(Component);
+		const name = getComponentName(Component);
+		if(typeof Component !== 'function') {
+			throw new Error(`Not a valid Component for registration. name: "${name}", type: [${typeof Component}]`);
 		}
-		this._components[component.name] = component;
+		if(_Components[name] !== undefined) {
+			console.warn('Component "%s" already registered', name);
+		}
+		_Components[name] = Component;
 		return this;
 	}
 	registerComponents(components) {
 		components.forEach((component) => this.registerComponent(component));
 		return this;
 	}
-	createEntity(Components = []) {
+	resolveComponent(Component) {
+		//console.info('EntityManager.resolveComponent(Component);', getComponentName(Component));
+		const {_Components} = this;
+		const name = getComponentName(Component);
+		if(!_Components[name]) this.registerComponent(Component);
+		return _Components[name];
+	}
+	createEntity(Components) {
+		//console.info('EntityManager.createEntity(Components);', Object.keys(Components));
 		const {_entities} = this;
 		const entity = new Entity(this, this.getNextEntityId());
 		_entities.push(entity);
@@ -182,65 +257,100 @@ class EntityManager {
 		return entity;
 	}
 	removeEntity(entity) {
+		//console.info('EntityManager.removeEntity(entity);');
 		const {_entities} = this;
+		
+		entity.dispatchEvent({type: EntityManager.EVENT_DESTROYENTITY, entity});
+
+		Object.keys(entity._components)
+			.map(name => entity._components[name])
+			.forEach(c => (typeof c.OnDestroy === 'function')?c.OnDestroy():null);
+
 		entity.removeAllComponents();
 		_entities.splice(_entities.indexOf(entity), 1);
-		entity.entities = null;
+		//entity.entities = null;
 		return this;
 	}
-	getComponent(Component) {
-		//console.info('Component.getComponent(Component);');
-		/*
-		if(!(Component.prototype instanceof Component)) {
-			component = this._components[Component];
-		}
-		*/
-		if(this._components[Component] !== undefined) {
-			Component = this._components[Component];
-		}
-		if(Component === undefined) throw new Error('Invalid component:', Component);
-		return Component;
-	}
 	instantiateComponent(entity, Component) {
-		return Object.defineProperties(new Component(), {
-			entities: {value: this, writable: false, enumerable: true},
-			entity: {value: entity, writable: false, enumerable: true},
-			_entity: {value: entity, writable: false, enumerable: true},
-			toString: {value: 
-				(Component.prototype.toString && Component.prototype.toString !== Object.prototype.toString)
-					?Component.prototype.toString
-					:() => `${Component.name}`
-			},
+		//console.info('EntityManager.instantiateComponent(entity, Component);', getComponentName(Component));
+		const instance = Object.defineProperties(new Component(), {
+			entities: {value: this, configurable: false, writable: false, enumerable: true},
+			entity: {value: entity, configurable: false, writable: false, enumerable: true},
+			_entity: {value: entity, configurable: false, writable: false, enumerable: true},
 		});
+		if(typeof instance.toJSON !== 'function') {
+			Object.defineProperty(instance, 'toJSON', {
+				value: componentToJSON,
+				configurable: true, writable: true, enumerable: true
+			});
+		} else {
+			Object.defineProperty(instance, 'toJSON', {
+				value: wrapToJson(instance),
+				configurable: true, writable: true, enumerable: true
+			});
+		}
+		if(typeof instance.fromJSON !== 'function') {
+			Object.defineProperty(instance, 'fromJSON', {
+				value: componentFromJSON,
+				configurable: true, writable: true, enumerable: true
+			});
+		}
+		if(instance.hasOwnProperty('toString') === false) {
+			Object.defineProperty(instance, 'toString', {
+				value: componentToString,
+				configurable: true, writable: true, enumerable: true
+			});
+		}
+		return instance;
 	}
-	entityAddComponent(entity, Component) {
-		//console.info('EntityManager.entityAddComponent(entity, Component);');
-		Component = this.getComponent(Component);
-		if(entity.hasComponent(Component)) return this;
-		const cName = getComponentPropertyName(Component);
+	entityAddComponent(entity, Component, opts) {
+		//console.info('EntityManager.entityAddComponent(entity, Component, opts);');
+		Component = this.resolveComponent(Component);
+		if(typeof Component === 'string') throw new Error(`Component not found: "${Component}"`);
+		if(entity.hasComponent(Component)) {
+			return this;
+		}
+		const propName = getComponentPropertyName(Component);
 		const component = this.instantiateComponent(entity, Component);
-		entity[cName] = component;
-		if(component.OnAttachComponent) component.OnAttachComponent(entity);
+		if(entity[propName] !== undefined) throw new Error(`Component name collision for "${propName}"`);
 		entity._Components.push(Component);
+		const name = getComponentName(Component);
+		entity._components[name] = component;
+		entity[propName] = component;
+		if(component.OnAttachComponent) component.OnAttachComponent(entity);
 		this.dispatchEvent({type: EntityManager.EVENT_ADDCOMPONENT, entity, Component});
+		if(opts) component.fromJSON(opts);
 		return this;
 	}
 	entityAddComponents(entity, Components) {
-		Components.forEach(Component => this.entityAddComponent(entity, Component));
+		//console.info('EntityManager.entityAddComponents(entity, Components);', Object.keys(Components));
+		if(Array.isArray(Components)) {
+			Components.forEach(C => this.entityAddComponent(entity, C));
+		} else if(typeof Components === 'object') {
+			const componentNames = Object.keys(Components);
+			componentNames.forEach(C => this.entityAddComponent(entity, C));
+			componentNames.forEach(C => entity.getComponent(C).fromJSON(Components[C]));
+		}
 		return this;
 	}
 	entityRemoveComponent(entity, Component) {
-		if(!entity.hasComponent(Component)) return this;
+		//console.info('EntityManager.entityRemoveComponent(entity, Component);');
+		const component = entity.getComponent(Component);
+		if(component === undefined) {
+			return this;
+		}
+		Component = component.constructor;
 		const cName = getComponentPropertyName(Component);
-		const component = entity[cName];
-		this.dispatchEvent({type: EntityManager.EVENT_REMOVECOMPONENT, entity, Component});
+		this.dispatchEvent({type: EntityManager.EVENT_REMOVECOMPONENT, entity, component});
 		if(component.OnDetachComponent) component.OnDetachComponent(entity);
 		entity._Components.splice(entity._Components.indexOf(Component), 1);
 		delete entity[cName];
+		delete entity._components[Component.name];
 		return this;
 	}
 	queryComponents(Components) {
 		if(!Array.isArray(Components)) Components = [Components];
+		Components = Components.map(C => this.resolveComponent(C));
 		//console.info('EntityManager.queryComponents(Components);', Components);
 		const res = this._entities.filter(entity => entity.hasAllComponents(Components));
 		return res;
@@ -249,7 +359,8 @@ class EntityManager {
 		//console.info('EntityManager.findComponent("%s");', Component.name || Component);
 		const entity = this.queryComponents(Component)[0];
 		if(entity === undefined) return undefined;
-		return entity.getComponent(Component);
+		const component = entity.getComponent(Component);
+		return component;
 	}
 	queryTags(tags) {
 		if(!Array.isArray(tags)) tags = [tags];
@@ -266,26 +377,121 @@ class EntityManager {
 }
 EntityManager.EVENT_ADDCOMPONENT = 'addcomponent';
 EntityManager.EVENT_REMOVECOMPONENT = 'removecomponent';
+EntityManager.EVENT_DESTROYENTITY = 'destroy';
 
-const createComponent = (name, Class, prototype = {}) => {
-	var constructorFunctionBody = `return function ${name}(){}`;
-	if(prototype.hasOwnProperty('constructor')
-			&& typeof prototype.constructor === 'function') {
-		constructorFunctionBody = prototype.constructor
+const createComponent = (name, Class, methods = {}) => {
+	console.info('createComponent("%s", Class, methods);', name);
+	let constructorFunctionBody = `return function ${name}(){}`;
+	console.log('methods:', Object.keys(methods));
+	console.log('has constructor:', methods.hasOwnProperty('constructor'));
+	if(methods.hasOwnProperty('constructor') && typeof methods.constructor === 'function') {
+		constructorFunctionBody = methods.constructor
 			.toString()
 			.replace(
 				/^\w*function[^(]*\(/i,
 				`return function ${name}(`
 			);
 	}
-	const constructor = new Function(constructorFunctionBody)();
-	constructor.prototype = Object.assign(Object.create(Class.prototype),
+	const Component = new Function(constructorFunctionBody)();
+	const prototype = Object.assign(
+		Object.create(Class.prototype),
 		{OnAttachComponent: function(entity) { Class.call(this); }},
-		prototype,
-		{constructor}
+		methods,
+		{constructor: Component}
 	);
-	return constructor;
+	Component.prototype = prototype;
+	return Component;
 };
+
+const makeComponent = (Class) => {
+	const Component = new Function(`return function ${Class.name}() {}`)();
+	Component.prototype = Object.create(Class.prototype, {
+		constructor: {
+			value: Component,
+			configurable: true, enumerable: true, writable: true
+		},
+		OnAttachComponent: {
+			value: function(entity) { Class.call(this); },
+			configurable: true, enumerable: true, writable: true
+		},
+		toJSON: {
+			value: componentToJSON,
+			configurable: true, enumerable: true, writable: true
+		}
+	});
+	return Component;
+};
+
+class Node {
+	constructor() {
+		this._parent = undefined;
+		this._children = [];
+		Object.defineProperties(this, {
+			parent: {get: () => this._parent},
+			children: {get: () => this._children},
+		});
+	}
+	OnDestroy(entity) {
+		//console.info('Node.OnDestroy(entity);', this.entity.id);
+		this.detach();
+	}
+	attach(childNode) {
+		//console.info('Node.attach(childNode);', this.entity.id);
+		if(Array.isArray(childNode)) {
+			childNode.forEach(childNode => this.attach(childNode));
+			return;
+		}
+		if(!(childNode instanceof Node)) throw new Error('childNode is not a Node');
+		childNode.detach();
+		childNode._parent = this;
+		this._children.push(childNode);
+		if(childNode.entity.transform) {
+			this.entity.transform.add(childNode.entity.transform);
+		}
+	}
+	detach(childNode) {
+		if(childNode === undefined) {
+			if(this._parent !== undefined) this._parent.detach(this);
+			return this;
+		}
+		//console.info('Node.detach(childNode);', this.entity.id);
+		const idx = this._children.indexOf(childNode);
+		if((childNode._parent !== this) || (idx === -1)) {
+			throw new Error('childNode is not a child of this node');
+		}
+		if(childNode.entity.transform &&
+			this.entity.transform &&
+			childNode.entity.transform.parent === this.entity.transform) {
+			this.entity.transform.remove(childNode.entity.transform);
+		}
+		childNode._parent = undefined;
+		this._children.splice(idx, 1);
+	}
+	fromJSON(json = {}) {
+		//console.info('Node.fromJSON(json);', this.entity.id);
+		const {entities, _children} = this;
+		const {children = []} = json;
+		[..._children].forEach(({entity}) => entity.destroy());
+		children.forEach(json => {
+			const child = entities.createEntity(json);
+			child.addComponent(Node);
+			this.attach(child.node);
+		});
+	}
+	toJSON() {
+		const {_children} = this;
+		const json = {};
+		//if(this._parent) json.parent = this._parent.entity.id;
+		if(_children.length > 0) json.children = _children.map(({entity}) => {
+			const json = entity.toJSON().components;
+			console.log(json);
+			delete json.node;
+			return json;
+		});
+		return json;
+	}
+}
+
 
 if(typeof module !== 'undefined' && ('exports' in module)){
 	const XenoECS = {
@@ -293,6 +499,8 @@ if(typeof module !== 'undefined' && ('exports' in module)){
 		System,
 		EntityManager,
 		createComponent,
+		makeComponent,
+		Node,
 	};
 	module.exports = XenoECS;
 	module.exports.XenoECS = XenoECS;

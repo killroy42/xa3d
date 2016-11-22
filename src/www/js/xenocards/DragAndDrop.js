@@ -61,7 +61,7 @@
 		var dropZ = this.dropZ;
 		var camera = this.app.camera;
 		var scene = this.app.scene;
-		var wireframe;
+		//var wireframe;
 		this.mouseHandler = mouseHandler;
 		var cardEventListeners = {
 			dragstart: function cardDragStart(e) {
@@ -78,13 +78,13 @@
 				}
 				this._dragStartPosition = this.position.clone();
 				this.animateVector(liftVector);
-				scene.add(wireframe);
+				//scene.add(wireframe);
 				self.dropTarget = self.getDropTarget(e, this, dropZ);
-				wireframe.position.copy(self.dropTarget);
+				//wireframe.position.copy(self.dropTarget);
 				this.dispatchEvent('lifted');
 			},
 			dragfinish: function cardDragFinish(e) {
-				scene.remove(wireframe);
+				//scene.remove(wireframe);
 				self.dropTarget = self.getDropTarget(e, this, dropZ);
 				var dropVector = self.dropTarget.clone();
 				dropVector.sub(this.position);
@@ -94,11 +94,11 @@
 			drag: function cardDrag(e) {
 				this.position.addVectors(this._dragStartPosition, e.delta);
 				self.dropTarget = self.getDropTarget(e, this, dropZ);
-				wireframe.position.copy(self.dropTarget);
+				//wireframe.position.copy(self.dropTarget);
 			}
 		};
 		this.attachCard = function(card) {
-			if(wireframe === undefined) wireframe = this.createWireFrame(card.mesh);
+			//if(wireframe === undefined) wireframe = this.createWireFrame(card.mesh);
 			card.addEventListeners(cardEventListeners);
 			self.dispatchEvent('cardattached', card);
 			card.detachDragAndDrop = function() {

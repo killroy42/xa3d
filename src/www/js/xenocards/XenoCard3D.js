@@ -77,9 +77,11 @@
 			text.name = 'card.text';
 			portrait.name = 'card.portrait';
 			card.mesh = body;
+			card.add(card.mesh);
 			body.add(face);
 			body.add(text);
 			body.add(portrait);
+			/*
 			var collider = new THREE.Mesh(res.body, new THREE.MeshBasicMaterial({color: 0x000000, visible: false}));
 			collider.name = 'card.collider';
 			collider.receiveMouseEvents = true;
@@ -89,8 +91,8 @@
 			XenoCard3D.FORWARDED_EVENTS.forEach(function(eventName) {
 				collider.addEventListener(eventName, eventForwarder);
 			});
-			card.add(card.mesh);
 			card.add(card.collider);
+			*/
 			// Icons
 				textures.costIcon.magFilter = THREE.NearestFilter;
 				textures.costIcon.minFilter = THREE.LinearMipMapLinearFilter;

@@ -68,8 +68,8 @@
 		controls.userPanSpeed = 0.1;
 		this.setCamera(this.camera.position, this.cameraTarget);
 		return controls;
-	}
-;	Prototype.prototype.createTextureLoader = function() {
+	};	
+	Prototype.prototype.createTextureLoader = function() {
 		var textureLoader = new THREE.TextureLoader();
 		textureLoader.crossOrigin = 'Anonymous';
 		return textureLoader;
