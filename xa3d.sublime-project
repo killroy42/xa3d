@@ -1,0 +1,25 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+			"name": "xa3d"
+		},
+		{
+			"path": ".\\src\\www\\js\\xeno",
+			"name": "xeno"
+		},
+		{
+			"path": ".\\src\\www\\prototypes",
+			"name": "prototypes"
+		},
+		{
+			"path": ".\\src\\www",
+			"name": "www"
+		},
+		{
+			"path": ".\\src\\server",
+			"name": "server"
+		},
+	]
+}

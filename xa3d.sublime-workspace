@@ -1,0 +1,1011 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"slot",
+				"slotWidth"
+			],
+			[
+				"IN",
+				"INHAND"
+			],
+			[
+				"DEA",
+				"DEALING"
+			],
+			[
+				"Move",
+				"MoveModel"
+			],
+			[
+				"set",
+				"setVolume"
+			],
+			[
+				"Card",
+				"CardView"
+			],
+			[
+				"Car",
+				"CardView"
+			],
+			[
+				"playS",
+				"playSound"
+			],
+			[
+				"background",
+				"background-size"
+			],
+			[
+				"DRAGSTART",
+				"onDragStart"
+			],
+			[
+				"prot",
+				"prototype"
+			],
+			[
+				"ener",
+				"energyMax"
+			],
+			[
+				"energ",
+				"energyMax"
+			],
+			[
+				"att",
+				"attacker"
+			],
+			[
+				"scale",
+				"cardScale0"
+			],
+			[
+				"opopn",
+				"opponentModel"
+			],
+			[
+				"get",
+				"getOpponent"
+			],
+			[
+				"ena",
+				"enableCards"
+			],
+			[
+				"Game",
+				"GameView"
+			],
+			[
+				"un",
+				"unhintCards"
+			],
+			[
+				"plaer",
+				"playerHandY"
+			],
+			[
+				"boar",
+				"boardUi"
+			],
+			[
+				"draw",
+				"drawFromDeckA"
+			],
+			[
+				"in",
+				"innerHTML"
+			],
+			[
+				"font-",
+				"font-family"
+			],
+			[
+				"cardZ",
+				"cardZboard"
+			],
+			[
+				"oppo",
+				"opponentHand"
+			],
+			[
+				"pl",
+				"playerHand"
+			],
+			[
+				"slo",
+				"slotTop"
+			],
+			[
+				"off",
+				"offsetY"
+			],
+			[
+				"free",
+				"freeSlot"
+			],
+			[
+				"unregister",
+				"unregisterEvent"
+			],
+			[
+				"new",
+				"newSlot"
+			],
+			[
+				"hove",
+				"hoverSlot"
+			],
+			[
+				"mo",
+				"mousedown"
+			],
+			[
+				"paren",
+				"parentPosition"
+			],
+			[
+				"playe",
+				"playerA"
+			],
+			[
+				"appen",
+				"appendTo"
+			],
+			[
+				"dec",
+				"deckSize"
+			],
+			[
+				"do",
+				"doTurn"
+			],
+			[
+				"b",
+				"board"
+			],
+			[
+				"GAMESTATE",
+				"GAMESTATE_READY"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"dis",
+				"Disconnect"
+			],
+			[
+				"Xeno",
+				"XenoClient"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 62.0,
+		"last_filter": "update",
+		"selected_items":
+		[
+			[
+				"update",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"remov",
+				"Package Control: Remove Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Upgrade Package"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"packa",
+				"Package Control: Remove Package"
+			],
+			[
+				"findk",
+				"FindKeyConflicts: All Conflicts"
+			],
+			[
+				"#",
+				"Snippet: #!/usr/bin/env"
+			],
+			[
+				"disc",
+				"Package Control: Discover Packages"
+			],
+			[
+				"ins",
+				"Package Control: Install Local Dependency"
+			],
+			[
+				"ena",
+				"Package Control: Enable Package"
+			],
+			[
+				"consol",
+				"Set Syntax: R Console"
+			],
+			[
+				"updat",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"sql",
+				"SQL Beautifier: Format Current SQL File"
+			],
+			[
+				"markdown chea",
+				"Markdown Preview: Open Markdown Cheat sheet"
+			],
+			[
+				"preview",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"upda",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"pack",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: up",
+				"Package Control: Upgrade Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"upd",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"upgrade",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"control",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"theme",
+				"Colorsublime: Install Theme"
+			],
+			[
+				"vali",
+				"Pretty JSON: Validate"
+			],
+			[
+				"prettty",
+				"Pretty JSON: Format (Pretty Print) JSON"
+			],
+			[
+				"Package Control: re",
+				"Package Control: Remove Package"
+			],
+			[
+				"co",
+				"Sublimerge: Compare Foremost Views"
+			],
+			[
+				"comp",
+				"Sublimerge: Compare Foremost Views"
+			],
+			[
+				"Package Control: sea",
+				"Package Control: Install Package"
+			],
+			[
+				"ssmd",
+				"Set Syntax: Markdown GFM"
+			],
+			[
+				"ssplt",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"gutter",
+				"SublimeLinter: Choose Gutter Theme"
+			],
+			[
+				"git: stat",
+				"Git: Status"
+			],
+			[
+				"instak",
+				"Package Control: Install Package"
+			],
+			[
+				"color",
+				"Colorsublime: Browse Themes"
+			],
+			[
+				"colors",
+				"Colorsublime: Browse Themes"
+			],
+			[
+				"markd",
+				"Set Syntax: Markdown"
+			],
+			[
+				"devd",
+				"DevDocs: Search From Input"
+			],
+			[
+				"dev",
+				"DevDocs: Search From Input"
+			],
+			[
+				"packe",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: insta",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: dup",
+				"Package Control: Upgrade Package"
+			],
+			[
+				"markdo",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"mark",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"markdown",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"packages",
+				"Preferences: Browse Packages"
+			]
+		],
+		"width": 426.0
+	},
+	"console":
+	{
+		"height": 886.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,sys; exec(\"if sys.version_info < (3,) or os.name != 'nt': raise OSError('This code is for Windows ST3 only!')\"); pr='Preferences.sublime-settings'; ip='ignored_packages'; n='Package Control'; s=sublime.load_settings(pr); ig=s.get(ip); ig.append(n); s.set(ip,ig); sublime.save_settings('Preferences.sublime-settings'); pf=n+'.sublime-package'; urllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler())); by=urllib.request.urlopen('https://packagecontrol.io/'+pf.replace(' ','%20')).read(); open(os.path.join(sublime.installed_packages_path(),pf),'wb').write(by); ig.remove(n); s.set(ip,ig); sublime.save_settings(pr); print('Package Control: 3.0.0 upgrade successful!')",
+			"sublime.log_commands(True)",
+			"ublime.log_commands(True)",
+			"sublime.log_commands(True)",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"yt"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/gitroot/xa3d/src/www/js/xeno",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs",
+		"/C/gitroot/xa3d/src/www/prototypes",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement",
+		"/C/gitroot/xa3d/src/www",
+		"/C/gitroot/xa3d/src/www/js",
+		"/C/gitroot/xa3d/src/www/js/THREE",
+		"/C/gitroot/xa3d/src/www/js/xenocards"
+	],
+	"file_history":
+	[
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/index.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/XenoECS.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCards.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsEditor.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/Environment.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/XenoCard3D.js",
+		"/C/gitroot/xa3d/src/www/js/THREE/MouseHandler.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsTHREE.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/index.html",
+		"/C/gitroot/xa3d/src/www/js/networking/ConnectionServer.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/EventDispatcher.js",
+		"/C/gitroot/xa3d/src/www/js/networking/WebSocketConnection.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Runtime/index.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsGuiCore.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCore.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/PlacesEditor/index.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/PlacesEditor-transitions/index.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/XenoRuntime.js",
+		"/C/gitroot/xa3d/src/www/data/ProximaNovaCnLt_Bold.json",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/PlacesEditor/index.html",
+		"/C/gitroot/xa3d/src/www/js/polyfills/fetch.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/MouseCursor.js",
+		"/C/gitroot/xa3d/package.json",
+		"/C/gitroot/xa3d/app.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCards2.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsPlaces.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Runtime/index.html",
+		"/C/gitroot/xa3d/src/www/prototypes/interaction/draganddrop/index.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/DragAndDrop.js",
+		"/C/gitroot/xa3d/src/www/js/THREE/Prototype.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/xenocard/index.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsComponents.js",
+		"/C/gitroot/xa3d/xa3d.sublime-project",
+		"/C/gitroot/xa3d/xa3d.sublime-workspace",
+		"/C/gitroot/rmsr2017/src/components/RaceEventManager.js",
+		"/C/gitroot/rmsr2017/data/rmsr_events.nedb",
+		"/C/gitroot/rmsr2017/src/components/RaceEventSelector.js",
+		"/C/gitroot/rmsr2017/src/components/urls.js",
+		"/C/gitroot/rmsr2017/src/components/SaveUndoBar.js",
+		"/C/gitroot/rmsr2017/src/components/YearSelector.js",
+		"/C/gitroot/rmsr2017/node_modules/material-ui/Avatar/Avatar.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/events.js",
+		"/C/gitroot/rmsr2017/src/components/RaceEditor.js",
+		"/C/gitroot/rmsr2017/src/components/helpers.js",
+		"/C/gitroot/rmsr2017/lib/CesiumUnminified/Workers/createCircleGeometry.js",
+		"/C/gitroot/rmsr2017/src/components/RacesSaveUndoBar.js",
+		"/C/gitroot/rmsr2017/src/states/api.js",
+		"/C/gitroot/rmsr2017/src/components/__LegacyRaceManager.js",
+		"/C/gitroot/rmsr2017/src/apps/admin/pages/Dashboard.js",
+		"/C/gitroot/xenocards/src/www/views/app/index.js",
+		"/C/gitroot/rmsr2017/src/apps/admin/pages/Races.js",
+		"/C/gitroot/rmsr2017/src/server/libs/SQLite.js",
+		"/C/gitroot/rmsr2017/src/components/RaceEventLoader.js",
+		"/C/gitroot/rmsr2017/src/components/RaceSelector.js",
+		"/C/gitroot/rmsr2017/src/apps/admin/AppRouter.js",
+		"/C/$WINDOWS.~BT/Sources/Panther/diagerr.xml",
+		"/C/$WINDOWS.~BT/Sources/Rollback/LogRestore.TXT",
+		"/C/$WINDOWS.~BT/Sources/Panther/setupact.log",
+		"/C/$WINDOWS.~BT/Sources/Panther/setuperr.log",
+		"/C/$WINDOWS.~BT/Sources/Panther/f3JEGTRSqESAK8o9.3.8.0.0_APPRAISER_HumanReadable.xml",
+		"/C/$WINDOWS.~BT/Sources/Panther/f3JEGTRSqESAK8o9.3.8.0.0_APPRAISER_SetupOutput.xml",
+		"/C/$WINDOWS.~BT/Sources/Panther/setupinfo",
+		"/C/$WINDOWS.~BT/Sources/Panther/setup.etl",
+		"/C/$WINDOWS.~BT/Sources/Rollback/diagerr.xml",
+		"/C/$WINDOWS.~BT/Sources/Rollback/setupact.log",
+		"/C/$WINDOWS.~BT/Sources/Rollback/setuperr.log",
+		"/C/$WINDOWS.~BT/Sources/Panther/DDACLSys.log",
+		"/G/MediaMeta.xml",
+		"/C/gitroot/rmsr2017/src/components/ApiLoader.js",
+		"/C/gitroot/rmsr2017/src/apps/admin/pages/RaceManager.js",
+		"/C/gitroot/rmsr2017/src/apps/admin/pages/EntrantManager.js",
+		"/C/gitroot/rmsr2017/rmsr2017.sublime-project",
+		"/C/gitroot/rmsr2017/src/components/ReportListing.js",
+		"/D/Downloads/RedditRip.v1.0/notes.txt",
+		"/C/gitroot/rmsr2017/src/assets/test_data.json",
+		"/C/gitroot/rmsr2017/src/components/EntrantEditor.js",
+		"/C/gitroot/rmsr2017/src/apps/admin/pages/EntrantListing.js",
+		"/C/gitroot/rmsr2017/src/components/Grid.js",
+		"/C/gitroot/xa3d/src/www/js/core/module-loader.js",
+		"/C/gitroot/xa3d/src/www/vendors/THREE/three_r83dev.js",
+		"/C/Users/killroy/Dropbox/Projects/RMSR 2017/Design/README.txt",
+		"/D/Downloads/fleetlist-2016-10-31.csv",
+		"/C/gitroot/rmsr2017/www/styles/racereports.css",
+		"/C/gitroot/rmsr2017/src/components/styles/racereports.css",
+		"/C/gitroot/rmsr2017/src/server/cms/server.js",
+		"/C/gitroot/rmsr2017/package.json",
+		"/C/gitroot/rmsr2017/src/components/RaceReport.js",
+		"/C/gitroot/rmsr2017/node_modules/crc/package.json",
+		"/C/Users/killroy/Dropbox/PortableApps/SublimeText/Data/Packages/User/BufferScroll.sublime-settings",
+		"/C/Users/killroy/Dropbox/PortableApps/SublimeText/Data/Packages/BufferScroll/BufferScroll.sublime-settings",
+		"/C/Users/killroy/Dropbox/PortableApps/SublimeText/Data/Packages/DistractionFreeWindow/settings/distraction_free_window.sublime-settings",
+		"/C/Users/killroy/Dropbox/PortableApps/SublimeText/Data/Index/000112.log",
+		"/D/Downloads/fleetlist-2016-10-26.csv",
+		"/C/gitroot/echofleet/builds/webgl/index.html",
+		"/D/Shared/VM/rmsr2017/rmsr2017/results/report_requiredfinishingtimes_print.cfm",
+		"/D/Shared/VM/rmsr2017/rmsr2017/admin/modules/included/reports/report_requiredfinishingtimes_print.cfm",
+		"/D/Shared/VM/rmsr2017/rmsr2017/admin/rmsr/lib_fleetposition.cfm",
+		"/D/Shared/VM/rmsr2017/rmsr2017/results/index.cfm",
+		"/D/Shared/VM/rmsr2017/rmsr2017/admin/rmsr/lib_trackerdata.inc.cfm",
+		"/C/gitroot/rmsr2017/src/tools/raceMath.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/index.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/requiredfinishingtimes.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/entrant.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/final.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/report-tools.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/yellowbrick.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/tracking.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/starting.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/scruteneering_blank.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/entrantsstatus.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/berthing.js",
+		"/C/gitroot/rmsr2017/src/server/rmsrapi/index.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/fleetlist.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/fleetinfo.js",
+		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/finish.js",
+		"/C/gitroot/xa3d/src/www/prototypes/extra/wfc/index.js",
+		"/C/gitroot/xa3d/src/www/prototypes/extra/wfc/index.html",
+		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/index.js",
+		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/model.js",
+		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/package.json",
+		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/overlapping-model.js",
+		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/README.md",
+		"/C/gitroot/xa3d/src/www/prototypes/extra/wfc/wfc.js",
+		"/C/gitroot/killroy42.github.io/index.html",
+		"/C/gitroot/killroy42.github.io/js/discord.js",
+		"/C/gitroot/killroy42.github.io/js/main.js",
+		"/C/gitroot/killroy42.github.io/js/discord-widget.min.js",
+		"/C/gitroot/killroy42.github.io/multichat.html"
+	],
+	"find":
+	{
+		"height": 42.0
+	},
+	"find_in_files":
+	{
+		"height": 168.0,
+		"where_history":
+		[
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -*.dump, -logs/*, -*.tif, -*.bil, -*.raw, -*.map, -dist*/*",
+			"<open folders>",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -*.dump, -logs/*, -*.tif, -*.bil, -*.raw, -*.map, -dist*/*",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -.*, -*.dump, -logs/*, -*.tif, -*.bil, -*.raw, -*.map, -dist*/*",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -.*, -*.dump, -logs/*, -*.tif, -*.bil, -*.raw, -*.map, -dist*/*, -lib/*",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -.*, -*.dump, -logs/*, -*.tif, -*.bil, -*.raw, -*.map, -dist*/*",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -.*, -*.dump, -logs/*, -*.tif, -*.bil, -*.raw, -*.map",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -.*, -*.dump, -logs/*, -*.tif, -*.bil, -*.raw",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -.*, -*.dump, -logs/*, -*.tif, -*.bil, -*.raw)",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -.*, -*.dump, -logs/*, -*.(tif|bil|raw)",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -.*, -*.dump, -logs/*, -*.tif",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -assetcache/*, -.*, -*.dump, -logs/*",
+			"<open folders>,-node_modules/*, -docs/*, -assetcache/*, -.*, -*.dump, -logs/*",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -colony/*, -assetcache/*, -.*, -*.dump, -logs/*",
+			"<open folders>,-node_modules/*, -docs/*, -gameclient/*, -vendor/*, -colony/*, -assetcache/*, -.*, -*.dump, -logs/*",
+			"<open folders>,-node_modules/*, -docs/*, -gameclient/*, -vendor/*, -colony/*, -assetcache/*, -.*, -*.dump",
+			"<open folders>,-node_modules/*, -docs/*, -gameclient/*, -vendor/*, -colony/*, -.*, -*.dump",
+			"<open folders>,-node_modules/*, -docs/*, -public/*, -vendor/*, -colony/*, -.*, -*.dump",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -colony/*, -.*, -*.dump",
+			"<open folders>,-node_modules/*, -docs/*, -public/*, -vendor/*, -colony/*, -.*, -*.dump",
+			"<open folders>,-node_modules/*, -docs/*, -vendor/*, -colony/*, -.*, -*.dump",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*, -.*, -*.dump",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*, -.*, *.dump",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*, -.*",
+			"C:\\gitroot\\xenocide-academy\\",
+			"C:\\gitroot\\xenocide-academy\\public\\img",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*, -.*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*, -.git/*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*",
+			"<open folders>,-node_modules/*, -pulic/*, -docs/*, -vendor/*, -colony/*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*,public/json/*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*, public/json/*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*, +public/json/*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*, -colony/*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*, -vendor/*",
+			"<open folders>,-node_modules/*, -public/*, -docs/*",
+			"<open folders>,-node_modules/*, -public/*",
+			"<open folders>,-node_modules/*, public/*",
+			"<open folders>,-node_modules/*, -public/*",
+			"<open folders>,-node_modules/*",
+			"<open folders>,-node_modules",
+			"C:\\Users\\killroy\\Dropbox\\gitroot\\xenocide-academy",
+			"C:\\Users\\killroy\\Dropbox\\gitroot\\xenocide-academy\\lib\\",
+			"C:\\Users\\killroy\\Dropbox\\gitroot\\xenocide-academy\\lib\\xenocards",
+			"",
+			"<open folders>,-node_modules"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"dragPrepare",
+			"drag",
+			"Editable",
+			":",
+			",",
+			"\"",
+			"handleRemoveEntity",
+			"_boundHandlers",
+			"bindHandler",
+			".delegate",
+			"Persistant",
+			"getComponentName",
+			"hasComponent",
+			"hasAllComponents",
+			"resolveComponent",
+			"handle",
+			"loadPersistant",
+			"createGirdCards",
+			"loadPersistant",
+			"Component.name",
+			"rafId",
+			"removeen",
+			"EVENT_REMOVEENTITY",
+			"TransformHandle",
+			"toString",
+			"localStorage",
+			"loadPlacesFromJson",
+			"instantiateComponent",
+			"_components",
+			"resolveComponent",
+			"THREE",
+			"ecsTHREE",
+			"getComponentClass",
+			"parseComponent",
+			"FontLoaderComponent",
+			"handleControlMousedown",
+			"controlInUse",
+			"detach",
+			"requestAnimationFrame",
+			"render",
+			"TransformControls",
+			"TweenMax",
+			"enter",
+			"Entity",
+			"XenoCard3D",
+			"dimensions",
+			"colors",
+			"read",
+			"entity",
+			"scene",
+			"Scene",
+			"Renderer",
+			"Camera",
+			"MouseEvents",
+			"mouseEvents",
+			"from",
+			"fronm",
+			"Render",
+			"getRandomColor",
+			"makeRoundedRectShape",
+			"THREE.",
+			"LineBasicMaterial",
+			"THREE.",
+			"EventDispatcher",
+			"Transform",
+			"Collider",
+			"MeshComponent",
+			"MouseEvents",
+			"dimensions",
+			"getRandomPortraitUrl",
+			"colors",
+			",\n",
+			"translation",
+			"curve",
+			"setFromMesh",
+			"componentToString",
+			"getManager",
+			"_",
+			"id",
+			"_id",
+			"getCurve",
+			"twee",
+			"animateMesh",
+			"animateVector",
+			"dragPrepare",
+			"wireframe",
+			"DragAndDrop",
+			"OrbitControls",
+			"visible",
+			"portrait",
+			"getRandomPortraitUrl",
+			"TextureLoader",
+			"objLoader",
+			"OBJ",
+			"OBJLoader",
+			"getRandom",
+			"_components",
+			"getRandomColor",
+			"boxgeo",
+			"assetdata",
+			"renderer",
+			"textureLoader",
+			"queryComponents",
+			"runtime",
+			"getComponentPropertyName",
+			"Transform",
+			"entityRemoveComponent",
+			"delegate",
+			"receiveMouseEvents",
+			"enter",
+			"attachEvent",
+			"addevent",
+			"Handler",
+			"mousemove",
+			"mousemoveHandler",
+			"push",
+			"componentWillReceiveProps",
+			"propsToState",
+			"years",
+			"rout",
+			"||",
+			"backgroundColor",
+			"grey400",
+			"queryStartingGroups",
+			"isUndefined",
+			"isEqual",
+			"isEqualWith",
+			"cloneDeep"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			": ",
+			", ",
+			"",
+			"'",
+			"Component",
+			"jQuery(",
+			"entrants.",
+			"'},",
+			"'",
+			"\"",
+			"\"\\1\"",
+			"\"",
+			"",
+			"\\t",
+			"},",
+			"{'50': ",
+			"', '",
+			"name: ",
+			"type: ",
+			"name: ",
+			"'",
+			":0",
+			":",
+			"-",
+			"\"$1\":",
+			"\"",
+			"\"$1\"",
+			"const ",
+			"",
+			"\\u00E8",
+			"",
+			" real DEFAULT NULL",
+			"",
+			"INTEGER PRIMARY KEY,",
+			"''",
+			" ",
+			"'components/",
+			"'componets/",
+			"\"",
+			"\n",
+			"src=\"/vendors/THREE/three_r78.js\"",
+			"xe",
+			"MSG_NETID_DESTROY",
+			"MSG_NETID_MSG",
+			"MSG_NETID_CREATE",
+			"MSG_NETID_CREATE_PEER",
+			"netIds",
+			"NetId",
+			"",
+			")",
+			"(",
+			" = ",
+			"",
+			" ",
+			"'\\1', ",
+			"'$1', ",
+			"_listeners",
+			"<script src=\"/vendors/THREE/controls/OrbitControls.js\"></script>",
+			"<script src=\"/vendors/THREE/three_r77dev.js\"></script>",
+			"'",
+			"<script src=\"/js/xenocards/materials.js\"></script>",
+			"d_",
+			"c_",
+			"b_",
+			"NetServer",
+			"<script src=\"/js/core/module-loader.js\"></script>[",
+			"],\n[",
+			",\n",
+			".mouseV2",
+			"\"",
+			"2",
+			"1",
+			"@",
+			"@\n",
+			"\n",
+			"\n\n",
+			"\n",
+			"",
+			"\\1",
+			"\\1, ",
+			"",
+			"\"",
+			"\"D:",
+			"\"",
+			"'",
+			"checkPermissionAsync",
+			"\"owner\"",
+			"><",
+			" ",
+			"\n\t\t\t\tif(data.makers.length > itemLimit) {\n\t\t\t\t\tdata.makers = data.makers.slice(0, itemLimit);\n\t\t\t\t\tdata.moreMakers = true;\n\t\t\t\t}",
+			"P",
+			"NaN",
+			"\"/cardimage/",
+			"logger.",
+			".png?",
+			"ResourceProvider",
+			"\n",
+			"\\n\n",
+			"\n",
+			"'../fonts/",
+			"files['+fileIdx+']'",
+			"Server",
+			"/res/fonts/",
+			"','",
+			"\n\"id\"",
+			"      \"id\"",
+			"",
+			".png\"",
+			"holder.js/100p",
+			"https://cdnjs.cloudflare.com/ajax/libs/holder/2.8.2/holder.js",
+			"@import \"vendors/bootstrap/",
+			"\"url\":",
+			"\"",
+			"1em 0.3em hsla(180,100%,80%,1.0)",
+			",  0.0em",
+			"hsla(180,100%,80%,1.0)",
+			"em  2.5em",
+			"em  1.8em",
+			"em  0.0em",
+			"\t 2.5em",
+			"\t 1.8em",
+			"\t 0.0em",
+			"0 0 hsla(180,100%,50%",
+			"0 0 hsla(180,100%",
+			"1em 0.5em",
+			"50%",
+			"hsla(180,100%,%0%,",
+			"2.5em"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": false,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 32.0
+	},
+	"input":
+	{
+		"height": 38.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": false,
+	"output.find_results":
+	{
+		"height": 430.0
+	},
+	"pinned_build_system": "",
+	"project": "xa3d.sublime-project",
+	"replace":
+	{
+		"height": 76.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"update",
+				"node_modules\\acorn\\bin\\update_authors.sh"
+			],
+			[
+				"linter",
+				"C:\\Users\\killroy\\Dropbox\\PortableApps\\SublimeText\\Data\\Packages\\SublimeLinter\\SublimeLinter.sublime-settings"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 1012.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 944.0
+	},
+	"select_symbol":
+	{
+		"height": 375.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 1178.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 184.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
