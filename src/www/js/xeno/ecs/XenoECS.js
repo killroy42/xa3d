@@ -26,6 +26,7 @@ const componentToString = function() {
 };
 
 const getComponentName = (Component) => {
+	if(Component === undefined) throw new Error('Component is undefined in getComponentName(Component)');
 	if(typeof Component === 'string') return Component;
 	if(typeof Component.name === 'string') return Component.name;
 	return Component.toString().replace(/.*?class (\w+).*/, '$1');
@@ -238,6 +239,14 @@ class EntityManager {
 		return this;
 	}
 	registerComponents(components) {
+		components.forEach((component) => {
+			if(component === undefined) {
+				const err = new Error('undefined value in registerComponents(components)');
+				console.error(err);
+				console.log('components:\n', components);
+				throw err;
+			}
+		});
 		components.forEach((component) => this.registerComponent(component));
 		return this;
 	}
@@ -422,6 +431,20 @@ const makeComponent = (Class) => {
 	return Component;
 };
 
+const showSceneGraph = ({entity, children}, indent = '') => {
+	const graphChildren = children
+		.filter(({entity}) => entity !== undefined)
+		.filter(({entity: {id}}) => id !== entity.id);
+	return `E[${entity.id}]: ${Object.keys(entity._components).join(',')}${
+		(graphChildren.length === 0)
+			?''
+			:`\n${
+				graphChildren
+				.map(child => `${indent} > ${showSceneGraph(child, `${indent}   `)}`)
+				.join('\n')}`
+		}`;
+};
+
 
 if(typeof module !== 'undefined' && ('exports' in module)){
 	const XenoECS = {
@@ -430,6 +453,7 @@ if(typeof module !== 'undefined' && ('exports' in module)){
 		EntityManager,
 		createComponent,
 		makeComponent,
+		showSceneGraph,
 	};
 	module.exports = XenoECS;
 	module.exports.XenoECS = XenoECS;

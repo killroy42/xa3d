@@ -5,6 +5,9 @@ const {Entity, makeComponent} = require('XenoECS');
 const TweenMax = require('TweenMax');
 const TweenLite = require('TweenLite');
 const {Sine, SlowMo, Power0, Power4, Back} = TweenLite;
+const {
+	Collider, TransformHandle
+} = require('ecsTHREE');
 
 
 const identityFunction = _=>_;
@@ -40,6 +43,37 @@ class EntityStore {
 		json.entities
 			.map(entityJson => entities.createEntity(entityJson.components))
 			.map(this.OnAfterLoad);
+	}
+}
+
+class Editable {
+	constructor() {
+		this.handleMouseup = this.handleMouseup.bind(this);
+	}
+	handleMouseup(event) {
+		const {entities, entity: {transform}} = this;
+		const handle = entities.findComponent(TransformHandle);
+		const contextMenu = entities.findComponent(ContextMenu);
+		switch(event.button) {
+			case 0: // left
+				handle.attach(transform);
+				contextMenu.hide();
+				break;
+			case 2: // right
+				handle.detach();
+				contextMenu.show(event);
+				break;
+		}
+	}
+	OnAttachComponent(entity) {
+		const {entities} = entity;
+		const collider = entity.requireComponent(Collider);
+		entity.addEventListener('mouseup', this.handleMouseup);
+	}
+	OnDetachComponent(entity) {
+		const {entities, entity: {transform}} = this;
+		const handle = entities.findComponent(TransformHandle);
+		handle.detach(transform);
 	}
 }
 
@@ -236,6 +270,7 @@ class ContextMenuButton extends Button {
 if(typeof module !== 'undefined' && ('exports' in module)){
 	module.exports = {
 		EntityStore,
+		Editable,
 		Node, Button,
 		ContextMenu, ContextMenuButton,
 	};

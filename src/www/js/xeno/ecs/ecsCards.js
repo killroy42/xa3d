@@ -11,7 +11,7 @@ const assetdata = require('assetdata');
 const XenoCard3D = require('XenoCard3D');
 const {makeRoundedRectShape} = require('GeometryHelpers');
 const {
-	Vector3,
+	Vector3, Euler,
 	MeshPhongMaterial,
 	Geometry, BoxGeometry, SphereGeometry, ExtrudeGeometry,
 	Mesh,
@@ -173,8 +173,8 @@ class XACard extends CardMesh {
 
 const TweenMax = require('TweenMax');
 const TweenLite = require('TweenLite');
-const {Sine, SlowMo, Power0} = TweenLite;
-class Animator {
+const {Sine, SlowMo, Power0, Power1, Power2, Power3, Power4} = TweenLite;
+class CardAnimator {
 	OnAttachComponent(entity) {
 		//console.info('Animator.OnAttachComponent(entity);');
 		this.directions = [
@@ -286,6 +286,27 @@ class Animator {
 			}
 		});
 	}
+	slideTo(targetPos, targetRot, onComplete) {
+		//console.info('CardAnimator.slideTo(targetPos, targetRot, onComplete);');
+		const transform = this.entity.getComponent(Transform);
+		const props = {t: 0};
+		const startPos = transform.position.clone();
+		const startRot = transform.rotation.clone();
+		const pos = new Vector3();
+		const rot = new Euler();
+		return TweenMax.to(props, 0.2, {
+			t: 1,
+			ease: Power2.easeInOut,
+			onUpdate: () => {
+				pos.lerpVectors(startPos, targetPos, props.t);
+				transform.position.copy(pos);
+				transform.rotation.x = (targetRot.x - startRot.x) * props.t + startRot.x;
+				transform.rotation.y = (targetRot.y - startRot.y) * props.t + startRot.y;
+				transform.rotation.z = (targetRot.z - startRot.z) * props.t + startRot.z;
+			},
+			onComplete
+		});
+	}
 }
 
 
@@ -298,7 +319,7 @@ if(typeof module !== 'undefined' && ('exports' in module)){
 		RoundedCornersCard,
 		BallCard,
 		XACard,
-		Animator,
+		CardAnimator,
 	};
 	module.exports.ecsCards = module.exports;
 }
