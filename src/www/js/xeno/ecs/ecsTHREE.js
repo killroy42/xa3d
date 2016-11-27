@@ -14,6 +14,12 @@ const {
 const {
 	colors, dimensions,
 } = require('assetdata');
+const TweenMax = require('TweenMax');
+const TweenLite = require('TweenLite');
+
+
+const {Sine, SlowMo, Power0, Power1, Power2, Power3, Power4} = TweenLite;
+
 
 class Transform extends makeComponent(THREE.Object3D) {
 	OnAttachComponent(entity) {
@@ -208,18 +214,45 @@ class OrbitCamComponent extends makeComponent(OrbitControls) {
 		this.camera = camera;
 		this.userPanSpeed = 0.1;
 		this.setCamera(camera.position);
+		this._targetDistance = undefined;
 	}
 	setCamera(position, target) {
 		const {entity, cameraTarget, camera} = this;
 		target = target || cameraTarget || new Vector3(0, 0, 0);
 		camera.position.copy(position);
 		camera.lookAt(target);
+		this._targetDistance = camera.position.clone().sub(target).length();
 		camera.updateMatrix();
 		camera.near = 0.1;
 		this.position0.copy(position);
 		this.target0.copy(target);
 		this.reset();
 		this.cameraTarget = target;
+	}
+	getTarget() {
+		const {camera} = this;
+		const direction = camera.getWorldDirection();
+		return camera.position.clone().add(direction.multiplyScalar(this._targetDistance));
+	}
+	slideCamera(endPosition, endTarget) {
+		const startPosition = this.camera.position.clone();
+		const startTarget = this.getTarget();
+		const position = new Vector3();
+		const target = new Vector3();
+		const distance = (
+			startPosition.clone().sub(endPosition).length() +
+			startTarget.clone().sub(endTarget).length()
+			) * 0.5;
+		const speed = 5;
+		const duration = Math.min(2, Math.max(0.1, distance / speed));
+		const update = progress => this.setCamera(
+			position.lerpVectors(startPosition, endPosition, progress),
+			target.lerpVectors(startTarget, endTarget, progress)
+		);
+		TweenMax.to({}, duration, {
+			ease: Power3.easeInOut,
+			onUpdate: function() {update(this.ratio);},
+		});
 	}
 	fromJSON({position = this.camera.position, target = this.cameraTarget}) {
 		this.setCamera(position, target);

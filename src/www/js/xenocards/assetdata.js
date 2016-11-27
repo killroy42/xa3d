@@ -5,7 +5,9 @@ const colors = {
 	white: 0xffffff,
 	black: 0x000000,
 	grey50: 0xfafafa, grey100: 0xf5f5f5, grey200: 0xeeeeee, grey300: 0xe0e0e0, grey400: 0xbdbdbd, grey500: 0x9e9e9e, grey600: 0x757575, grey700: 0x616161, grey800: 0x424242, grey900: 0x212121,
+	'grey': {'50': '#fafafa', '100': '#f5f5f5', '200': '#eeeeee', '300': '#e0e0e0', '400': '#bdbdbd', '500': '#9e9e9e', '600': '#757575', '700': '#616161', '800': '#424242', '900': '#212121'},
 	Yellow200: 0xFFF59D, Yellow300: 0xFFF176, Yellow400: 0xFFEE58,
+	'yellow': {'50': '#fffde7', '100': '#fff9c4', '200': '#fff59d', '300': '#fff176', '400': '#ffee58', '500': '#ffeb3b', '600': '#fdd835', '700': '#fbc02d', '800': '#f9a825', '900': '#f57f17', 'a100': '#ffff8d', 'a200': '#ffff00', 'a400': '#ffea00', 'a700': '#ffd600'},
 	BlueGrey50: 0xECEFF1, BlueGrey100: 0xCFD8DC, BlueGrey200: 0xB0BEC5, BlueGrey300: 0x90A4AE, BlueGrey400: 0x78909C, BlueGrey500: 0x607D8B, BlueGrey600: 0x546E7A, BlueGrey700: 0x455A64, BlueGrey800: 0x37474F, BlueGrey900: 0x263238,
 	Pink50: 0xF3E5F5, Pink100: 0xF8BBD0, Pink200: 0xF48FB1, Pink300: 0xF06292, Pink400: 0xEC407A, Pink500: 0xE91E63, Pink600: 0xD81B60, Pink700: 0xC2185B, Pink800: 0xAD1457, Pink900: 0x880E4F,
 	Teal50: 0xE0F2F1, Teal100: 0xB2DFDB, Teal200: 0x80CBC4, Teal300: 0x4DB6AC, Teal400: 0x26A69A, Teal500: 0x009688, Teal600: 0x00897B, Teal700: 0x00796B, Teal800: 0x00695C, Teal900: 0x004D40,
@@ -57,7 +59,7 @@ const dimensions = {
 	unitScale: {
 		screen: {width: 19.2, height: 10.8},
 		board: {width: 14.4, height: 10.8},
-		card: {width: 1.6, height: 2.2},
+		card: {width: 1.3, height: 1.8},
 	}
 };
 var cardInfo = {

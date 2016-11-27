@@ -19,7 +19,30 @@ class Environment {
 		const transform = entity.requireComponent(Transform);
 		transform.add(this.floor = this.createFloor());
 		transform.add(this.floorGrid = this.createFloorGrid());
-		transform.add(this.screenOutline = this.createScreenOutline());
+		const screenOutline = this.createOutline({
+			width: dimensions.unitScale.screen.width,
+			height: dimensions.unitScale.screen.height,
+			color: colors.grey['600']
+		});
+		screenOutline.name = 'screen';
+		screenOutline.position.set(0, 0.001, 0);
+		transform.add(screenOutline);
+		const gameOutline = this.createOutline({
+			width: dimensions.unitScale.board.width,
+			height: dimensions.unitScale.board.height,
+			color: colors.grey['600']
+		});
+		gameOutline.name = 'game';
+		gameOutline.position.set(0, 0.001, 0);
+		transform.add(gameOutline);
+		const boardOutline = this.createOutline({
+			width: dimensions.unitScale.board.width - 1,
+			height: dimensions.unitScale.board.height - 1,
+			color: colors['Blue Grey']['900']
+		});
+		boardOutline.name = 'board';
+		boardOutline.position.set(0, 0.001, 0);
+		transform.add(boardOutline);
 		this.createLights();
 	}
 	createFloor({size = 100, color = colors.grey900} = {}) {
@@ -38,10 +61,7 @@ class Environment {
 		floorGrid.position.set(0, 0.001, 0);
 		return floorGrid;
 	}
-	createScreenOutline({
-		width = dimensions.unitScale.screen.width,
-		height = dimensions.unitScale.screen.height,
-		color = colors.grey600} = {}) {
+	createOutline({width, height, color}) {
 		const geometry = new Geometry();
 		geometry.vertices.push(
 			new Vector3(-0.5, 0, -0.5),
@@ -52,10 +72,7 @@ class Environment {
 		);
 		geometry.scale(width, 1, height);
 		const material = new LineBasicMaterial({color});
-		const screenOutline = new Line(geometry, material);
-		screenOutline.name = 'screen';
-		screenOutline.position.set(0, 0.001, 0);
-		return screenOutline;
+		return new Line(geometry, material);
 	}
 	createLights() {
 		const {entity} = this;

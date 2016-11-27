@@ -53,15 +53,15 @@ class Editable {
 	handleMouseup(event) {
 		const {entities, entity: {transform}} = this;
 		const handle = entities.findComponent(TransformHandle);
-		const contextMenu = entities.findComponent(ContextMenu);
+		//const contextMenu = entities.findComponent(ContextMenu);
 		switch(event.button) {
 			case 0: // left
 				handle.attach(transform);
-				contextMenu.hide();
+				//contextMenu.hide();
 				break;
 			case 2: // right
 				handle.detach();
-				contextMenu.show(event);
+				//contextMenu.show(event);
 				break;
 		}
 	}

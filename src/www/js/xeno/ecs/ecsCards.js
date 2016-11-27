@@ -18,7 +18,11 @@ const {
 	TextureLoader,
 	Line, LineBasicMaterial, CatmullRomCurve3,
 } = THREE;
+const TweenMax = require('TweenMax');
+const TweenLite = require('TweenLite');
 
+
+const {Sine, SlowMo, Power0, Power1, Power2, Power3, Power4} = TweenLite;
 const {colors, dimensions, getRandomPortraitUrl} = assetdata;
 
 
@@ -171,9 +175,6 @@ class XACard extends CardMesh {
 	}
 }
 
-const TweenMax = require('TweenMax');
-const TweenLite = require('TweenLite');
-const {Sine, SlowMo, Power0, Power1, Power2, Power3, Power4} = TweenLite;
 class CardAnimator {
 	OnAttachComponent(entity) {
 		//console.info('Animator.OnAttachComponent(entity);');
