@@ -46,6 +46,7 @@ class CardData extends DataComponent {
 class Card {
 	OnAttachComponent(entity) {
 		const meshTypes = [BallCard, RoundedCornersCard, XACard];
+		//const meshTypes = [BallCard, RoundedCornersCard, BallCard];
 		const collider = entity.requireComponent(Collider);
 		const cardData = entity.requireComponent(CardData);
 		collider.padding.set(0.2, 0.05, 0.2);
@@ -68,7 +69,9 @@ class Card {
 			if(change.type !== undefined && data.type !== change.type) {
 				entity.removeComponent(CardMesh);
 				entity.addComponent(meshTypes[change.type]);
-				collider.setFromMesh(entity.getComponent(Transform));
+				//console.log(entity.transform.position);
+				//console.log(entity.transform.children.map(child => child.position).join(', '));
+				collider.setFromMesh(entity.transform);
 				const cardMesh = entity.getComponent(CardMesh);
 				if(cardMesh) cardMesh.setColor(data.color);
 			}

@@ -13,10 +13,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fs-extra": "^0.30.0",
+    "fs-extra": "^1.0.0",
     "gm": "^1.22.0",
     "portable-module": "^0.1.1",
-    "portable-uuid": "^0.1.0",
+    "portable-uuid": "^0.3.0",
     "socket.io": "^1.4.6",
     "thenify-all": "^1.6.0",
     "ws": "^1.1.0"

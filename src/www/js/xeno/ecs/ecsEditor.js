@@ -1,7 +1,7 @@
 (() => {
 //const THREE = require('THREE');
 const {colors} = require('assetdata');
-const {makeComponent} = require('XenoECS');
+const {Entity, makeComponent} = require('XenoECS');
 const TweenMax = require('TweenMax');
 const TweenLite = require('TweenLite');
 const {Sine, SlowMo, Power0, Power4, Back} = TweenLite;
@@ -11,7 +11,7 @@ const identityFunction = _=>_;
 
 class EntityStore {
 	constructor() {
-		this.storeKey = 'saved_entities';
+		this.storeKey = 'EntityStore';
 		this.OnFilterEntities = entity => !entity.hasComponent(EntityStore);
 		this.OnBeforeSave = identityFunction;
 		this.OnBeforeLoad = identityFunction;
@@ -40,6 +40,83 @@ class EntityStore {
 		json.entities
 			.map(entityJson => entities.createEntity(entityJson.components))
 			.map(this.OnAfterLoad);
+	}
+}
+
+class Node {
+	constructor() {
+		this._parent = undefined;
+		this._children = [];
+		Object.defineProperties(this, {
+			parent: {get: () => this._parent},
+			children: {get: () => this._children},
+		});
+	}
+	OnDestroy(entity) {
+		//console.info('Node.OnDestroy(entity);', this.entity.id);
+		this.detach();
+	}
+	attach(childNode) {
+		//console.info('Node.attach(childNode);', this.entity.id);
+		if(Array.isArray(childNode)) {
+			childNode.forEach(childNode => this.attach(childNode));
+			return;
+		}
+		if(childNode.entity instanceof Entity) childNode = childNode.entity;
+		if(childNode instanceof Entity) {
+			if(!childNode.hasComponent(Node)) childNode.addComponent(Node);
+			childNode = childNode.node;
+		}
+		if(!(childNode instanceof Node)) throw new Error('childNode is not a Node');
+		childNode.detach();
+		childNode._parent = this;
+		this._children.push(childNode);
+		if(childNode.entity.transform) {
+			this.entity.transform.add(childNode.entity.transform);
+		}
+	}
+	detach(childNode) {
+		if(childNode === undefined) {
+			if(this._parent !== undefined) this._parent.detach(this);
+			return this;
+		}
+		//console.info('Node.detach(childNode);', this.entity.id);
+		if(childNode.entity instanceof Entity) childNode = childNode.entity;
+		if(childNode instanceof Entity) childNode = childNode.node;
+		const idx = this._children.indexOf(childNode);
+		if((childNode._parent !== this) || (idx === -1)) {
+			throw new Error('childNode is not a child of this node');
+		}
+		if(childNode.entity.transform &&
+			this.entity.transform &&
+			childNode.entity.transform.parent === this.entity.transform) {
+			this.entity.transform.remove(childNode.entity.transform);
+		}
+		childNode._parent = undefined;
+		this._children.splice(idx, 1);
+	}
+	fromJSON(json = {}) {
+		//console.info('Node.fromJSON(json);', this.entity.id);
+		const {entities, _children} = this;
+		const {children = []} = json;
+		[..._children].forEach(({entity}) => entity.destroy());
+		children.forEach(json => {
+			const child = entities.createEntity(json);
+			child.addComponent(Node);
+			this.attach(child.node);
+		});
+	}
+	toJSON() {
+		const {_children} = this;
+		const json = {};
+		//if(this._parent) json.parent = this._parent.entity.id;
+		if(_children.length > 0) json.children = _children.map(({entity}) => {
+			const json = entity.toJSON().components;
+			console.log(json);
+			delete json.node;
+			return json;
+		});
+		return json;
 	}
 }
 
@@ -159,7 +236,7 @@ class ContextMenuButton extends Button {
 if(typeof module !== 'undefined' && ('exports' in module)){
 	module.exports = {
 		EntityStore,
-		Button,
+		Node, Button,
 		ContextMenu, ContextMenuButton,
 	};
 	module.exports.ecsEditor = module.exports;

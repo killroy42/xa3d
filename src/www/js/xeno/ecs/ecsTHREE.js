@@ -17,6 +17,7 @@ const {
 
 class Transform extends makeComponent(THREE.Object3D) {
 	OnAttachComponent(entity) {
+		//console.info('Transform.OnAttachComponent(entity);');
 		THREE.Object3D.call(this);
 		const {entities} = this;
 		const scene = entities.findComponent(Scene);
@@ -25,11 +26,13 @@ class Transform extends makeComponent(THREE.Object3D) {
 	OnDetachComponent(entity) {
 		if(this.parent) this.parent.remove(this);
 	}
-	fromJSON({
-		position = {x: 0, y: 0, z: 0},
-		rotation = {x: 0, y: 0, z: 0},
-		scale = {x: 1, y: 1, z: 1}
-	} = {}) {
+	fromJSON(json = {}) {
+		//console.info('Transform.fromJSON(json);');
+		const {
+			position = {x: 0, y: 0, z: 0},
+			rotation = {x: 0, y: 0, z: 0},
+			scale = {x: 1, y: 1, z: 1}
+		} = json;
 		this.position.set(position.x, position.y, position.z);
 		this.rotation.set(rotation.x, rotation.y, rotation.z, rotation.order);
 		this.scale.set(scale.x, scale.y, scale.z);
@@ -286,7 +289,6 @@ class TransformHandle extends makeComponent(TransformControls) {
 		this.rafId = requestAnimationFrame(this.handleAnimationFrame);
 	}
 }
-
 
 const FontLoaderComponent = makeComponent(THREE.FontLoader);
 class Text extends MeshComponent {
