@@ -161,6 +161,13 @@ CardIcon.getShieldShape = function() {
 	return shape;
 };
 
+const getRandomColor = (color) => {
+	if(typeof color === 'number') return color;
+	if(typeof color === 'string') return parseInt('0x'+color.replace(/^#/, ''));
+	var keys = Object.keys(colors);
+	return getRandomColor(colors[keys[Math.floor(Math.random() * keys.length)]]);
+};
+
 
 if(typeof module !== 'undefined' && ('exports' in module)){
 	module.exports = {
@@ -175,6 +182,7 @@ if(typeof module !== 'undefined' && ('exports' in module)){
 		snapCardPosition,
 		cardOutline,
 		CardIcon,
+		getRandomColor,
 	};
 	module.exports.assetdata = module.exports;
 }

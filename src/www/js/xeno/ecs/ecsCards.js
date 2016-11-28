@@ -23,15 +23,7 @@ const TweenLite = require('TweenLite');
 
 
 const {Sine, SlowMo, Power0, Power1, Power2, Power3, Power4} = TweenLite;
-const {colors, dimensions, getRandomPortraitUrl} = assetdata;
-
-
-const getRandomColor = (color) => {
-	if(typeof color === 'number') return color;
-	if(typeof color === 'string') return parseInt('0x'+color.replace(/^#/, ''));
-	var keys = Object.keys(colors);
-	return getRandomColor(colors[keys[Math.floor(Math.random() * keys.length)]]);
-};
+const {colors, dimensions, getRandomPortraitUrl, getRandomColor} = assetdata;
 
 class CardData extends DataComponent {
 	constructor() {

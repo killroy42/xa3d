@@ -4,17 +4,8 @@ const {makeComponent} = require('XenoECS');
 class DataComponent {
 	constructor() {
 		const props = {};
-		const createProp = (name, initialValue) => {
-			Object.defineProperty(this, name, {
-				get: () => props[name],
-				set: (val) => set(name, val)
-			});
-			initProp(name, initialValue);
-		};
-		const initProp = (name, initialValue) => {
-			props[name] = initialValue;
-		};
 		const set = (key, val) => {
+			//console.error('set > set(%s, %s)', key, val);
 			const update = {};
 			if(typeof key === 'object') {
 				val = key;
@@ -23,12 +14,20 @@ class DataComponent {
 				if(val !== props[key]) update[key] = val;
 			}
 			if(Object.keys(update).length > 0) {
-				//console.info('DataComponent.set(props, "%s", [%s]); from = %s', key, val, props[key]);
-				this.entity.dispatchEvent(DataComponent.EVENT_DATACHANGED, update, this);
+				const prev = Object.assign({}, props);
 				Object.assign(props, update);
+				this.entity.dispatchEvent(DataComponent.EVENT_DATACHANGED, update, prev, this);
 			}
 			return this;
 		};
+		const createProp = (name, initialValue) => {
+			Object.defineProperty(this, name, {
+				get: () => props[name],
+				set: (val) => set(name, val)
+			});
+			initProp(name, initialValue);
+		};
+		const initProp = (name, initialValue) => props[name] = initialValue;
 		const toString = () => `${this.constructor.name}[${Object.keys(props).map(key => `${key}: ${props[key]}`).join('; ')}]`;
 		const fromJSON = (nextProps) => set(nextProps);
 		const toJSON = () => Object.assign({}, props);

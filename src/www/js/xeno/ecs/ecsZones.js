@@ -1,7 +1,8 @@
 (() => {
 const THREE = require('THREE');
 const {makeComponent} = require('XenoECS');
-const {dimensions} = require('assetdata');
+const {DataComponent} = require('ecsCore');
+const {dimensions, getRandomColor} = require('assetdata');
 const {
 	Vector3, Euler,
 	LineBasicMaterial, Geometry, Line, 
@@ -42,46 +43,60 @@ const createGridSlots = (max) => {
 	};
 };
 
+const createDeckSlots = (max) => {
+	const divisions = max-1;
+	return (idx, total) => {
+		let position = new Vector3((idx / divisions) - 0.5 * ((total - 1) / divisions), 0, 0);
+		let rotation = new Euler(0.5 * Math.PI, 0, -0.5 * Math.PI);
+		return {position, rotation};
+	};
+};
+
+class ZoneData extends DataComponent {
+	constructor() {
+		super();
+		this.createProp('kind', 'zone');
+		this.createProp('layout', 'grid');
+		this.createProp('slotCount', 3);
+		this.createProp('ownership', 'neutral');
+		this.createProp('visibility', 'all');
+	}
+	OnAttachComponent(entity) {
+		//this.initProp('name', `zone-${entity.id}`);
+	}
+}
+
 class CardZone {
 	constructor() {
 		this._cards = [];
 		this._slotPadding = 0.2;
 		this._slotWidth = cardDims.width + this._slotPadding;
 		this._slotHeight = cardDims.height + this._slotPadding;
+		this.handleZoneMouseup = this.handleZoneMouseup.bind(this);
 		this.handleCardMouseup = this.handleCardMouseup.bind(this);
-		this._layout = 'grid';
-		this._slotCount = 3;
-		Object.defineProperties(this, {
-			slotCount: {
-				get: _=>this._slotCount,
-				set: newSlotCount => {
-					this.setSlots(this._layout, newSlotCount);
-				}
-			},
-			layout: {
-				get: _=>this._layout,
-				set: newLayout => {
-					this.setSlots(newLayout, this._slotCount);
-				}
-			},
-		});
+		this.handleDatachange = this.updateSlots.bind(this);
 	}
 	OnAttachComponent(entity) {
 		//console.info('CardZone.OnAttachComponent(entity);');
 		const {entities} = this;
+		const zoneData = entity.requireComponent(ZoneData);
 		const transform = entity.requireComponent('Transform');
 		const collider = entity.requireComponent('Collider');
 		const node = entity.requireComponent('Node');
-		collider.addEventListener('mouseup', (event) => {
-			const card = entities.createEntity({
-				CardData: {type: 1},
-				Card: {},
-				CardAnimator: {}
-			});
-			this.attachCard(card);
-			this.insertCard(card);
+		entity.on('datachanged', this.handleDatachange);
+		collider.addEventListener('mouseup', this.handleZoneMouseup);
+		this.updateSlots();
+	}
+	handleZoneMouseup(event) {
+		//console.info('CardZone.handleZoneMouseup(event);');
+		const {entities} = this;
+		const card = entities.createEntity({
+			CardData: {type: 1},
+			Card: {},
+			CardAnimator: {}
 		});
-		this.setSlots(this.layout, this.slotCount);
+		this.attachCard(card);
+		this.insertCard(card);
 	}
 	handleCardMouseup(event) {
 		//console.info('CardZone.handleCardMouseup(event);');
@@ -104,8 +119,6 @@ class CardZone {
 		const {entity: {node}, _cards} = this;
 		if(card !== null) node.attach(card);
 		_cards.splice(slot, 0, card);
-		//this.slots.set(this.slots.layout, _cards.length);
-		//this.updateSlots();
 		this.arrangeCards();
 	}
 	removeCard(card) {
@@ -118,24 +131,23 @@ class CardZone {
 			this.arrangeCards();
 		}
 	}
-	setSlots(layout, slotCount) {
-		//console.info('CardZone.setSlots(layout, slotCount);');
+	updateSlots() {
+		//console.info('CardZone.updateSlots();');
 		const {
-			entity: {transform, collider: {scale}},
+			entity: {collider: {scale}, zoneData: {layout, slotCount}},
 			slots, _slotWidth, _slotHeight
 		} = this;
-		this._layout = layout;
-		this._slotCount = slotCount;
 		this.slotOffset = new Vector3(0, 0.1, 0);
 		this.slotScale = new Vector3(scale.x - _slotWidth, 1, scale.z - _slotHeight);
 		switch(layout) {
 			case 'grid': this._slotFunc = createGridSlots(slotCount); break;
 			case 'fan': this._slotFunc = createFanSlots(slotCount); break;
+			case 'deck': this._slotFunc = createDeckSlots(slotCount); break;
 		}
 		this.arrangeCards();
 		this.drawLayoutLine();
 	}
-	getSlot(idx, total = this._slotCount) {
+	getSlot(idx, total = this.entity.zoneData.slotCount) {
 		const slot = this._slotFunc(idx, total);
 		slot.position.add(this.slotOffset).multiply(this.slotScale);
 		return slot;
@@ -151,21 +163,22 @@ class CardZone {
 		});
 	}
 	drawLayoutLine() {
-		const {entity: {transform}, _slotCount}= this;
+		//console.error('CardZone.drawLayoutLine();');
+		const {entity: {transform, zoneData: {slotCount}}} = this;
 		transform.children
 			.filter(child => child instanceof Line)
 			.forEach(line => transform.remove(line));
 		const material = new LineBasicMaterial({color: 0xff0000});
 		const geometry = new Geometry();
-		for(var i = 0; i < _slotCount; i++) geometry.vertices.push(this.getSlot(i).position);
+		for(var i = 0; i < slotCount; i++) geometry.vertices.push(this.getSlot(i).position);
 		const line = new Line(geometry, material);
 		transform.add(line);
 		line.position.y = 0.5;
 	}
 	fromJSON(json = {}) {
 		//console.info('CardZone.fromJSON(json);');
-		const {slots, layout, slotCount} = this;
-		this.setSlots(json.layout || layout, json.slotCount || slotCount);
+		const {entity: {zoneData}} = this;
+		zoneData.set(json);
 		return this;
 	}
 }
@@ -173,7 +186,8 @@ class CardZone {
 
 if(typeof module !== 'undefined' && ('exports' in module)){
 	module.exports = {
-		CardZone
+		ZoneData,
+		CardZone,
 	};
 	module.exports.ecsZones = module.exports;
 }
