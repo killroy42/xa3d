@@ -188,10 +188,10 @@
 	"buffers":
 	[
 		{
-			"file": "src/www/prototypes/XenoEngine/CardMovement/index.js",
+			"file": "src/www/prototypes/XenoEngine/Zones/index.js",
 			"settings":
 			{
-				"buffer_size": 9335,
+				"buffer_size": 12597,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -448,7 +448,7 @@
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs",
 		"/C/gitroot/xa3d/src/www/prototypes",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine",
-		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Zones",
 		"/C/gitroot/xa3d/src/www",
 		"/C/gitroot/xa3d/src/www/js",
 		"/C/gitroot/xa3d/src/www/js/THREE",
@@ -456,12 +456,13 @@
 	],
 	"file_history":
 	[
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCards.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsZones.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCore.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCards.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/assetdata.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/index.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsTHREE.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsEditor.js",
-		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/index.js",
-		"/C/gitroot/xa3d/src/www/js/xenocards/assetdata.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/Environment.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/XenoECS.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/index.html",
@@ -475,7 +476,6 @@
 		"/C/gitroot/xa3d/src/www/js/networking/WebSocketConnection.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Runtime/index.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsGuiCore.js",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCore.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/PlacesEditor/index.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/PlacesEditor-transitions/index.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/XenoRuntime.js",
@@ -649,6 +649,31 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"pick",
+			"fisher",
+			"yates",
+			"shuffle",
+			"tokenRes",
+			"filterTargets",
+			"filterKind",
+			"assertToken",
+			"assertType",
+			"parseIdentifier",
+			"parseChainExpression",
+			"targets",
+			"filterKind",
+			"handleIdentifier",
+			"filterByIdentifier",
+			"handleSymbol",
+			"while",
+			"updateSlots",
+			"setSlots",
+			"setslots",
+			".slots",
+			"_slotCoun",
+			"_slotCount",
+			"_layout",
+			"getGlobalAlphaSetter",
 			"TweenMax",
 			"ease",
 			"eas",
@@ -751,32 +776,7 @@
 			"getRandomColor",
 			"makeRoundedRectShape",
 			"THREE.",
-			"LineBasicMaterial",
-			"THREE.",
-			"EventDispatcher",
-			"Transform",
-			"Collider",
-			"MeshComponent",
-			"MouseEvents",
-			"dimensions",
-			"getRandomPortraitUrl",
-			"colors",
-			",\n",
-			"translation",
-			"curve",
-			"setFromMesh",
-			"componentToString",
-			"getManager",
-			"_",
-			"id",
-			"_id",
-			"getCurve",
-			"twee",
-			"animateMesh",
-			"animateVector",
-			"dragPrepare",
-			"wireframe",
-			"DragAndDrop"
+			"LineBasicMaterial"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -927,32 +927,32 @@
 			[
 				{
 					"buffer": 0,
-					"file": "src/www/prototypes/XenoEngine/CardMovement/index.js",
+					"file": "src/www/prototypes/XenoEngine/Zones/index.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9335,
+						"buffer_size": 12597,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7337,
-								7337
+								6558,
+								6558
 							]
 						],
 						"settings":
 						{
 							"apply_syntax_touched": true,
 							"bs_sintax": "javascript (babel)",
-							"buffer_scroll_name": "c89e8edf",
+							"buffer_scroll_name": "8420399c",
 							"spell_check": false,
 							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2519.0,
+						"translation.y": 2202.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,

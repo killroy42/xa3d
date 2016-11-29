@@ -108,6 +108,7 @@ class Node {
 		if(childNode.entity.transform) {
 			this.entity.transform.add(childNode.entity.transform);
 		}
+		return this;
 	}
 	detach(childNode) {
 		if(childNode === undefined) {

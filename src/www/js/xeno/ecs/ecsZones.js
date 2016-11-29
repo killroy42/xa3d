@@ -102,6 +102,9 @@ class CardZone {
 		//console.info('CardZone.handleCardMouseup(event);');
 		this.removeCard(event.target.entity);
 	}
+	getCards() {
+		return this._cards;
+	}
 	attachCard(card) {
 		//console.info('CardZone.attachCard(card);');
 		const {entity: {node}} = this;

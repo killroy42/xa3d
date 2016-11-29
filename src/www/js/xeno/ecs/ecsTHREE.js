@@ -19,7 +19,7 @@ const TweenLite = require('TweenLite');
 
 
 const {Sine, SlowMo, Power0, Power1, Power2, Power3, Power4} = TweenLite;
-
+const DEFAULT_SLIDE_SPEED = 5;
 
 class Transform extends makeComponent(THREE.Object3D) {
 	OnAttachComponent(entity) {
@@ -234,16 +234,19 @@ class OrbitCamComponent extends makeComponent(OrbitControls) {
 		const direction = camera.getWorldDirection();
 		return camera.position.clone().add(direction.multiplyScalar(this._targetDistance));
 	}
-	slideCamera(endPosition, endTarget) {
+	slideCamera(endPosition, endTarget, speed = DEFAULT_SLIDE_SPEED, onComplete) {
 		const startPosition = this.camera.position.clone();
 		const startTarget = this.getTarget();
 		const position = new Vector3();
 		const target = new Vector3();
+		if(typeof speed === 'function') {
+			onComplete = speed;
+			speed = DEFAULT_SLIDE_SPEED;
+		}
 		const distance = (
 			startPosition.clone().sub(endPosition).length() +
 			startTarget.clone().sub(endTarget).length()
 			) * 0.5;
-		const speed = 5;
 		const duration = Math.min(2, Math.max(0.1, distance / speed));
 		const update = progress => this.setCamera(
 			position.lerpVectors(startPosition, endPosition, progress),
@@ -252,6 +255,7 @@ class OrbitCamComponent extends makeComponent(OrbitControls) {
 		TweenMax.to({}, duration, {
 			ease: Power3.easeInOut,
 			onUpdate: function() {update(this.ratio);},
+			onComplete
 		});
 	}
 	fromJSON({position = this.camera.position, target = this.cameraTarget}) {
