@@ -116,6 +116,10 @@ const {Vector2, Vector3, Face3, Box3, Geometry} = require('THREE');
 		var range = new THREE.Vector2(max.x - min.x, max.y - min.y);
 		geometry.faceVertexUvs[0] = [];
 		var faces = geometry.faces;
+		//console.log('min:', min);
+		//console.log('max:', max);
+		//console.log('offset:', offset);
+		//console.log('range:', range);
 		for (var i = 0, l = geometry.faces.length; i < l; i++) {
 			var v1 = geometry.vertices[faces[i].a];
 			var v2 = geometry.vertices[faces[i].b];

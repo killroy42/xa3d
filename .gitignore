@@ -4,6 +4,8 @@
 
 node_modules/
 src/www/vendors/
+src/www/portrait/
+src/www/sunwell/
 npm-debug.log.*
 
 #################

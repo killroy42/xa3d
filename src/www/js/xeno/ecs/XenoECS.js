@@ -74,10 +74,11 @@ class Entity {
 	}
 	getComponent(Component) {
 		//console.info('Entity.getComponent(Component);', Component.name || Component);
-		const {_Components, _components} = this;
+		const {entities, _Components, _components} = this;
 		if(_Components.length === 0) return undefined;
 		const component = _components[getComponentName(Component)];
 		if(component !== undefined) return component;
+		if(typeof Component === 'string') Component = entities.resolveComponent(Component);
 		if(typeof Component.isPrototypeOf !== 'function') return undefined;
 		const ClassMatch = _Components.find(C => Component.isPrototypeOf(C));
 		if(ClassMatch === undefined) return undefined;
@@ -448,6 +449,7 @@ const showSceneGraph = ({entity, children}, indent = '') => {
 
 if(typeof module !== 'undefined' && ('exports' in module)){
 	const XenoECS = {
+		getComponentName,
 		Entity,
 		System,
 		EntityManager,

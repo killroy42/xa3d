@@ -6,10 +6,10 @@ const MouseHandler = require('MouseHandler');
 const MouseCursor = require('MouseCursor');
 const THREE = require('THREE');
 const {
-	Vector3, Box3, Object3D,
+	Vector3, Matrix4, Box3, Object3D,
 	BoxGeometry, MeshBasicMaterial, Mesh,
 	OrbitControls, TransformControls,
-	BufferGeometry, TextGeometry, MeshPhongMaterial,
+	BufferGeometry, Geometry, TextGeometry, MeshPhongMaterial,
 } = THREE;
 const {
 	colors, dimensions,
@@ -327,13 +327,88 @@ class TransformHandle extends makeComponent(TransformControls) {
 	}
 }
 
-const FontLoaderComponent = makeComponent(THREE.FontLoader);
+class FontLoaderComponent extends makeComponent(THREE.FontLoader) {}
+
+class TextureLoaderComponent extends makeComponent(THREE.TextureLoader) {
+	constructor() {
+		super();
+		this.cache = {};
+	}
+	OnAttachComponent(entity) {
+		super.OnAttachComponent(entity);
+		this.crossOrigin = 'Anonymous';
+	}
+	load(url) {
+		if(!this.cache[url]) this.cache[url] = super.load(url);
+		return this.cache[url];
+	}
+}
+
+class CSSFontLoaderComponent {
+	constructor() {
+		this.cache = {};
+	}
+	waitForFont({url, family, style = 'normal', weight = 'normal', timeout = 100, interval = 5}) {
+		return new Promise((resolve, reject) => {
+			const ctx = document.createElement('canvas').getContext('2d');
+			ctx.font = weight+' '+style+' 60px "'+family+'"';
+			const startWidth = ctx.measureText('1').width;
+			const timeoutId = setTimeout(() => {
+				//console.log('timeout!');
+				clearTimeout(timeoutId);
+				clearInterval(intervalId);
+				reject(new Error('Font loading timed out for \''+ctx.font+'\''));
+			}, timeout);
+			const intervalId = setInterval(() => {
+				const width = ctx.measureText('W').width;
+				//console.log('interval!', width, startWidth);
+				if(width !== startWidth) {
+					clearTimeout(timeoutId);
+					clearInterval(intervalId);
+					resolve();
+				}
+			}, interval);
+		});
+	}
+	loadFont({url, family, style, weight}) {
+		return fetch(url)
+		.then(res => res.blob())
+		.then(res => {
+			const blobUrl = window.URL.createObjectURL(res);
+			const format = 'woff';
+			const tag = document.createElement('style');
+			tag.type = 'text/css';
+			tag.rel = 'stylesheet';
+			tag.innerHTML = '@font-face {\n'+
+				'font-family: "'+family+'";\n'+
+				'font-style: '+style+';\n'+
+				'font-weight: '+weight+';\n'+
+				'src: url('+blobUrl+') format("'+format+'");\n'+
+			'}';
+			document.getElementsByTagName('head')[0].appendChild(tag);
+		});
+	}
+	load(font) {
+		const cacheKey = this.getKey(font);
+		if(!this.cache[cacheKey]) {
+			this.cache[cacheKey] = this
+				.loadFont(font)
+				.then(() => this.waitForFont(font));
+		}
+		return this.cache[cacheKey];
+	}
+	getKey(font) {
+		return JSON.stringify(font);
+	}
+}
+
 class Text extends MeshComponent {
 	constructor() {
 		super();
 		var _value = 'Text';
 		this.text = 'Text';
-		this.fontUrl = '/data/ProximaNovaCnLt_Bold.json';
+		//this.fontUrl = '/fonts/ProximaNovaCnLt_Bold.json';
+		this.fontUrl = '/fonts/Belwe Bd BT_Bold.json';
 		this.font = undefined;
 		this.size = 1;
 		this.fontStatus = 0;
@@ -361,8 +436,9 @@ class Text extends MeshComponent {
 	}
 	createTextGeometry() {
 		//console.info('TextComponent.createTextGeometry(); fontStatus:', this.fontStatus);
-		const {entity} = this;
-		const fontLoader = entity.requireComponent(FontLoaderComponent);
+		const {entity, entities} = this;
+		//const fontLoader = entity.requireComponent(FontLoaderComponent);
+		const fontLoader = entities.findComponent(FontLoaderComponent);
 		if(this.fontStatus === 0) {
 			fontLoader.load(this.fontUrl, font => {
 				this.fontStatus = 1;
@@ -371,6 +447,33 @@ class Text extends MeshComponent {
 			});
 			return;
 		}
+		/*
+		const geometry = new Geometry();
+		const posMat = new Matrix4();
+		this.value.split('\n').forEach((line, idx) => {
+			//posMat.setPosition(new Vector3(0, idx * 1, 0));
+			console.log('line:', idx, line, new Vector3(0, idx * 1, 0), posMat.toArray().join(', '));
+			console.log('%s\n%s',
+				posMat.toArray().join(', '),
+				posMat.setPosition(new Vector3(0, idx * 1, 0)).toArray().join(', '));
+			const lineGeo = new TextGeometry(line, {
+				font: this.font,
+				size: 1,
+				height: 1,
+				curveSegments: 0,
+				bevelEnabled: false,
+				bevelThickness: 0,
+				bevelSize: 0,
+				//material: 0,
+				//extrudeMaterial: 1
+			});
+			lineGeo.translate(0, 0.1, 0);
+			geometry.merge(lineGeo);
+		});
+		*/
+		
+		//singleGeometry.merge(boxMesh.geometry, boxMesh.matrix);
+		
 		const geometry = new TextGeometry(this.value, {
 			font: this.font,
 			size: 1,
@@ -382,8 +485,12 @@ class Text extends MeshComponent {
 			//material: 0,
 			//extrudeMaterial: 1
 		});
+		
 		geometry.rotateX(1.5 * Math.PI);
 		geometry.computeBoundingBox();
+
+
+
 		const size = geometry.boundingBox.getSize();
 		const zScale = 1 / size.z;
 		geometry.scale(zScale, zScale, zScale);
@@ -418,6 +525,9 @@ if(typeof module !== 'undefined' && ('exports' in module)){
 		Collider,
 		OrbitCamComponent,
 		TransformHandle,
+		FontLoaderComponent,
+		TextureLoaderComponent,
+		CSSFontLoaderComponent,
 		Text,
 	};
 	module.exports.ecsTHREE = module.exports;

@@ -33,6 +33,7 @@ class XenoRuntime {
 		this.camera = undefined;
 		this.rafId = undefined;
 		this.updateTimoutId = undefined;
+		this.OnBeforeRender = [];
 	}
 	createRenderer() {
 		const {window, renderOpts, clearColor} = this;
@@ -90,6 +91,9 @@ class XenoRuntime {
 		} = this;
 		this.renderTime = time;
 		this.updateTimoutId = setTimeout(handleUpdate, 0);
+		for(var i = 0; i < this.OnBeforeRender.length; i++) {
+			this.OnBeforeRender[i](time);
+		} 
 		renderer.render(scene, camera);
 	}
 	start() {

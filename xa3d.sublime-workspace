@@ -187,15 +187,6 @@
 	},
 	"buffers":
 	[
-		{
-			"file": "src/www/prototypes/XenoEngine/Zones/index.js",
-			"settings":
-			{
-				"buffer_size": 12597,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		}
 	],
 	"build_system": "",
 	"build_system_choices":
@@ -204,10 +195,14 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 375.0,
-		"last_filter": "list",
+		"height": 287.0,
+		"last_filter": "json",
 		"selected_items":
 		[
+			[
+				"json",
+				"Pretty JSON: Format (Pretty Print) JSON"
+			],
 			[
 				"list",
 				"Package Control: List Packages"
@@ -444,32 +439,70 @@
 	},
 	"expanded_folders":
 	[
-		"/C/gitroot/xa3d/src/www/js/xeno",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs",
 		"/C/gitroot/xa3d/src/www/prototypes",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine",
-		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Zones",
-		"/C/gitroot/xa3d/src/www",
-		"/C/gitroot/xa3d/src/www/js",
-		"/C/gitroot/xa3d/src/www/js/THREE",
-		"/C/gitroot/xa3d/src/www/js/xenocards"
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/BrimstoneVisualizer",
+		"/C/gitroot/xa3d/src/www/js/xeno",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs",
+		"/C/gitroot/xa3d/src/server",
+		"/C/gitroot/xa3d/src/server/reloader",
+		"/C/gitroot/xa3d/src/server/xenonetwork",
+		"/C/gitroot/xa3d"
 	],
 	"file_history":
 	[
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsZones.js",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCore.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/BrimstoneVisualizer/index.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCards.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsZones.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/BrimstoneVisualizer/index.html",
+		"/C/gitroot/xa3d/src/server/portraitProxy/server.js",
+		"/C/gitroot/xa3d/app.js",
+		"/C/gitroot/xa3d/package.json",
+		"/C/gitroot/xa3d/src/server/xenonetwork/server.js",
+		"/C/gitroot/xa3d/src/www/data/cards_v1.15590.json",
+		"/D/Downloads/NConvert-win64/XnView/ReadMe.txt",
+		"/D/Downloads/NConvert-win64/XnView/Usage.txt",
+		"/D/Downloads/NConvert-win64/XnView/Formats.txt",
+		"/D/Downloads/libwebp-0.5.1-windows-x64/Readme.txt",
+		"/C/gitroot/xa3d/src/www/js/helpers/GeometryHelpers.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/XenoECS.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsTHREE.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/XenoRuntime.js",
+		"/C/gitroot/xa3d/src/www/js/THREE/MaterialRenderer.js",
+		"/C/gitroot/xa3d/src/www/prototypes/shaders/spritefield/index.js",
+		"/C/gitroot/xa3d/src/www/js/polyfills/fetch.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsSelectable.js",
+		"/C/gitroot/xa3d/src/www/js/legacy/CardRenderer.js",
+		"/C/gitroot/xa3d/src/www/fonts/Belwe Bd BT_Bold.json",
+		"/C/gitroot/xa3d/src/www/shaders/forcefield.fragment.glsl",
+		"/C/gitroot/xa3d/src/www/shaders/forcefield.vertex.glsl",
+		"/C/gitroot/xa3d/src/www/js/THREE/Prototype.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/materials.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/ForcefieldEffect.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/CardGlow.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/XenoCard3D.js",
+		"/C/gitroot/xa3d/xa3d.sublime-project",
+		"/C/gitroot/HearthstoneJSON/update_s3_configuration.py",
+		"/C/gitroot/HearthstoneJSON/README.md",
+		"/C/gitroot/HearthstoneJSON/requirements.txt",
+		"/C/gitroot/HearthstoneJSON/generate_card_textures.py",
+		"/C/gitroot/sunwell/artwork/README",
+		"/C/gitroot/xa3d/src/www/js/xeno/cardTargeting.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Zones/index.js",
+		"/C/gitroot/Brimstone/BrimstoneDocumentation/BrimstoneDocumentation.shfbproj",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Zones/index.html",
+		"/C/gitroot/xa3d/src/www/prototypes/extra/wfc/index.html",
+		"/C/gitroot/xa3d/src/www/prototypes/shaders/starnest/index.html",
+		"/D/Downloads/1063_6A1C23E481BAD4D4F2254150D04A13E72DEF358F.scen",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsEditor.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCore.js",
 		"/C/gitroot/xa3d/src/www/js/xenocards/assetdata.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/index.js",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsTHREE.js",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsEditor.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/Environment.js",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/XenoECS.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/CardMovement/index.html",
 		"/C/Windows/Logs/CBS/CBS.log",
 		"/D/Downloads/RedditRip.v1.0/notes.txt",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/ContextMenu/index.js",
-		"/C/gitroot/xa3d/src/www/js/xenocards/XenoCard3D.js",
 		"/C/gitroot/xa3d/src/www/js/THREE/MouseHandler.js",
 		"/C/gitroot/xa3d/src/www/js/networking/ConnectionServer.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/EventDispatcher.js",
@@ -478,22 +511,16 @@
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsGuiCore.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/PlacesEditor/index.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/PlacesEditor-transitions/index.js",
-		"/C/gitroot/xa3d/src/www/js/xeno/XenoRuntime.js",
 		"/C/gitroot/xa3d/src/www/data/ProximaNovaCnLt_Bold.json",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/PlacesEditor/index.html",
-		"/C/gitroot/xa3d/src/www/js/polyfills/fetch.js",
 		"/C/gitroot/xa3d/src/www/js/xenocards/MouseCursor.js",
-		"/C/gitroot/xa3d/package.json",
-		"/C/gitroot/xa3d/app.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCards2.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsPlaces.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Runtime/index.html",
 		"/C/gitroot/xa3d/src/www/prototypes/interaction/draganddrop/index.js",
 		"/C/gitroot/xa3d/src/www/js/xenocards/DragAndDrop.js",
-		"/C/gitroot/xa3d/src/www/js/THREE/Prototype.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/xenocard/index.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsComponents.js",
-		"/C/gitroot/xa3d/xa3d.sublime-project",
 		"/C/gitroot/xa3d/xa3d.sublime-workspace",
 		"/C/gitroot/rmsr2017/src/components/RaceEventManager.js",
 		"/C/gitroot/rmsr2017/data/rmsr_events.nedb",
@@ -551,39 +578,7 @@
 		"/C/Users/killroy/Dropbox/PortableApps/SublimeText/Data/Packages/User/BufferScroll.sublime-settings",
 		"/C/Users/killroy/Dropbox/PortableApps/SublimeText/Data/Packages/BufferScroll/BufferScroll.sublime-settings",
 		"/C/Users/killroy/Dropbox/PortableApps/SublimeText/Data/Packages/DistractionFreeWindow/settings/distraction_free_window.sublime-settings",
-		"/C/Users/killroy/Dropbox/PortableApps/SublimeText/Data/Index/000112.log",
-		"/D/Downloads/fleetlist-2016-10-26.csv",
-		"/C/gitroot/echofleet/builds/webgl/index.html",
-		"/D/Shared/VM/rmsr2017/rmsr2017/results/report_requiredfinishingtimes_print.cfm",
-		"/D/Shared/VM/rmsr2017/rmsr2017/admin/modules/included/reports/report_requiredfinishingtimes_print.cfm",
-		"/D/Shared/VM/rmsr2017/rmsr2017/admin/rmsr/lib_fleetposition.cfm",
-		"/D/Shared/VM/rmsr2017/rmsr2017/results/index.cfm",
-		"/D/Shared/VM/rmsr2017/rmsr2017/admin/rmsr/lib_trackerdata.inc.cfm",
-		"/C/gitroot/rmsr2017/src/tools/raceMath.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/index.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/requiredfinishingtimes.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/entrant.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/final.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/report-tools.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/yellowbrick.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/tracking.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/starting.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/scruteneering_blank.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/entrantsstatus.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/berthing.js",
-		"/C/gitroot/rmsr2017/src/server/rmsrapi/index.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/fleetlist.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/fleetinfo.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/reports/finish.js",
-		"/C/gitroot/xa3d/src/www/prototypes/extra/wfc/index.js",
-		"/C/gitroot/xa3d/src/www/prototypes/extra/wfc/index.html",
-		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/index.js",
-		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/model.js",
-		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/package.json",
-		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/overlapping-model.js",
-		"/C/gitroot/xa3d/node_modules/wavefunctioncollapse/README.md",
-		"/C/gitroot/xa3d/src/www/prototypes/extra/wfc/wfc.js",
-		"/C/gitroot/killroy42.github.io/index.html"
+		"/C/Users/killroy/Dropbox/PortableApps/SublimeText/Data/Index/000112.log"
 	],
 	"find":
 	{
@@ -649,6 +644,54 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"spaceWidth",
+			"[x]",
+			"getProp",
+			"canvasTex",
+			"\"',",
+			"material",
+			"exampl",
+			"webp",
+			"minFilter",
+			"collider",
+			"getSlot",
+			"_slotFunc",
+			"createFanSlots",
+			"testHSCard",
+			"textur",
+			"textAlign",
+			"setStyle",
+			"renderText",
+			"descriptionStyle",
+			"r",
+			"createCanvas",
+			"a",
+			"loadResource",
+			"\n\t\t\t#ifdef GL_ES\n\t\t\t\tprecision highp float;\n\t\t\t#endif\n\t\t\tuniform sampler2D tOne;\n\t\t\tuniform sampler2D tSec;\n\t\t\tvarying vec2 vUv;\n\t\t\tvoid main(void) {\n\t\t\t\tvec3 c;\n\t\t\t\tvec4 Ca = texture2D(tOne, vUv);\n\t\t\t\tvec4 Cb = texture2D(tSec, vUv);\n\t\t\t\tc = Ca.rgb * Ca.a + Cb.rgb * Cb.a * (1.0 - Ca.a);\n\t\t\t\tgl_FragColor = vec4(c, 1.0);\n\t\t\t}",
+			"loadTextures",
+			"764",
+			"map =",
+			"normalizeUVs",
+			"TextureLoader",
+			"fromJson",
+			"fromJSON",
+			"lodash",
+			"{}",
+			"FontLoaderComponent",
+			"camer",
+			"floor",
+			"handle",
+			"getGlobalAlphaSetter",
+			"_cards",
+			"zones",
+			"entities",
+			"zones",
+			"entities",
+			"props",
+			"filterZone",
+			"identifier",
+			"reNumber",
+			"tokenTypes",
 			"pick",
 			"fisher",
 			"yates",
@@ -728,55 +771,7 @@
 			"Persistant",
 			"getComponentName",
 			"hasComponent",
-			"hasAllComponents",
-			"resolveComponent",
-			"handle",
-			"loadPersistant",
-			"createGirdCards",
-			"loadPersistant",
-			"Component.name",
-			"rafId",
-			"removeen",
-			"EVENT_REMOVEENTITY",
-			"TransformHandle",
-			"toString",
-			"localStorage",
-			"loadPlacesFromJson",
-			"instantiateComponent",
-			"_components",
-			"resolveComponent",
-			"THREE",
-			"ecsTHREE",
-			"getComponentClass",
-			"parseComponent",
-			"FontLoaderComponent",
-			"handleControlMousedown",
-			"controlInUse",
-			"detach",
-			"requestAnimationFrame",
-			"render",
-			"TransformControls",
-			"TweenMax",
-			"enter",
-			"Entity",
-			"XenoCard3D",
-			"dimensions",
-			"colors",
-			"read",
-			"entity",
-			"scene",
-			"Scene",
-			"Renderer",
-			"Camera",
-			"MouseEvents",
-			"mouseEvents",
-			"from",
-			"fronm",
-			"Render",
-			"getRandomColor",
-			"makeRoundedRectShape",
-			"THREE.",
-			"LineBasicMaterial"
+			"hasAllComponents"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -922,42 +917,8 @@
 	"groups":
 	[
 		{
-			"selected": 0,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "src/www/prototypes/XenoEngine/Zones/index.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 12597,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6558,
-								6558
-							]
-						],
-						"settings":
-						{
-							"apply_syntax_touched": true,
-							"bs_sintax": "javascript (babel)",
-							"buffer_scroll_name": "8420399c",
-							"spell_check": false,
-							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2202.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				}
 			]
 		}
 	],
@@ -994,7 +955,7 @@
 	"menu_visible": false,
 	"output.find_results":
 	{
-		"height": 430.0
+		"height": 667.0
 	},
 	"pinned_build_system": "",
 	"project": "xa3d.sublime-project",
@@ -1046,7 +1007,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 141.0,
+	"side_bar_width": 154.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

@@ -1,6 +1,6 @@
 (() => {
 const THREE = require('THREE');
-const {makeComponent} = require('XenoECS');
+const {makeComponent, getComponentName} = require('XenoECS');
 const {DataComponent} = require('ecsCore');
 const {
 	//Scene, Renderer, Camera, Runtime, MouseEvents, Cursor,
@@ -40,9 +40,12 @@ class CardData extends DataComponent {
 }
 
 class Card {
+	constructor() {
+		this.meshTypes = [];
+	}
 	OnAttachComponent(entity) {
-		const meshTypes = [BallCard, RoundedCornersCard, XACard];
-		//const meshTypes = [BallCard, RoundedCornersCard, BallCard];
+		//const meshTypes = [BallCard, RoundedCornersCard, XACard];
+		const {meshTypes} = this;
 		const collider = entity.requireComponent(Collider);
 		const cardData = entity.requireComponent(CardData);
 		collider.padding.set(0.2, 0.05, 0.2);
@@ -63,17 +66,46 @@ class Card {
 				if(cardMesh) cardMesh.setColor(change.color);
 			}
 			if(change.type !== undefined && data.type !== change.type) {
-				entity.removeComponent(CardMesh);
-				entity.addComponent(meshTypes[change.type]);
-				//console.log(entity.transform.position);
-				//console.log(entity.transform.children.map(child => child.position).join(', '));
-				collider.setFromMesh(entity.transform);
-				const cardMesh = entity.getComponent(CardMesh);
-				if(cardMesh) cardMesh.setColor(data.color);
+				this.setCardMesh(meshTypes[change.type]);
+				/*
+					if(meshTypes[change.type]) {
+						entity.removeComponent(CardMesh);
+						entity.addComponent(meshTypes[change.type]);
+						//console.log(entity.transform.position);
+						//console.log(entity.transform.children.map(child => child.position).join(', '));
+						collider.setFromMesh(entity.transform);
+						const cardMesh = entity.getComponent(CardMesh);
+						if(cardMesh) cardMesh.setColor(data.color);
+					}
+				*/
 			}
 		});
 	}
+	setCardMesh(newCardMesh) {
+		const {entity} = this;
+		const collider = entity.requireComponent(Collider);
+		const data = entity.requireComponent(CardData);
+		if(newCardMesh) {
+			entity.removeComponent('CardMesh');
+			entity.addComponent(newCardMesh);
+			//console.log(entity.transform.position);
+			//console.log(entity.transform.children.map(child => child.position).join(', '));
+			collider.setFromMesh(entity.transform);
+			const cardMesh = entity.getComponent(CardMesh);
+			if(cardMesh) cardMesh.setColor(data.color);
+		}
+	}
+	fromJSON(json) {
+		this.meshTypes = json.meshTypes;
+		this.setCardMesh(this.meshTypes[this.entity.cardData.type]);
+	}
+	toJSON() {
+		const json = super.toJSON();
+		json.meshTypes = this.meshTypes.map(getComponentName);
+		return json;
+	}
 }
+//Card.MESH_TYPES = [BallCard, RoundedCornersCard, XACard];
 
 class CardMesh extends MeshComponent {
 	constructor() {
@@ -86,7 +118,7 @@ class CardMesh extends MeshComponent {
 	}
 	setColor(color) {
 		//console.info('CardMesh.setColor(color);');
-		this.material.color.set(color);
+		if(this.material.color) this.material.color.set(color);
 	}
 }
 class RoundedCornersCard extends CardMesh {

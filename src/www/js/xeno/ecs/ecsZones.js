@@ -30,7 +30,7 @@ const createFanSlots = (max) => {
 			(point.y + 1 - 0.5 * f) * (1 / f)
 		);
 		let rotation = new Euler(0, ang, -0.025 * Math.PI);
-		return {position, rotation};
+		return {position, rotation, renderOrder: total - idx};
 	};
 };
 
@@ -39,7 +39,7 @@ const createGridSlots = (max) => {
 	return (idx, total) => {
 		let position = new Vector3(0.5 * ((total - 1) / divisions) - (idx / divisions), 0, 0);
 		let rotation = new Euler();
-		return {position, rotation};
+		return {position, rotation, renderOrder: idx}
 	};
 };
 
@@ -72,7 +72,6 @@ class CardZone {
 		this._slotPadding = 0.2;
 		this._slotWidth = cardDims.width + this._slotPadding;
 		this._slotHeight = cardDims.height + this._slotPadding;
-		this.handleZoneMouseup = this.handleZoneMouseup.bind(this);
 		this.handleCardMouseup = this.handleCardMouseup.bind(this);
 		this.handleDatachange = this.updateSlots.bind(this);
 	}
@@ -84,19 +83,7 @@ class CardZone {
 		const collider = entity.requireComponent('Collider');
 		const node = entity.requireComponent('Node');
 		entity.on('datachanged', this.handleDatachange);
-		collider.addEventListener('mouseup', this.handleZoneMouseup);
 		this.updateSlots();
-	}
-	handleZoneMouseup(event) {
-		//console.info('CardZone.handleZoneMouseup(event);');
-		const {entities} = this;
-		const card = entities.createEntity({
-			CardData: {type: 1},
-			Card: {},
-			CardAnimator: {}
-		});
-		this.attachCard(card);
-		this.insertCard(card);
 	}
 	handleCardMouseup(event) {
 		//console.info('CardZone.handleCardMouseup(event);');
@@ -161,6 +148,7 @@ class CardZone {
 		_cards.forEach((card, idx) => {
 			if(card) {
 				const slot = this.getSlot(idx, _cards.length);
+				card.getComponent('CardMesh').renderOrder = slot.renderOrder || idx;
 				card.cardAnimator.slideTo(slot.position, slot.rotation);
 			}
 		});
