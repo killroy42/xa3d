@@ -37,7 +37,7 @@
 	MouseCursor.COLOR_DRAGGABLE = MouseCursor._COLOR_DRAGGABLE;
 	MouseCursor.prototype.createCursor = function() {
 		var cursor = new THREE.Mesh(
-			new THREE.BoxGeometry(10, 10, 10),
+			new THREE.BoxGeometry(1, 1, 1),
 			new THREE.MeshBasicMaterial({color: 0xffff00})
 		);
 		var mouseCursorMaterial = cursor.material;

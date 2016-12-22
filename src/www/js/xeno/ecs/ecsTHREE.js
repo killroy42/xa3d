@@ -168,6 +168,7 @@ class Collider extends MeshComponent {
 			transparent: true,
 			opacity: 0.1,
 			visible: true,
+			depthWrite: false,
 		});
 		Mesh.call(this, geometry, material);
 		this.name = 'collider';
@@ -202,6 +203,9 @@ class Collider extends MeshComponent {
 				.multiplyScalar(0.5)
 				.sub(transform.position);
 		}
+	}
+	refresh() {
+		this.setFromMesh(this.entity.transform);
 	}
 }
 

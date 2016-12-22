@@ -56,6 +56,7 @@ class Entity {
 		return this.entities;
 	}
 	addComponent(Component, opts) {
+		//console.info('Entity.addComponent(Component, opts);', Component.name || Component);
 		this.entities.entityAddComponent(this, Component, opts);
 		return this;
 	}
@@ -116,6 +117,7 @@ class Entity {
 	requireComponent(Component) {
 		//console.group('Entity.requireComponent');
 		//console.info('Entity.requireComponent(Component);', Component.name || Component);
+		//console.log(this.toString());
 		if(!this.hasComponent(Component)) this.addComponent(Component);
 		const component = this.getComponent(Component);
 		//console.groupEnd('Entity.requireComponent');
@@ -159,6 +161,7 @@ class Entity {
 				:Component.name;
 	}
 	fromJSON(json) {
+		console.info('Entity.fromJSON(json);', json);
 		this.addComponents(json.components);
 	}
 	toJSON() {
@@ -314,7 +317,7 @@ class EntityManager {
 		return instance;
 	}
 	entityAddComponent(entity, Component, opts) {
-		//console.info('EntityManager.entityAddComponent(entity, Component, opts);');
+		//console.info('EntityManager.entityAddComponent(entity, "%s", opts);',  getComponentName(Component));
 		Component = this.resolveComponent(Component);
 		if(typeof Component === 'string') throw new Error(`Component not found: "${Component}"`);
 		if(entity.hasComponent(Component)) {

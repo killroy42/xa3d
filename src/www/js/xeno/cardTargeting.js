@@ -93,11 +93,13 @@ const targetFactory = (defaultTargets) => {
 		return filtered;
 	};
 	const getCardsOfTarget = target => {
+		//console.info('getCardsOfTarget(target);');
 		if(target.cardData !== undefined) return [target];
 		if(target.cardZone !== undefined) return target.cardZone.getCards();
 		throw new Error(`Invalid target: ${target}`);
 	};
 	const getCardsOfTargets = (targets = []) => {
+		//console.info('getCardsOfTargets(targets);');
 		return Array.prototype.concat.apply([], targets.map(getCardsOfTarget));
 	};
 	const getZoneOfTarget = target => {
@@ -105,7 +107,12 @@ const targetFactory = (defaultTargets) => {
 		return zones.find(({cardZone}) => cardZone.getCards().indexOf(target) !== -1);
 	};
 	const parseCardPick = (targets = []) => {
+		//console.info('parseCardPick(targets);');
 		let cards, cardPos;
+		if(targets.length === 0) {
+			consumeToken(); // Consume, don't care
+			return targets;
+		}
 		targets = getCardsOfTargets(targets);
 		switch(consumeToken()) {
 			case 'first': if(targets.length > 0) targets.length = 1; break;

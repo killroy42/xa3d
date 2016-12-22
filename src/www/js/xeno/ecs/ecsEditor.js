@@ -147,7 +147,6 @@ class Node {
 		//if(this._parent) json.parent = this._parent.entity.id;
 		if(_children.length > 0) json.children = _children.map(({entity}) => {
 			const json = entity.toJSON().components;
-			console.log(json);
 			delete json.node;
 			return json;
 		});
