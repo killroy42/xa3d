@@ -34,12 +34,18 @@ const createFanSlots = (max) => {
 	};
 };
 
-const createGridSlots = (max) => {
-	const divisions = max-1;
+const createGridSlots = (max, columns = max) => {
 	return (idx, total) => {
-		let position = new Vector3(0.5 * ((total - 1) / divisions) - (idx / divisions), 0, 0);
+		let wrapX = Math.min(columns, max);
+		let wrapY = Math.floor(max / wrapX);
+		let lineTot = Math.min(wrapX, total - Math.floor((total - idx - 1) / wrapX) * wrapX);
+		let x = -0.5 * (lineTot - 1) + ((total - idx - 1) % columns);
+		x /= (wrapX - 1);
+		let y = 0.5 * Math.floor(((total - 1)) / wrapX) - Math.floor((total - idx - 1) / wrapX);
+		y /= Math.max(1, wrapY - 1);
+		let position = new Vector3(x, 0, y);
 		let rotation = new Euler();
-		return {position, rotation, renderOrder: idx}
+		return {position, rotation, renderOrder: idx};
 	};
 };
 
@@ -58,6 +64,7 @@ class ZoneData extends DataComponent {
 		this.createProp('kind', 'zone');
 		this.createProp('layout', 'grid');
 		this.createProp('slotCount', 3);
+		this.createProp('columns', 999);
 		this.createProp('ownership', 'neutral');
 		this.createProp('visibility', 'all');
 	}
@@ -124,13 +131,13 @@ class CardZone {
 	updateSlots() {
 		//console.info('CardZone.updateSlots();');
 		const {
-			entity: {collider: {scale}, zoneData: {layout, slotCount}},
+			entity: {collider: {scale}, zoneData: {layout, slotCount, columns = slotCount}},
 			slots, _slotWidth, _slotHeight
 		} = this;
 		this.slotOffset = new Vector3(0, 0.1, 0);
 		this.slotScale = new Vector3(scale.x - _slotWidth, 1, scale.z - _slotHeight);
 		switch(layout) {
-			case 'grid': this._slotFunc = createGridSlots(slotCount); break;
+			case 'grid': this._slotFunc = createGridSlots(slotCount, columns); break;
 			case 'fan': this._slotFunc = createFanSlots(slotCount); break;
 			case 'deck': this._slotFunc = createDeckSlots(slotCount); break;
 		}
