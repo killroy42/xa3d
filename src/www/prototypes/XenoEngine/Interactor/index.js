@@ -74,12 +74,13 @@ const runtimeJson = {
 	const calcD = (v, a, t) => t * v + a * (t * t);
 	const calcAccel = maxV => (v, a) => clamp(v + a, -maxV, maxV);
 	const dOverTime = maxV => (d, v, a, t = 0) => (t <= 0)?d:dOverTime(d = d - (v = calcAccel(maxV)(v, a)), v, a, --t);
-	const makeRotatorFunc = (maxA, maxV, accelF, initialV = 0) => {
+	const makeRotatorFunc = (getAccelFunc, maxA, maxV, initialV = 0) => {
 		let calcAccelMaxV = calcAccel(maxV);
+		const accelFunc = getAccelFunc(maxA);
 		const rotator = function(d) {
 			const sign = (d < 0)?-1:1;
 			const v = rotator.v;
-			rotator.a = accelF(d * sign, v * sign) * sign;
+			rotator.a = accelFunc(d * sign, v * sign) * sign;
 			rotator.v = calcAccelMaxV(v, rotator.a);
 			return rotator.v;
 		};
@@ -494,7 +495,7 @@ const runTests = (accelFunc, graph, maxA, maxV) => {
 		//{d: 1.0 * Math.PI, v: 0, t: 30}, {d: 1.0 * Math.PI, v: maxV, t: 30}, {d: 1.0 * Math.PI, v: -maxV, t: 30},
 		//{d: 1.0 * Math.PI - 1 * maxV, v: -maxV, t: 500},
 	].map(({d, v, t})=>{
-		const rotator = makeRotatorFunc(maxA, maxV, accelFunc(maxA), v);
+		const rotator = makeRotatorFunc(accelFunc, maxA, maxV, v);
 		graphScenario(rotator, graph, d, v, t);
 	});
 	graph.getRenderer()();
@@ -641,7 +642,6 @@ const init = () => {
 	entities.queryComponents([Ref]).find(({ref: {id}}) => id === 'red').collider.addEventListener('mouseup', handleSetColor);
 	entities.queryComponents([Ref]).find(({ref: {id}}) => id === 'white').collider.addEventListener('mouseup', handleSetColor);
 	
-	//const curve = new THREE.EllipseCurve(0, 0, 1, 1, 0, 0, false, 0.5 * Math.PI);
 	const line = new THREE.Line(new THREE.Geometry(), new THREE.LineBasicMaterial({color: 0xffffff}));
 	const arc = character.node.children[4].entity;
 	const setArc = (startA, endA) => {
@@ -667,28 +667,31 @@ const init = () => {
 		geo.elementsNeedUpdate = true;
 	};
 
-	//const faceTo = playFaceTowards(new Vector3());
-	//character.characterAnimator.play(faceTo.player);
-
 	const handle = entities.findComponent('TransformHandle');
 	const target = entities.createEntity(markerJson);
-	const target2 = entities.createEntity(markerJson);
-
-	target2.transform.position.set(0, 0, 2);
-	target.transform.position.set(0, 0, 2);
-	
 	const pointer = entities.createEntity(pointerJson);
-	
 	const updatePointer = () => {
 		pointer.transform.position.copy(character.transform.position);
 		pointer.transform.lookAt(target.transform.position);
 		pointer.transform.updateMatrix();
-		//characterPointer.transform.lookAt(target2.transform.position);
 	};
-	//character.transform.lookAt(new Vector3(1, 0, -1));
+
+	target.transform.position.set(0, 0, 2);
 	updatePointer();
 
+	const graph = new DebugGraph();
+	graph.graphSpacing = 3;
 
+	class Navigator {
+		constructor() {
+			// transV, maxTV, maxTA
+			// rotV, maxRV, maxRA
+			// target
+			// character
+		}
+	}
+
+	
 	const getRotAccel = (maxA) => (d, v) => {
 		let a = 0;
 		const sd = Math.sign(v) * calcStoppingDistance(v, maxA);
@@ -710,38 +713,41 @@ const init = () => {
 		}
 		return clamp(a, -maxA, maxA);
 	};
-
+	const maxTV = 1, maxTA = 1 / 1 * (1 / 60) * maxTV;
+	let tv = 0;
 	//const maxV = 0.015 * Math.PI, maxA = 0.0001 * Math.PI;
-	const maxV = 0.1 * Math.PI, maxA = 0.01 * Math.PI;
-	const graph = new DebugGraph();
-	graph.graphSpacing = 3;
-	runTests(getRotAccel, graph, maxA, maxV);
-	
-	debugger;
+	const maxRV = 0.1 * Math.PI, maxRA = 1 / 1 * (1 / 60) * maxRV;
+	//runTests(getRotAccel, graph, maxRA, maxRV); debugger;
 
-	const rotator = makeRotatorFunc(maxA, maxV, getRotAccel(maxA), 0);
-	const axis = new Vector3(0, 1, 0);
-	const updatePointers = f => time => {
-		const [start, end] = getAngles(characterPointer.transform, pointer.transform);
+	const rotator = makeRotatorFunc(getRotAccel, maxRA, maxRV, 0);
+	const updatePointers = time => {
+		const [start, end] = getAngles(character.transform, pointer.transform);
 		let d = calcAngularDistance(start, end);
-		const m = new THREE.Matrix4().makeRotationAxis(axis, rotator(d));
-		characterPointer.transform.applyMatrix(m);
+		character.transform.rotateY(rotator(d));
+		const transD = character.transform.position.distanceTo(target.transform.position);
+		if(transD > calcStoppingDistance(tv, maxTA) + 1) {
+			tv = Math.min(maxTV, tv + maxTA);
+		} else {
+			tv = Math.max(0, tv - maxTA);
+		}
+		character.transform.translateZ(tv);
+		updatePointer();
 		let {v, a} = rotator;
 		graph.addDataPoint([
 			(1 / Math.PI) * d * 1,
-			(1 / Math.PI) * calcStoppingDistance(v, maxA) * 1,
-			v * (1 / maxV),
-			a * (1 / maxV),
+			(1 / Math.PI) * calcStoppingDistance(v, maxRA) * 1,
+			v * (1 / maxRV),
+			a * (1 / maxRV),
 			0, 0, 0, 0,
 		]);
 		graph.getRenderer()();
 	};
 	const updateArc = time => {
-		const [startA, endA] = getAngles(characterPointer.transform, pointer.transform);
-		setArc(startA, endA);
+		const [startA, endA] = getAngles(character.transform, pointer.transform);
+		setArc(0, endA - startA);
 	};
 	const runtime = entities.findComponent(Runtime);
-	runtime.OnBeforeRender.push(updatePointers(getRotAccel(maxA)));
+	runtime.OnBeforeRender.push(updatePointers);
 	runtime.OnBeforeRender.push(updateArc);
 
 	handle.addEventListener('change', event => updatePointer());

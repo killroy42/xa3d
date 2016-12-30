@@ -188,12 +188,10 @@
 	"buffers":
 	[
 		{
-			"file": "src/www/prototypes/XenoEngine/Interactor/index.js",
 			"settings":
 			{
-				"buffer_size": 37475,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
+				"buffer_size": 0,
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -449,21 +447,22 @@
 	"expanded_folders":
 	[
 		"/C/gitroot/xa3d/src/www/prototypes",
+		"/C/gitroot/xa3d/src/www/prototypes/shaders/effectsampler",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine",
-		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/BrimstoneVisualizer",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Interactor",
-		"/C/gitroot/xa3d/src/www/js/xeno",
+		"/C/gitroot/xa3d/src/www/js/helpers",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs",
-		"/C/gitroot/xa3d/src/www/js",
-		"/C/gitroot/xa3d/src/www/js/xenocards",
 		"/C/gitroot/xa3d/src/www",
-		"/C/gitroot/xa3d/src/www/data",
+		"/C/gitroot/xa3d/src/www/js",
+		"/C/gitroot/xa3d/src/www/js/helpers",
 		"/C/gitroot/xa3d",
 		"/C/gitroot/xa3d/src"
 	],
 	"file_history":
 	[
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Interactor/index.js",
+		"/C/gitroot/xa3d/src/www/js/helpers/DebugGraph.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Interactor/index.html",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/BrimstoneVisualizer/index.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/cardTargeting.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCards.js",
@@ -473,7 +472,6 @@
 		"/D/Downloads/qdjDuHGK6tovBN7nXtYV4c.hsreplay.xml",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsTHREE.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/XenoECS.js",
-		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Interactor/index.html",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/BrimstoneVisualizer/index.html",
 		"/C/gitroot/xa3d/src/www/vendors/CesiumUnminified/Workers/combineGeometry.js",
 		"/C/gitroot/xa3d/app.js",
@@ -589,8 +587,7 @@
 		"/D/Downloads/fleetlist-2016-10-31.csv",
 		"/C/gitroot/rmsr2017/www/styles/racereports.css",
 		"/C/gitroot/rmsr2017/src/components/styles/racereports.css",
-		"/C/gitroot/rmsr2017/src/server/cms/server.js",
-		"/C/gitroot/rmsr2017/package.json"
+		"/C/gitroot/rmsr2017/src/server/cms/server.js"
 	],
 	"find":
 	{
@@ -656,6 +653,14 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"runtime",
+			"updatePointers",
+			"updateArc",
+			"axis",
+			"dOverTime",
+			"calcAccel",
+			"PI2",
+			"accelFun01",
 			"calcAccel",
 			"calcDecel",
 			"calcAccel",
@@ -775,15 +780,7 @@
 			"\"",
 			"getGlobalAlphaSetter",
 			"createGridCards",
-			"LoadButton",
-			"getGlobalAlphaSetter",
-			"Animator",
-			"cardAnim",
-			"CardAnim",
-			"Animator2",
-			"Animator",
-			"CardAnimator",
-			"CatmullRomCurve3"
+			"LoadButton"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -934,32 +931,28 @@
 			[
 				{
 					"buffer": 0,
-					"file": "src/www/prototypes/XenoEngine/Interactor/index.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 37475,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								19532,
-								19532
+								0,
+								0
 							]
 						],
 						"settings":
 						{
 							"apply_syntax_touched": true,
-							"bs_sintax": "javascript (babel)",
-							"buffer_scroll_name": "16372269",
-							"spell_check": true,
-							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"bs_sintax": "plain text",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 4672.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -1052,7 +1045,7 @@
 	"show_minimap": true,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": false,
+	"side_bar_visible": true,
 	"side_bar_width": 154.0,
 	"status_bar_visible": true,
 	"template_settings":

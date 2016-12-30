@@ -22,9 +22,11 @@ class DebugGraph {
 		this.ctx = ctx;
 		this.data = [];
 		this.graphSpacing = 1;
+		this.graphPos = 0;
 	}
 	addDataPoint(data) {
-		this.data.push(data);
+		this.data[this.graphPos] = data;
+		this.graphPos = (this.graphPos + 1) % Math.floor(this.ctx.canvas.width / this.graphSpacing);
 	}
 	getRenderer() {
 		return time => this.render(time);
@@ -40,9 +42,7 @@ class DebugGraph {
 		ctx.stroke();
 	}
 	render(time) {
-		const {ctx, ctx: {canvas: {width, height}}, data, graphSpacing} = this;
-		const w = width / graphSpacing;
-		if(data.length > w) data.splice(0, data.length - w);
+		const {ctx, ctx: {canvas: {width, height}}, data} = this;
 		ctx.clearRect(0, 0, width, height);
 		ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
 		ctx.fillRect(0, 0, width, height);
