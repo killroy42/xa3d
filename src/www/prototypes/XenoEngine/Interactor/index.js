@@ -72,16 +72,35 @@ const runtimeJson = {
 	const calcStoppingDistance = (v, a) => (a === 0)?0:((v * v) / (2 * a));
 	const calcStoppingAcceleration = (v, d) => (d === 0)?-v:((v * v) * (1 / Math.abs(d)) * 0.5);
 	const calcD = (v, a, t) => t * v + a * (t * t);
-	const calcAccel = maxV => (v, a) => clamp(v + a, -maxV, maxV);
-	const dOverTime = maxV => (d, v, a, t = 0) => (t <= 0)?d:dOverTime(d = d - (v = calcAccel(maxV)(v, a)), v, a, --t);
-	const makeRotatorFunc = (getAccelFunc, maxA, maxV, initialV = 0) => {
-		let calcAccelMaxV = calcAccel(maxV);
-		const accelFunc = getAccelFunc(maxA);
+	//const calcAccel = maxV => (v, a) => clamp(v + a, -maxV, maxV);
+	//const dOverTime = maxV => (d, v, a, t = 0) => (t <= 0)?d:dOverTime(d = d - (v = calcAccel(maxV)(v, a)), v, a, --t);
+	const rotAccel = (d, v, maxA) => {
+		let a = 0;
+		const sd = Math.sign(v) * calcStoppingDistance(v, maxA);
+		if(Math.abs(d - v) <= maxA && Math.abs(v) <= maxA) {
+			a = d - v;
+			if(Math.abs(v + a) > maxA) {
+				a = Math.sign(a) * (maxA - Math.abs(v));
+			}
+		} else if(d - (v + maxA) - sd >= 0) {
+			a = maxA;
+		} else if(d - (v - maxA) - sd >= 0) {
+			a = -maxA;
+		} else if(d - v - sd >= 0) {
+			const tmp = d*d - 2*d*v - v*v;
+			if(tmp < 0) console.error('d*d - 2*d*v - v*v < 0 at ', d, v);
+			a = (1/2) * (-Math.sqrt(tmp) + d - v);
+		} else {
+			a = -0.5 * Math.sign(v) * (v * v) * (1 / d);
+		}
+		return clamp(a, -maxA, maxA);
+	};
+	const makeRotator = (accelFunc, maxA, maxV, initialV = 0) => {
 		const rotator = function(d) {
 			const sign = (d < 0)?-1:1;
 			const v = rotator.v;
-			rotator.a = accelFunc(d * sign, v * sign) * sign;
-			rotator.v = calcAccelMaxV(v, rotator.a);
+			rotator.a = accelFunc(d * sign, v * sign, maxA) * sign;
+			rotator.v = clamp(v + rotator.a, -maxV, maxV);
 			return rotator.v;
 		};
 		rotator.maxA = maxA;
@@ -95,14 +114,11 @@ const runtimeJson = {
 	const getAngles = (ta, tb) => {
 		const m = new THREE.Matrix4();
 		const v0 = new THREE.Vector3(0, 0, 1);
-		const v1 = v0.clone();
-		const v2 = v0.clone();
-		v1.transformDirection(m.makeRotationFromQuaternion(ta.quaternion));
+		const v1 = v0.clone().transformDirection(m.makeRotationFromQuaternion(ta.quaternion));
 		v1.y = 0;
-		v2.transformDirection(m.makeRotationFromQuaternion(tb.quaternion));
+		const v2 = v0.clone().transformDirection(m.makeRotationFromQuaternion(tb.quaternion));
 		v2.y = 0;
-		var a = v0.angleTo(v1);
-		var b = v0.angleTo(v2);
+		let a = v0.angleTo(v1), b = v0.angleTo(v2);
 		if(Math.sign(v1.x) < 0) a *= -1;
 		if(Math.sign(v2.x) < 0) b *= -1;
 		return [normalizeAngle(a), normalizeAngle(b)];
@@ -572,7 +588,7 @@ const init = () => {
 				arrowJson,
 			]},
 			Collider: {},
-			Editable: {}
+			//Editable: {}
 		};
 		const markerJson = {
 			Transform: {},
@@ -586,7 +602,7 @@ const init = () => {
 				},
 			]},
 			//Collider: {},
-			Editable: {}
+			//Editable: {}
 		};
 	const character = entities.createEntity({
 		Ref: {id: 'character_01'},
@@ -676,62 +692,48 @@ const init = () => {
 		pointer.transform.updateMatrix();
 	};
 
-	target.transform.position.set(0, 0, 2);
-	updatePointer();
-
-	const graph = new DebugGraph();
-	graph.graphSpacing = 3;
-
-	class Navigator {
-		constructor() {
-			// transV, maxTV, maxTA
-			// rotV, maxRV, maxRA
-			// target
-			// character
-		}
-	}
-
-	
-	const getRotAccel = (maxA) => (d, v) => {
-		let a = 0;
-		const sd = Math.sign(v) * calcStoppingDistance(v, maxA);
-		if(Math.abs(d - v) <= maxA && Math.abs(v) <= maxA) {
-			a = d - v;
-			if(Math.abs(v + a) > maxA) {
-				a = Math.sign(a) * (maxA - Math.abs(v));
+	const makeTranslator = (maxAV, maxTV, initialV = 0) => {
+		let tv = 0;
+		const translator = function(d, deltaT = 1) {
+			if(d > calcStoppingDistance(tv, maxTA) + 1) {
+				tv = Math.min(maxTV, tv + maxTA * deltaT);
+			} else {
+				tv = Math.max(0, tv - maxTA * deltaT);
 			}
-		} else if(d - (v + maxA) - sd >= 0) {
-			a = maxA;
-		} else if(d - (v - maxA) - sd >= 0) {
-			a = -maxA;
-		} else if(d - v - sd >= 0) {
-			const tmp = d*d - 2*d*v - v*v;
-			if(tmp < 0) console.error('d*d - 2*d*v - v*v < 0 at ', d, v);
-			a = (1/2) * (-Math.sqrt(d*d - 2*d*v - v*v) + d - v);
-		} else {
-			a = -0.5 * Math.sign(v) * (v * v) * (1 / d);
-		}
-		return clamp(a, -maxA, maxA);
+			return tv;
+		};
+		return translator;
 	};
-	const maxTV = 1, maxTA = 1 / 1 * (1 / 60) * maxTV;
-	let tv = 0;
-	//const maxV = 0.015 * Math.PI, maxA = 0.0001 * Math.PI;
-	const maxRV = 0.1 * Math.PI, maxRA = 1 / 1 * (1 / 60) * maxRV;
-	//runTests(getRotAccel, graph, maxRA, maxRV); debugger;
 
-	const rotator = makeRotatorFunc(getRotAccel, maxRA, maxRV, 0);
-	const updatePointers = time => {
-		const [start, end] = getAngles(character.transform, pointer.transform);
-		let d = calcAngularDistance(start, end);
-		character.transform.rotateY(rotator(d));
-		const transD = character.transform.position.distanceTo(target.transform.position);
-		if(transD > calcStoppingDistance(tv, maxTA) + 1) {
-			tv = Math.min(maxTV, tv + maxTA);
-		} else {
-			tv = Math.max(0, tv - maxTA);
-		}
-		character.transform.translateZ(tv);
-		updatePointer();
+	const makeNavigator = ({character, target, translator, rotator, maxTV}) => {
+		const m1 = new THREE.Matrix4();
+		const targetQ = new THREE.Quaternion();
+		let prevT = 0, deltaT = 0;
+		return time => {
+			if(prevT !== 0) {
+				deltaT = (time - prevT) / 1000;
+				//console.log(deltaT);
+			}
+			prevT = time;
+			m1.lookAt(target.position, character.position, character.up);
+			targetQ.setFromRotationMatrix(m1);
+			const [start, end] = getAngles(character, {quaternion: targetQ});
+			setArc(0, end - start);
+			let angD = calcAngularDistance(start, end);
+			const rv = rotator(angD, deltaT);
+			//console.log('rv:', rv);
+			character.rotateY(rv);
+			const transD = character.position.distanceTo(target.position);
+			const tv = translator(Math.max(0, transD - 1), deltaT);
+			character.translateZ(tv);
+			//const scale = 0.2 + (tv / maxTV);
+			//character.scale.set(scale, scale, scale);
+			updatePointer();
+		};
+	};
+	/*
+		const graph = new DebugGraph();
+		graph.graphSpacing = 3;
 		let {v, a} = rotator;
 		graph.addDataPoint([
 			(1 / Math.PI) * d * 1,
@@ -741,16 +743,97 @@ const init = () => {
 			0, 0, 0, 0,
 		]);
 		graph.getRenderer()();
-	};
-	const updateArc = time => {
-		const [startA, endA] = getAngles(character.transform, pointer.transform);
-		setArc(0, endA - startA);
-	};
+	*/
+	
 	const runtime = entities.findComponent(Runtime);
-	runtime.OnBeforeRender.push(updatePointers);
-	runtime.OnBeforeRender.push(updateArc);
+	const maxTV = 1, maxTA = 1 / 2 * (1 / 60) * maxTV;
+	//const maxRV = 1 * 2 * Math.PI, maxRA = 1 * 2 * Math.PI;
+	const maxRV = 0.1 * Math.PI, maxRA = 1 / 1 * (1 / 60) * maxRV;
+	console.log('maxRV:', maxRV);
 
-	handle.addEventListener('change', event => updatePointer());
+	//const translator = makeTranslator(maxTA, maxTV);
+	const translator = makeRotator(rotAccel, maxTA, maxTV);
+	const rotator = makeRotator(rotAccel, maxRA, maxRV);
+	const navigator = makeNavigator({
+		character: character.transform,
+		target: target.transform,
+		translator, rotator
+	});
+	runtime.OnBeforeRender.push(navigator);
+	/*
+		const rotator = makeRotator(rotAccel, maxRA, maxRV, 0);
+		const updatePointers = time => {
+			const [start, end] = getAngles(character.transform, pointer.transform);
+			let d = calcAngularDistance(start, end);
+			character.transform.rotateY(rotator(d));
+			const transD = character.transform.position.distanceTo(target.transform.position);
+			if(transD > calcStoppingDistance(tv, maxTA) + 1) {
+				tv = Math.min(maxTV, tv + maxTA);
+			} else {
+				tv = Math.max(0, tv - maxTA);
+			}
+			character.transform.translateZ(tv);
+			updatePointer();
+		};
+		const updateArc = time => {
+			const [startA, endA] = getAngles(character.transform, pointer.transform);
+			setArc(0, endA - startA);
+		};
+		runtime.OnBeforeRender.push(updatePointers);
+		runtime.OnBeforeRender.push(updateArc);
+	*/
+
+	const makeRunner = (maxTA, maxTV, maxRA, maxRV, target) => {
+		const character = entities.createEntity({
+			Transform: {},
+			Node: {children: [
+				{
+					Transform: {position: {x: 0, y: 0.5, z: 0}},
+					Node: {children: [arrowJson]}
+				},
+				{
+					Transform: {position: {x: 0, y: 0.5, z: 0}, scale: {x: 1, y: 1, z: 1}},
+					PhongMaterial: materialBlueJson,
+					BoxGeometry: {},
+					GenericMeshComponent: {},
+				}
+			]},
+			Editable: {}
+		});
+		character.transform.position.set(
+			4 * (-1 + 2 * Math.random()),
+			0,
+			4 * (-1 + 2 * Math.random())
+		);
+		//const translator = makeTranslator(maxTA, maxTV);
+		const translator = makeRotator(rotAccel, maxTA, maxTV);
+		const rotator = makeRotator(rotAccel, maxRA, maxRV);
+		const navigator = makeNavigator({
+			character: character.transform,
+			target,
+			translator,
+			rotator,
+			maxTV,
+		});
+		runtime.OnBeforeRender.push(navigator);
+	};
+	for(var i = 0; i < 10; i++) {
+		makeRunner(
+			(0.1 + 3 * Math.random()) * maxTA,
+			(0.1 + 3 * Math.random()) * maxTV,
+			(0.1 + 3 * Math.random()) * maxRA,
+			(0.1 + 3 * Math.random()) * maxRV,
+			target.transform
+		);
+	}
+	
+
+	//handle.addEventListener('change', event => updatePointer());
+	entities.findComponent(Environment)
+		.floor.addEventListener('mousemove', event => {
+			const {point} = event.intersection;
+			target.transform.position.copy(point);
+		});
 	entities.findComponent(Environment)
 		.floor.addEventListener('mousedown', event => {
 			if(event.originalEvent.shiftKey) {
