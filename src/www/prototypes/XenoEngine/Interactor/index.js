@@ -74,33 +74,18 @@ const runtimeJson = {
 	const calcD = (v, a, t) => t * v + a * (t * t);
 	//const calcAccel = maxV => (v, a) => clamp(v + a, -maxV, maxV);
 	//const dOverTime = maxV => (d, v, a, t = 0) => (t <= 0)?d:dOverTime(d = d - (v = calcAccel(maxV)(v, a)), v, a, --t);
-	const rotAccel = (d, v, maxA) => {
-		let a = 0;
-		const sd = Math.sign(v) * calcStoppingDistance(v, maxA);
-		if(Math.abs(d - v) <= maxA && Math.abs(v) <= maxA) {
-			a = d - v;
-			if(Math.abs(v + a) > maxA) {
-				a = Math.sign(a) * (maxA - Math.abs(v));
-			}
-		} else if(d - (v + maxA) - sd >= 0) {
-			a = maxA;
-		} else if(d - (v - maxA) - sd >= 0) {
-			a = -maxA;
-		} else if(d - v - sd >= 0) {
-			const tmp = d*d - 2*d*v - v*v;
-			if(tmp < 0) console.error('d*d - 2*d*v - v*v < 0 at ', d, v);
-			a = (1/2) * (-Math.sqrt(tmp) + d - v);
-		} else {
-			a = -0.5 * Math.sign(v) * (v * v) * (1 / d);
-		}
+	const rotAccel = (x, v, maxA, dt) => {
+		if(dt === 0) return 0;
+		const dt2 = dt * dt;
+		const a = (Math.sqrt(Math.abs(maxA*maxA * (dt2*dt2) + 2 * maxA * dt2 * x)) - (maxA * dt2) - v * dt) / dt2;
 		return clamp(a, -maxA, maxA);
 	};
 	const makeRotator = (accelFunc, maxA, maxV, initialV = 0) => {
-		const rotator = function(d) {
-			const sign = (d < 0)?-1:1;
+		const rotator = function(x, dt = 1) {
+			const sign = (x < 0)?-1:1;
 			const v = rotator.v;
-			rotator.a = accelFunc(d * sign, v * sign, maxA) * sign;
-			rotator.v = clamp(v + rotator.a, -maxV, maxV);
+			rotator.a = accelFunc(x * sign, v * sign, maxA, dt) * sign;
+			rotator.v = clamp(v + rotator.a * dt, -maxV, maxV);
 			return rotator.v;
 		};
 		rotator.maxA = maxA;
@@ -125,36 +110,37 @@ const runtimeJson = {
 	};
 
 // Testing
-	const evalScenario = (d, t, rotator) => {
+	const evalScenario = (x, t, rotator) => {
 		const result = [];
-		let a = 0, v = rotator.v;
-		result.push({d, v, a});
+		let a = 0, v = rotator.v, dt = 1 / 5;
+		result.push({x, v, a});
 		while(t--) {
-			let label = `t: ${t} d/v/a: ${roundTo(3)(d)} / ${roundTo(3)(v)} / ${roundTo(3)(a)}`;
+			let label = `t: ${t} x/v/a: ${roundTo(3)(x)} / ${roundTo(3)(v)} / ${roundTo(3)(a)}`;
 			//console.group(label);
-			v = rotator(d);
+			dt = (1 + 1 * Math.random()) * (1 / 5);
+			v = rotator(x, dt);
 			a = rotator.a;
-			d -= v;
+			x -= v * dt;
 			//if(Math.abs(d) > Math.PI) d = PI2 - (d % PI2);
-			result.push({d, v, a});
-			console.log([d, v, a].map(roundTo(3)));
+			result.push({x, v, a});
+			console.log([x, v, a].map(roundTo(3)));
 			//console.groupEnd(label);
 		}
 		return result;
 	};
-	const graphScenario = (rotator, graph, d, v, t = 0) => {
+	const graphScenario = (rotator, graph, x, v, t = 0) => {
 		const {maxA, maxV} = rotator;
-		const scenarioLabel = `t = ${t}, d = ${roundTo(3)(d)}, v = ${roundTo(3)(v)}, maxA = ${roundTo(3)(maxA)}, maxV = ${roundTo(3)(maxV)}`;
+		const scenarioLabel = `t = ${t}, x = ${roundTo(3)(x)}, v = ${roundTo(3)(v)}, maxA = ${roundTo(3)(maxA)}, maxV = ${roundTo(3)(maxV)}`;
 		console.group(scenarioLabel);
-		const data = evalScenario(d, t, rotator);
-		const maxD = data.reduce((d, next) => Math.max(Math.abs(next.d), d), 0);
-		data.forEach(({d, v, a}) => {
+		const data = evalScenario(x, t, rotator);
+		const maxD = data.reduce((x, next) => Math.max(Math.abs(next.x), x), 0);
+		data.forEach(({x, v, a}) => {
 			let sd = calcStoppingDistance(v, maxA);
 			graph.addDataPoint([
-				(1 / maxD) * d,
+				(1 / maxD) * x,
 				(1 / maxD) * sd,
-				v * (1 / maxV),
-				a * (1 / maxV),
+				v * (1 / maxV) * 1,
+				a * (1 / maxA) * 1,
 				0, 0, 0, 0,
 			].map(v=>v*1));
 		});
@@ -500,19 +486,21 @@ class GenericMeshComponent extends MeshComponent {
 }
 
 
-const runTests = (accelFunc, graph, maxA, maxV) => {
+const runTests = (accelFunc, maxA, maxV) => {
+	const graph = new DebugGraph();
+	graph.graphSpacing = 20;
 	[
-		//{d: 0, v: 0, t: 1},
-		{d: 0.5 * maxV, v: 0, t: 4}, {d: 1.0 * maxV, v: 0, t: 5}, {d: 1.5 * maxV, v: 0, t: 12}, {d: 2.5 * maxV, v: 0, t: 14}, {d: 1 * Math.PI, v: 0, t: 20},
-		//{d: 0, v:  1 * maxA, t: 6}, {d: 0, v: -1 * maxA, t: 10}, {d: 0, v:  1 * maxV, t: 15}, {d: 0, v: -1 * maxV, t: 15}, {d: 0, v:  10 * maxV, t: 15}, {d: 0, v:  -10 * maxV, t: 15},
-		//{d: 1.0 * maxV, v: 0.5 * maxA, t: 10}, {d: 1.0 * maxV, v: 1.0 * maxA, t: 10}, {d: 1.0 * maxV, v: 1.5 * maxA, t: 10}, {d: 1.0 * maxV, v: 2.5 * maxA, t: 10}, {d: 1.0 * maxV, v: maxV, t: 20},
-		//{d: 1.0 * maxV, v: -0.5 * maxA, t: 12}, {d: 1.0 * maxV, v: -1.0 * maxA, t: 12}, {d: 1.0 * maxV, v: -1.5 * maxA, t: 14}, {d: 1.0 * maxV, v: -2.5 * maxA, t: 16}, {d: 1.0 * maxV, v: -maxV, t: 15},
-		//{d: 1.0 * maxV, v: -1.5 * maxA, t: 10},
-		//{d: 1.0 * Math.PI, v: 0, t: 30}, {d: 1.0 * Math.PI, v: maxV, t: 30}, {d: 1.0 * Math.PI, v: -maxV, t: 30},
-		//{d: 1.0 * Math.PI - 1 * maxV, v: -maxV, t: 500},
-	].map(({d, v, t})=>{
-		const rotator = makeRotatorFunc(accelFunc, maxA, maxV, v);
-		graphScenario(rotator, graph, d, v, t);
+		//{x: 0, v: 0, t: 5},
+		//{x: 0.5 * Math.PI, v: 0, t: 10}, {x: 1.0 * maxV, v: 0, t: 30}, {x: 1.5 * maxV, v: 0, t: 12}, {x: 2.5 * maxV, v: 0, t: 14}, {x: 1 * Math.PI, v: 0, t: 20},
+		//{x: 0, v:  1 * maxA, t: 6}, {x: 0, v: -1 * maxA, t: 10}, {x: 0, v:  1 * maxV, t: 15}, {x: 0, v: -1 * maxV, t: 15}, {x: 0, v:  10 * maxV, t: 15}, {x: 0, v:  -10 * maxV, t: 15},
+		//{x: 1.0 * maxV, v: 0.5 * maxA, t: 10}, {x: 1.0 * maxV, v: 1.0 * maxA, t: 10}, {x: 1.0 * maxV, v: 1.5 * maxA, t: 10}, {x: 1.0 * maxV, v: 2.5 * maxA, t: 10}, {x: 1.0 * maxV, v: maxV, t: 20},
+		//{x: 1.0 * maxV, v: -0.5 * maxA, t: 12}, {x: 1.0 * maxV, v: -1.0 * maxA, t: 12}, {x: 1.0 * maxV, v: -1.5 * maxA, t: 14}, {x: 1.0 * maxV, v: -2.5 * maxA, t: 16}, {x: 1.0 * maxV, v: -maxV, t: 15},
+		//{x: 1.0 * maxV, v: -1.5 * maxA, t: 10},
+		{x: 1.0 * Math.PI, v: 0, t: 30}, {x: 1.0 * Math.PI, v: maxV, t: 30}, {x: 1.0 * Math.PI, v: -maxV, t: 30},
+		//{x: 1.0 * Math.PI - 1 * maxV, v: -maxV, t: 500},
+	].map(({x, v, t})=>{
+		const rotator = makeRotator(accelFunc, maxA, maxV, v);
+		graphScenario(rotator, graph, x, v, t);
 	});
 	graph.getRenderer()();
 };
@@ -708,26 +696,24 @@ const init = () => {
 	const makeNavigator = ({character, target, translator, rotator, maxTV}) => {
 		const m1 = new THREE.Matrix4();
 		const targetQ = new THREE.Quaternion();
-		let prevT = 0, deltaT = 0;
+		let t0 = 0, dt = 0;
 		return time => {
-			if(prevT !== 0) {
-				deltaT = (time - prevT) / 1000;
-				//console.log(deltaT);
-			}
-			prevT = time;
+			if(t0 !== 0) dt = (time - t0) / 1000;
+			t0 = time;
 			m1.lookAt(target.position, character.position, character.up);
 			targetQ.setFromRotationMatrix(m1);
 			const [start, end] = getAngles(character, {quaternion: targetQ});
 			setArc(0, end - start);
 			let angD = calcAngularDistance(start, end);
-			const rv = rotator(angD, deltaT);
-			//console.log('rv:', rv);
-			character.rotateY(rv);
+			const rv = rotator(angD, dt);
+			character.rotateY(rv * dt);
+			
 			const transD = character.position.distanceTo(target.position);
-			const tv = translator(Math.max(0, transD - 1), deltaT);
-			character.translateZ(tv);
-			//const scale = 0.2 + (tv / maxTV);
-			//character.scale.set(scale, scale, scale);
+			const tv = translator(Math.max(0, transD - 1), dt);
+			character.translateZ(tv * dt);
+
+			const scale = 1 - 0.5 * (tv / maxTV);
+			character.scale.set(scale, scale, scale);
 			updatePointer();
 		};
 	};
@@ -744,44 +730,22 @@ const init = () => {
 		]);
 		graph.getRenderer()();
 	*/
-	
-	const runtime = entities.findComponent(Runtime);
-	const maxTV = 1, maxTA = 1 / 2 * (1 / 60) * maxTV;
-	//const maxRV = 1 * 2 * Math.PI, maxRA = 1 * 2 * Math.PI;
-	const maxRV = 0.1 * Math.PI, maxRA = 1 / 1 * (1 / 60) * maxRV;
-	console.log('maxRV:', maxRV);
 
-	//const translator = makeTranslator(maxTA, maxTV);
+	const runtime = entities.findComponent(Runtime);
+	const maxTV = 20, maxTA = 1 * maxTV;
+	//const maxRV = 1 * 2 * Math.PI, maxRA = 1 * 2 * Math.PI;
+	const maxRV = 3 * Math.PI, maxRA = 1 * maxRV;// * (1 / 60);
+
+	//runTests(rotAccel, maxRA, maxRV);
+
 	const translator = makeRotator(rotAccel, maxTA, maxTV);
 	const rotator = makeRotator(rotAccel, maxRA, maxRV);
 	const navigator = makeNavigator({
 		character: character.transform,
 		target: target.transform,
-		translator, rotator
+		translator, rotator, maxTV
 	});
 	runtime.OnBeforeRender.push(navigator);
-	/*
-		const rotator = makeRotator(rotAccel, maxRA, maxRV, 0);
-		const updatePointers = time => {
-			const [start, end] = getAngles(character.transform, pointer.transform);
-			let d = calcAngularDistance(start, end);
-			character.transform.rotateY(rotator(d));
-			const transD = character.transform.position.distanceTo(target.transform.position);
-			if(transD > calcStoppingDistance(tv, maxTA) + 1) {
-				tv = Math.min(maxTV, tv + maxTA);
-			} else {
-				tv = Math.max(0, tv - maxTA);
-			}
-			character.transform.translateZ(tv);
-			updatePointer();
-		};
-		const updateArc = time => {
-			const [startA, endA] = getAngles(character.transform, pointer.transform);
-			setArc(0, endA - startA);
-		};
-		runtime.OnBeforeRender.push(updatePointers);
-		runtime.OnBeforeRender.push(updateArc);
-	*/
 
 	const makeRunner = (maxTA, maxTV, maxRA, maxRV, target) => {
 		const character = entities.createEntity({
@@ -811,22 +775,19 @@ const init = () => {
 		const navigator = makeNavigator({
 			character: character.transform,
 			target,
-			translator,
-			rotator,
-			maxTV,
+			translator, rotator, maxTV
 		});
 		runtime.OnBeforeRender.push(navigator);
 	};
-	for(var i = 0; i < 10; i++) {
+	for(var i = 0; i < 30; i++) {
 		makeRunner(
-			(0.1 + 3 * Math.random()) * maxTA,
-			(0.1 + 3 * Math.random()) * maxTV,
-			(0.1 + 3 * Math.random()) * maxRA,
-			(0.1 + 3 * Math.random()) * maxRV,
+			(0.5 + 2 * Math.random()) * maxTA,
+			(0.5 + 2 * Math.random()) * maxTV,
+			(0.5 + 2 * Math.random()) * maxRA,
+			(0.5 + 2 * Math.random()) * maxRV,
 			target.transform
 		);
 	}
-	
 
 	//handle.addEventListener('change', event => updatePointer());
 	entities.findComponent(Environment)
