@@ -31,3 +31,77 @@ gm convert -depth 32 -define quantum:format=floating-point -endian lsb -size 200
 gm convert -depth 8 -size 200x200+0 gray:map04.raw -quality 100 map04.jpg
 
 
+x0
+v0
+a0
+sd
+
+
+=(x0-(v0+maxA*dt)*dt)-sd-maxA*dt
+
+sd = v0*v0 / 2*maxA
+
+x1 = x0 - (v0 + a1 * dt) *dt
+
+xa - sd = 0
+
+x = 0
+
+
+f(x, v, maxA, dt) => a / [-maxA, +maxA]
+
+v1 = v0 + a * dt
+x1 = x0 - v1 * dt
+
+
+a1 = sign(x0-sd)
+v1 = v0+a1*dt
+x1 = x0+v1*dt
+a2 = sign(x1-sd)
+
+
+sd = (v0+a0*dt)^2 / (2*maxA) * sign(v0)
+
+
+(v0+a0*dt)^2 / (2*maxA) === d0
+
+(v0+a0*dt)^2 === d0 * (2*maxA)
+
+(v0+a0*dt) === sqrt(d0 * (2*maxA))
+
+a0*dt === sqrt(d0 * (2*maxA)) - v0
+
+a0 === - (v0 + sqrt(d0 * (2*maxA))) / dt
+
+
+(x0-v0*dt) - sd = 0
+
+(x0-v0*dt) - (v0+a0*dt)^2 / (2*maxA) = 0
+(x0-v0*dt) = (v0+a0*dt)^2 / (2*maxA)
+(x0-v0*dt) * (2*maxA) = (v0+a0*dt)^2
+SQRT((x0-v0*dt) * (2*maxA)) = v0+a0*dt
+SQRT((x0-v0*dt) * (2*maxA))-v0 = a0*dt
+
+=IF(AND(I6<0, I5>0) , J6, maxA)
+=IF(I6 > 0, maxA, IF(I5 > 0, J6, -maxA))
+
+
+(x - (v + a * t) * t) = (v + a * t)^2 / (2 * M)
+
+a = (
+	SQRT(maxA^2 * dt^4 + 2 * maxA * dt^2 * x0)
+	- (maxA * dt * dt)
+	- v0 * dt
+) / (dt * dt)
+
+=-SQRT(ABS((D6-E6*B6) * (2 * maxA)))+F6
+
+(x - (v + a * t) * t) = (v + a * t)^2 / (2 * M); solve for a
+a = (-sqrt(M^2 t^4 + 2 M t^2 x) - M t^2 - t v)/t^2
+
+a = (SQRT(maxA^2 * (B6^4) + 2 * maxA * B6^2 * D6) - (maxA * B6^2) - E6 * B6) / B6^2
+   =(SQRT(ABS(maxA^2 * (B5^4) + 2 * maxA * B5^2 * D5)) - (maxA * B5^2) - E5 * B5) / B5^2
+
+a = -(2 M t v - 2 M x + v^2)/(2 M t^2) and M t!=0
+
+a = -(2 * maxA * B6 * E6 - 2 * maxA * D6 + E6^2)/(2 * maxA * B6^2)

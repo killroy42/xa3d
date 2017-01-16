@@ -462,19 +462,19 @@ class XACard extends CardMesh {
 			const {textTitle: title, textDescription: description} = this;
 			const ctx = canvas.getContext('2d');
 			const titleFont = {
-				url: '/fonts/Belwe_Bd_BT_bold.woff',
+				url: 'http://dev.xenocards.com/fonts/Belwe_Bd_BT_bold.woff',
 				family: 'Belwe',
 				style: 'normal',
 				weight: 'bold'
 			};
 			const descriptionFontReg = {
-				url: '/fonts/ITCFranklinGothicStd-MdCd.woff',
+				url: 'http://dev.xenocards.com/fonts/ITCFranklinGothicStd-MdCd.woff',
 				family: 'FranklinGothic',
 				style: 'normal',
 				weight: 'normal'
 			};
 			const descriptionFontBold = {
-				url: '/fonts/ITCFranklinGothicStd-DmCd.woff',
+				url: 'http://dev.xenocards.com/fonts/ITCFranklinGothicStd-DmCd.woff',
 				family: 'FranklinGothic',
 				style: 'normal',
 				weight: 'bold'
@@ -544,17 +544,17 @@ class XACard extends CardMesh {
 			this.textCanvas = canvas;
 			//this.setTitle('Kabal Courier');
 			const textures = {
-				template: textureLoader.load('/hsart/mNeutral_2.jpg'),
-				framesAlpha: textureLoader.load('/hsart/framesAlpha.png'),
-				back: textureLoader.load('/hsart/mNeutral.jpg'),
+				template: textureLoader.load('hsart/mNeutral_2.jpg'),
+				framesAlpha: textureLoader.load('hsart/framesAlpha.png'),
+				back: textureLoader.load('hsart/mNeutral.jpg'),
 				//back: new THREE.Texture(canvas),
 				//back: textureLoader.load('/images/testuv.jpg'),
 				//portrait: textureLoader.load('/hsart/OG_024.jpg'),
-				portrait: textureLoader.load('/hsart/CFM_649.jpg'),
-				gem: textureLoader.load('/hsart/gem.png'),
-				att: textureLoader.load('/hsart/attack.png'),
-				hp: textureLoader.load('/hsart/health.png'),
-				title: textureLoader.load('/hsart/title.png'),
+				portrait: textureLoader.load('hsart/CFM_649.jpg'),
+				gem: textureLoader.load('hsart/gem.png'),
+				att: textureLoader.load('hsart/attack.png'),
+				hp: textureLoader.load('hsart/health.png'),
+				title: textureLoader.load('hsart/title.png'),
 				rarity: undefined,
 				//rarity: textureLoader.load('/hsart/rarity-rare.png'),
 				//portrait: textureLoader.load('/images/testuv.jpg'),
@@ -690,10 +690,10 @@ class XACard extends CardMesh {
 			//console.info('setRarity("%s")', rarity);
 			const textureLoader = this.entities.findComponent('TextureLoaderComponent');
 			const rarityUrls = {
-				COMMON: '/hsart/rarity-common.png',
-				EPIC: '/hsart/rarity-epic.png',
-				LEGENDARY: '/hsart/rarity-legendary.png',
-				RARE: '/hsart/rarity-rare.png',
+				COMMON: 'hsart/rarity-common.png',
+				EPIC: 'hsart/rarity-epic.png',
+				LEGENDARY: 'hsart/rarity-legendary.png',
+				RARE: 'hsart/rarity-rare.png',
 			};
 			this.material.uniforms.rarityTex.value = rarityUrls[rarity]?textureLoader.load(rarityUrls[rarity]):undefined;
 		}

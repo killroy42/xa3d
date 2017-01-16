@@ -91,6 +91,7 @@ class Environment {
 		transform
 			.add(ambientLight)
 			.add(spotLight);
+		this.ambientLight = ambientLight;
 	}
 }
 

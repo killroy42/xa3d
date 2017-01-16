@@ -76,9 +76,11 @@ const runtimeJson = {
 	//const dOverTime = maxV => (d, v, a, t = 0) => (t <= 0)?d:dOverTime(d = d - (v = calcAccel(maxV)(v, a)), v, a, --t);
 	const rotAccel = (x, v, maxA, dt) => {
 		if(dt === 0) return 0;
-		const dt2 = dt * dt;
-		const a = (Math.sqrt(Math.abs(maxA*maxA * (dt2*dt2) + 2 * maxA * dt2 * x)) - (maxA * dt2) - v * dt) / dt2;
-		return clamp(a, -maxA, maxA);
+		//const dt2 = dt * dt; const a1 = (Math.sqrt(Math.abs(maxA*maxA * (dt2*dt2) + 2 * maxA * dt2 * x)) - (maxA * dt2) - v * dt) / dt2;
+		//const a2 = (Math.sqrt(Math.abs(2 * x * maxA)) * dt) / dt2 - (v / dt);
+		const a = Math.sqrt(1 + (2 * x) / (maxA * dt * dt)) * maxA - v / dt - maxA;
+		//if(Math.abs(a1 - a) > 0.00000000001) console.error('Diff at:', x, v, dt, a1, a);
+		return Math.min(maxA, Math.max(-maxA, a));
 	};
 	const makeRotator = (accelFunc, maxA, maxV, initialV = 0) => {
 		const rotator = function(x, dt = 1) {
@@ -485,7 +487,6 @@ class GenericMeshComponent extends MeshComponent {
 	}
 }
 
-
 const runTests = (accelFunc, maxA, maxV) => {
 	const graph = new DebugGraph();
 	graph.graphSpacing = 20;
@@ -693,30 +694,50 @@ const init = () => {
 		return translator;
 	};
 
-	const makeNavigator = ({character, target, translator, rotator, maxTV}) => {
+	const makeNavigator = ({character, target, translator, rotator, maxTV, maxRV}) => {
 		const m1 = new THREE.Matrix4();
-		const targetQ = new THREE.Quaternion();
+		const targetTransform = {quaternion:new THREE.Quaternion()};
 		let t0 = 0, dt = 0;
+		const posV = new Vector3();
 		return time => {
 			if(t0 !== 0) dt = (time - t0) / 1000;
 			t0 = time;
 			m1.lookAt(target.position, character.position, character.up);
-			targetQ.setFromRotationMatrix(m1);
-			const [start, end] = getAngles(character, {quaternion: targetQ});
+			targetTransform.quaternion.setFromRotationMatrix(m1);
+			const [start, end] = getAngles(character, targetTransform);
 			setArc(0, end - start);
+
 			let angD = calcAngularDistance(start, end);
 			const rv = rotator(angD, dt);
-			character.rotateY(rv * dt);
-			
-			const transD = character.position.distanceTo(target.position);
+			posV.set(target.position.x, character.position.y, target.position.z);
+			const transD = character.position.distanceTo(posV);
 			const tv = translator(Math.max(0, transD - 1), dt);
-			character.translateZ(tv * dt);
 
-			const scale = 1 - 0.5 * (tv / maxTV);
-			character.scale.set(scale, scale, scale);
+			const translation = tv * dt;
+			const pan = character.rotation.y + rv * dt;
+			//const y0 = character.position.y; 
+			//const y1 = 0.2 + 1 * (tv / maxTV);
+			//let pitch = character.rotation.x;
+			//if(translation > 0)	pitch += Math.sign(y0 - y1) * 0.01 * (new Vector3(translation, 0, 0)).angleTo(new Vector3(translation, y1 - y0, 0));
+			const roll = -0.5 * Math.PI * ((0.5 * rv / maxRV) * (1.5 * tv / maxTV));
+
+			character.rotation.z = 0;
+			character.rotation.y = pan;
+			character.translateZ(translation);
+			character.rotation.z = roll;
+			character.position.y = 0.2 + 0.2 * (tv);
+
+			character.scale.x = 0.5 + 4 * rv / maxRV; // width
+			character.scale.z = 0.5 + 0.05 * tv; // length
+			character.scale.y = 0.1 + 0.9 * (1 - tv / maxTV); // height
+
+			//const scale = 1 - 0.5 * (tv / maxTV);
+			//character.scale.set(scale, scale, scale);
+
 			updatePointer();
 		};
 	};
+
 	/*
 		const graph = new DebugGraph();
 		graph.graphSpacing = 3;
@@ -732,9 +753,9 @@ const init = () => {
 	*/
 
 	const runtime = entities.findComponent(Runtime);
-	const maxTV = 20, maxTA = 1 * maxTV;
+	const maxTV = 10, maxTA = 0.5 * maxTV;
 	//const maxRV = 1 * 2 * Math.PI, maxRA = 1 * 2 * Math.PI;
-	const maxRV = 3 * Math.PI, maxRA = 1 * maxRV;// * (1 / 60);
+	const maxRV = 2 * Math.PI, maxRA = 0.2 * maxRV;// * (1 / 60);
 
 	//runTests(rotAccel, maxRA, maxRV);
 
@@ -743,7 +764,7 @@ const init = () => {
 	const navigator = makeNavigator({
 		character: character.transform,
 		target: target.transform,
-		translator, rotator, maxTV
+		translator, rotator, maxTV, maxRV
 	});
 	runtime.OnBeforeRender.push(navigator);
 
@@ -752,11 +773,11 @@ const init = () => {
 			Transform: {},
 			Node: {children: [
 				{
-					Transform: {position: {x: 0, y: 0.5, z: 0}},
+					Transform: {position: {x: 0, y: 0.1, z: 0}},
 					Node: {children: [arrowJson]}
 				},
 				{
-					Transform: {position: {x: 0, y: 0.5, z: 0}, scale: {x: 1, y: 1, z: 1}},
+					Transform: {position: {x: 0, y: 0.1, z: 0}, scale: {x: 1, y: 0.2, z: 1}},
 					PhongMaterial: materialBlueJson,
 					BoxGeometry: {},
 					GenericMeshComponent: {},
@@ -775,16 +796,16 @@ const init = () => {
 		const navigator = makeNavigator({
 			character: character.transform,
 			target,
-			translator, rotator, maxTV
+			translator, rotator, maxTV, maxRV
 		});
 		runtime.OnBeforeRender.push(navigator);
 	};
-	for(var i = 0; i < 30; i++) {
+	for(var i = 0; i < 100; i++) {
 		makeRunner(
-			(0.5 + 2 * Math.random()) * maxTA,
-			(0.5 + 2 * Math.random()) * maxTV,
-			(0.5 + 2 * Math.random()) * maxRA,
-			(0.5 + 2 * Math.random()) * maxRV,
+			(0.5 + 4 * Math.random()) * maxTA,
+			(0.5 + 4 * Math.random()) * maxTV,
+			(0.5 + 4 * Math.random()) * maxRA,
+			(0.5 + 4 * Math.random()) * maxRV,
 			target.transform
 		);
 	}

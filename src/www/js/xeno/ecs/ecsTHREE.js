@@ -7,7 +7,7 @@ const MouseCursor = require('MouseCursor');
 const THREE = require('THREE');
 const {
 	Vector3, Matrix4, Box3, Object3D,
-	BoxGeometry, MeshBasicMaterial, Mesh,
+	MeshBasicMaterial, Mesh,
 	OrbitControls, TransformControls,
 	BufferGeometry, Geometry, TextGeometry, MeshPhongMaterial,
 } = THREE;
@@ -35,13 +35,24 @@ class Transform extends makeComponent(THREE.Object3D) {
 	fromJSON(json = {}) {
 		//console.info('Transform.fromJSON(json);');
 		const {
-			position = {x: 0, y: 0, z: 0},
-			rotation = {x: 0, y: 0, z: 0},
-			scale = {x: 1, y: 1, z: 1}
+			position = this.position,
+			rotation = this.rotation,
+			scale = this.scale,
+			parent
 		} = json;
-		this.position.set(position.x, position.y, position.z);
-		this.rotation.set(rotation.x, rotation.y, rotation.z, rotation.order);
+		this.position.set(
+			position.x || this.position.x,
+			position.y || this.position.y,
+			position.z || this.position.z
+		);
+		this.rotation.set(
+			rotation.x || this.rotation.x,
+			rotation.y || this.rotation.y,
+			rotation.z || this.rotation.z,
+			rotation.order || this.position.order
+		);
 		this.scale.set(scale.x, scale.y, scale.z);
+		if(parent !== undefined) parent.add(this);
 		return this;
 	}
 	toJSON() {
@@ -162,7 +173,7 @@ class Collider extends MeshComponent {
 	}
 	OnAttachComponent(entity) {
 		//console.info('Collider.OnAttachComponent(entity);');
-		const geometry = new BoxGeometry(1, 1, 1);
+		const geometry = new THREE.BoxGeometry(1, 1, 1);
 		const material = new MeshBasicMaterial({
 			color: colors.Teal300,
 			transparent: true,
@@ -376,6 +387,17 @@ class CSSFontLoaderComponent {
 	}
 	loadFont({url, family, style, weight}) {
 		return fetch(url)
+		.catch(err => {
+			console.error('FETCH ERROR: "%s", trying XHR...', err.message);
+			// Try XHR...
+			return new Promise(function(resolve, reject) {
+				var xhr = new XMLHttpRequest();
+				xhr.onload = () => resolve(new Response(xhr.responseText, {status: xhr.status}));
+				xhr.onerror = () => reject(new TypeError('Local request failed'));
+				xhr.open('GET', url);
+				xhr.send(null);
+			});
+		})
 		.then(res => res.blob())
 		.then(res => {
 			const blobUrl = window.URL.createObjectURL(res);
@@ -412,7 +434,7 @@ class Text extends MeshComponent {
 		var _value = 'Text';
 		this.text = 'Text';
 		//this.fontUrl = '/fonts/ProximaNovaCnLt_Bold.json';
-		this.fontUrl = '/fonts/Belwe Bd BT_Bold.json';
+		this.fontUrl = 'fonts/Belwe Bd BT_Bold.json';
 		this.font = undefined;
 		this.size = 1;
 		this.fontStatus = 0;
@@ -515,6 +537,112 @@ class Text extends MeshComponent {
 	}
 }
 
+class MaterialComponent extends makeComponent(THREE.MeshPhongMaterial) {}
+
+class PhongMaterial extends MaterialComponent {
+	OnAttachComponent(entity) {
+		//console.info('PhongMaterial.OnAttachComponent(entity);');
+		THREE.MeshPhongMaterial.call(this, {
+			color: 0xffffff,
+			//specular: 0x009900,
+			shininess: 550,
+			emissive: 0xffffff,
+			emissiveIntensity: 0.5,
+			transparent: true,
+			opacity: 0.95,
+			/*
+				color: 0xff0000, 
+				//specular: 0x009900,
+				shininess: 550, 
+				emissive: 0xff0000,
+				emissiveIntensity: 0.5,
+				transparent: true,
+				opacity: 0.8,
+			*/
+		});
+		this.needsUpdate = true;
+	}
+	OnDetachComponent(entity) {
+	}
+	fromJSON(json) {
+		//console.info('PhongMaterial.fromJSON(json);');
+		const {
+			color = this.color,
+			shininess = this.shininess,
+			emissive = this.emissive,
+			emissiveIntensity = this.emissiveIntensity,
+			transparent = this.transparent,
+			opacity = this.opacity,
+		} = json;
+		/*
+		console.log(JSON.stringify({
+			color,
+			shininess,
+			emissive,
+			emissiveIntensity,
+			transparent,
+			opacity
+		}, null, '  '));
+		*/
+		this.color.copy(new THREE.Color(color));
+		this.shininess = shininess;
+		this.emissive.copy(new THREE.Color(emissive));
+		this.emissiveIntensity = emissiveIntensity;
+		this.transparent = transparent;
+		this.opacity = opacity;
+		this.needsUpdate = true;
+		return this;
+	}
+	toJSON() {
+		//console.info('PhongMaterial.toJSON();');
+		const {
+			color,
+			shininess,
+			emissive,
+			emissiveIntensity,
+			transparent,
+			opacity,
+		} = this;
+		return {
+			color: `#${color.getHexString()}`,
+			shininess,
+			emissive: `#${emissive.getHexString()}`,
+			emissiveIntensity,
+			transparent,
+			opacity,
+		};
+	}
+}
+
+class GeometryComponent extends makeComponent(THREE.Geometry) {}
+
+class BoxGeometryComponent extends GeometryComponent {
+	OnAttachComponent(entity) {
+		//console.info('BoxGeometry.OnAttachComponent(entity);');
+		THREE.BoxGeometry.call(this, 1, 1, 1);
+	}
+	OnDetachComponent(entity) {
+	}
+	fromJSON({position, scale} = {}) {
+		return this;
+	}
+	toJSON() {
+		return {
+		};
+	}
+}
+
+class GenericMeshComponent extends MeshComponent {
+	OnAttachComponent(entity) {
+		//console.info('GenericMeshComponent.OnAttachComponent(entity);');
+		const geometry = entity.getComponent('GeometryComponent');
+		const material = entity.getComponent('MaterialComponent');
+		THREE.Mesh.call(this, geometry, material);
+		//this.material.needsUpdate = true;
+		super.OnAttachComponent(entity);
+	}
+}
+
 
 if(typeof module !== 'undefined' && ('exports' in module)){
 	module.exports = {
@@ -533,6 +661,9 @@ if(typeof module !== 'undefined' && ('exports' in module)){
 		TextureLoaderComponent,
 		CSSFontLoaderComponent,
 		Text,
+		MaterialComponent, PhongMaterial,
+		GeometryComponent, BoxGeometryComponent,
+		GenericMeshComponent,
 	};
 	module.exports.ecsTHREE = module.exports;
 }
