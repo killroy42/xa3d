@@ -74,7 +74,7 @@ class XenoRuntime {
 	}
 	handleWindowResize() {
 		const {window: {innerWidth: width, innerHeight: height}, camera, renderer} = this;
-		console.log('XenoRuntime.handleWindowResize:', width, height);
+		//console.log('XenoRuntime.handleWindowResize:', width, height);
 		renderer.setSize(width, height, true);
 		camera.aspect = width / height;
 		camera.updateProjectionMatrix();

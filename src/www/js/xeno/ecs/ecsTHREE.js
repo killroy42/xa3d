@@ -81,10 +81,8 @@ class Renderer extends makeComponent(THREE.WebGLRenderer) {
 		//this.shadowMap.enabled = true;
 		//this.shadowMap.type = THREE.PCFSoftShadowMap;
 		this.domElement.tabIndex = -1;
-		console.log('CSS:', this.domElement.style.cssText);
 		this.domElement.style.position = 'relative';
 		this.domElement.style.display = 'block';
-		console.log('CSS:', this.domElement.style.cssText);
 	}
 }
 
