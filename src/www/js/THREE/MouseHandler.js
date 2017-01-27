@@ -223,8 +223,8 @@
 		if(this.intersection === false) return;
 		if(this.intersection.object.draggable !== true) return;
 		if(e.button !== this.drag.button) return;
-		console.info('MouseHandler.dragPrepare(e);');
-		console.log(this.intersection.object);
+		//console.info('MouseHandler.dragPrepare(e);');
+		//console.log(this.intersection.object);
 		this.state = MouseHandler.STATE_TIMEOUT;
 		var drag = this.drag;
 		drag.event = e;

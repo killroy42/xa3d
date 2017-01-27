@@ -35,11 +35,12 @@ class XenoRuntime {
 		this.updateTimoutId = undefined;
 		this.OnBeforeRender = [];
 	}
-	createRenderer() {
+	__createRenderer() {
 		const {window, renderOpts, clearColor} = this;
 		const renderer = new WebGLRenderer(renderOpts);
-		renderer.setClearColor(clearColor, 0);
-		renderer.setPixelRatio(window.devicePixelRatio);
+		//renderer.setClearColor(clearColor, 0);
+		//renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setPixelRatio(1);
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = PCFSoftShadowMap;
@@ -55,7 +56,7 @@ class XenoRuntime {
 			window.innerWidth / window.innerHeight,
 			1, 2000
 		);
-		camera.position.set(0, 0, 1000);
+		camera.position.set(0, 0, 100);
 		camera.up = new Vector3(0, 1, 0);
 		camera.lookAt(new Vector3(0, 0, 0));
 		return camera;
@@ -65,7 +66,7 @@ class XenoRuntime {
 		if(initialized) return;
 		//console.info('XenoRuntime.init();');
 		this.initialized = true;
-		this.renderer = renderer || this.createRenderer();
+		this.renderer = renderer;// || this.createRenderer();
 		this.scene = scene || this.createScene();
 		this.camera = camera || this.createCamera();
 		domElement.appendChild(this.renderer.domElement);
@@ -73,6 +74,7 @@ class XenoRuntime {
 	}
 	handleWindowResize() {
 		const {window: {innerWidth: width, innerHeight: height}, camera, renderer} = this;
+		console.log('XenoRuntime.handleWindowResize:', width, height);
 		renderer.setSize(width, height, true);
 		camera.aspect = width / height;
 		camera.updateProjectionMatrix();
@@ -96,13 +98,23 @@ class XenoRuntime {
 		} 
 		renderer.render(scene, camera);
 	}
+	createAnimationFrameHandler() {
+		const {renderer, scene, camera, OnBeforeRender} = this;
+		const handleAnimationFrame = time => {
+			this.renderTime = time;
+			requestAnimationFrame(handleAnimationFrame);
+			for(var i = 0; i < OnBeforeRender.length; i++) OnBeforeRender[i](time);
+			renderer.render(scene, camera);
+		};
+		return handleAnimationFrame;
+	}
 	start() {
 		//console.info('XenoRuntime.start();');
 		const {window, window: {requestAnimationFrame}} = this;
 		this.init();
 		window.addEventListener('resize', this.handleWindowResize);
 		window.addEventListener('contextmenu', this.handleContextMenu);
-		this.rafId = requestAnimationFrame(this.handleAnimationFrame);
+		this.rafId = requestAnimationFrame(this.createAnimationFrameHandler());
 	}
 }
 XenoRuntime.DEFAULT_OPTS = DEFAULT_OPTS;

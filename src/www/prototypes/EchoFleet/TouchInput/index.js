@@ -1,5 +1,6 @@
 (function() {
 const THREE = require('THREE');
+const Hammer = require('Hammer');
 const {EntityManager, Entity, makeComponent} = require('XenoECS');
 const {Camera} = require('ecsTHREE');
 const {Components, createRuntime} = require('bootstrap');
@@ -129,11 +130,11 @@ const init = () => {
 	const axis = new Vector3(1, 0, 0), angle = 50, distance = 10, zoomUnit = 0.5;
 	cam._camera.position.set(0, distance, 0);
 	let currentCam = cam.lookAtToVectors({target: new Vector3(0, 0, 0), axis, angle, distance});
-	console.log(currentCam);
 	
 	const minZoom = -9, maxZoom = 15;
 	let zoom = 0;
 	const moveCamWithZoom = (instant = false) => {
+		zoom = Math.max(minZoom, Math.min(maxZoom, zoom));
 		if(instant) {
 			cam.fromVectors({
 				position: currentCam.position.clone().add(new Vector3(0, Math.sign(zoom), -0.5 * Math.sign(zoom)).multiplyScalar(Math.abs(zoom) * zoomUnit)),
@@ -143,7 +144,7 @@ const init = () => {
 			cam.slideCamera({
 				position: currentCam.position.clone().add(new Vector3(0, Math.sign(zoom), -0.5 * Math.sign(zoom)).multiplyScalar(Math.abs(zoom) * zoomUnit)),
 				target: currentCam.target,
-				onComplete: ()=>console.log('onComplete'),
+				//onComplete: ()=>console.log('onComplete'),
 			});
 		}
 	};
@@ -156,7 +157,6 @@ const init = () => {
 	};
 	const handleWheel = event => {
 		zoom += Math.sign(event.deltaY);
-		zoom = Math.max(minZoom, Math.min(maxZoom, zoom));
 		console.log('zoom:', zoom);
 		moveCamWithZoom();
 	};
@@ -187,17 +187,79 @@ const init = () => {
 	floor.addEventListener('mouseup', handleMouseup);
 	window.addEventListener('wheel', handleWheel);
 	window.addEventListener('keydown', handleKeydown);
+
+	/*
+	window.addEventListener('touchstart', event => console.info('win.touchstart', event));
+	window.addEventListener('touchstart', event => console.info('doc.touchstart', event));
+	window.addEventListener('touchend', event => console.info('touchend', event));
+	window.addEventListener('touchmove', event => console.info('touchmove', event));
+	window.addEventListener('gesturestart', event => console.info('gesturestart', event));
+	window.addEventListener('gestureend', event => console.info('gestureend', event));
+	window.addEventListener('gesturechange', event => console.info('gesturechange', event));
+	*/
+
+	const hammertime = new Hammer(window, {
+		recognizers: [
+			// RecognizerClass, [options], [recognizeWith, ...], [requireFailure, ...]
+			//[Hammer.Rotate],
+			[Hammer.Pan],
+			//[Hammer.Pinch, { enable: true }, ['rotate']],
+			//[Hammer.Pinch, {enable: true}],
+			//[Hammer.Swipe, {enable: true, direction: Hammer.DIRECTION_VERTICAL}],
+			//[Hammer.Press],
+			//[Hammer.Tap],
+		]
+	});
+	let startZoom = zoom;
+	let startScale;
+	hammertime.on('pinchstart', event => {
+		console.log('pinchstart:', event.scale, zoom);
+		startZoom = zoom;
+		startScale = event.scale;
+	});
+	/*
+	hammertime.on('pinchmove', event => {
+		//console.log('pinchmove:', event);
+		console.log('pinchmove:', event.additionalEvent, event.scale, event.distance, startZoom, zoom);
+		zoom = startZoom + ((event.additionalEvent==='pinchout')?1:-1) * 3 *  event.distance;
+		moveCamWithZoom();
+	});
+	*/
+	hammertime.on('pinchin', event => {
+		console.log('pinchin:', zoom, event.scale - startScale, 100 * Math.abs(event.scale - startScale), event.distance, startZoom, zoom);
+		zoom = startZoom + 1 * 100 * Math.abs(event.scale - startScale);
+		moveCamWithZoom();
+	});
+	hammertime.on('pinchout', event => {
+		console.log('pinchout:', zoom, event.scale - startScale, 100 * Math.abs(event.scale - startScale), event.distance, startZoom, zoom);
+		zoom = startZoom + -1 * 100 * Math.abs(event.scale - startScale);
+		moveCamWithZoom();
+	});
+	hammertime.on('pinchend', event => {
+		console.log('pinchend:', event.scale, zoom);
+		//startZoom = zoom;
+	});
+	hammertime.on('pinchcancel', event => {
+		console.log('pinchcancel:', event.scale, zoom);
+		//startZoom = zoom;
+	});
+
+	hammertime.on('pan', event => console.log('pan:', event));
+	hammertime.on('panstart', event => console.log('panstart:', event));
+	hammertime.on('panmove', event => console.log('panmove:', event));
+	hammertime.on('panend', event => console.log('panend:', event));
+	hammertime.on('pancancel', event => console.log('pancancel:', event));
+	hammertime.on('panup', event => console.log('panup:', event));
+	//hammertime.on('pinch', event => console.log('pinch:', event));
+	//hammertime.on('swipe', event => console.log('swipe:', event));
+	//hammertime.on('swipeleft', event => console.log('swipeleft:', event));
+	//hammertime.on('swiperight', event => console.log('swiperight:', event));
+	//hammertime.on('swipeup', event => console.log('swipeup:', event));
+	//hammertime.on('press', event => console.log('press:', event));
+	//hammertime.on('tap', event => console.log('tap:', event));
+
 	moveCamWithZoom(true);
 	runtime.start();
-	
-	/*
-	setInterval(_=>{
-		currentCam = cam.lookAtToVectors({
-			target: new Vector3((-1 + 2 * Math.random()) * 10, 0, (-1 + 2 * Math.random()) * 10),
-			axis, angle, distance});
-		moveCamWithZoom();
-	},1000);
-	*/
 	
 
 	/*

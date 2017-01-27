@@ -1,7 +1,8 @@
 
-var child_process = require('child_process');
+const child_process = require('child_process');
 
-var npmCmd = (require('os').platform() === 'win32')?'npm.cmd':'npm';
+const npmCmd = (require('os').platform() === 'win32')?'npm.cmd':'npm';
+const childProcesses = [];
 
 function exec(cmd) {
 	cmd = cmd.split(/\s+/);
@@ -19,7 +20,7 @@ function runDelayed(cmd, delay, pause) {
 			var logText = 'Executing: '+cmd;
 			console.time(logText);
 			setTimeout(function() {
-				exec(cmd);
+				childProcesses.push(exec(cmd));
 				setTimeout(function() {
 					console.timeEnd(logText);
 					resolve();
@@ -28,6 +29,40 @@ function runDelayed(cmd, delay, pause) {
 		});
 	};
 }
+
+/*
+process.on('exit', function() {
+	console.log('EXITING!');
+  console.log('killing', childProcesses.length, 'child processes');
+  childProcesses.forEach(child=>child.kill());
+});
+*/
+
+
+if (process.platform === 'win32') {
+	const rl = require('readline').createInterface({input: process.stdin, output: process.stdout});
+	rl.on('SIGINT', () => process.emit('SIGINT'));
+	rl.on('SIGUSR1', () => process.emit('SIGUSR1'));
+	rl.on('SIGUSR2', () => process.emit('SIGUSR2'));
+}
+
+const handleExit = msg => {
+	process.stdout.write('Close due to: '+msg);
+  console.log('killing', childProcesses.length, 'child processes');
+  childProcesses.forEach(child=>child.kill());
+	process.exit();
+};
+
+process.on('exit', ()=>handleExit('EXIT'));
+process.on('uncaughtException', ()=>handleExit('uncaughtException'));
+process.on('SIGINT', ()=>handleExit('SIGINT'));
+process.on('SIGHUP', ()=>handleExit('SIGHUP'));
+process.on('SIGTERM', ()=>handleExit('SIGTERM'));
+process.on('SIGUSR1', ()=>handleExit('SIGUSR1'));
+process.on('SIGUSR2', ()=>handleExit('SIGUSR2'));
+process.on('SIGBREAK', ()=>handleExit('SIGBREAK'));
+process.on('SIGWINCH', ()=>handleExit('SIGWINCH'));
+
 
 console.info('Launching reloaderserver and HTTP server:');
 return Promise.resolve()

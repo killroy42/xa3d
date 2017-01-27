@@ -13,7 +13,7 @@ app.on('window-all-closed', function() {
 app.on('ready', function() {
 	//mainWindow = new BrowserWindow({width: 800, height: 600, frame:false});
 	mainWindow = new BrowserWindow({
-		x: -1920 + 400, y: 100,
+		/*x: -1920 + 400, y: 100,*/
 		width: 1280, height: 720,
 		frame: false,
 		backgroundColor: '#000000',
@@ -24,7 +24,7 @@ app.on('ready', function() {
 		titleBarStyle: 'hidden-inset',
 		show: false,
 		alwaysOnTop: true,
-		focusable: false,
+		focusable: true,
 	});
 	
 	console.log('__dirname:', __dirname);
@@ -32,8 +32,8 @@ app.on('ready', function() {
 	//mainWindow.setIgnoreMouseEvents(true);
 	mainWindow.webContents.openDevTools();
 
-	let displays = electron.screen.getAllDisplays();
-	console.log('displays:', displays);
+	//let displays = electron.screen.getAllDisplays();
+	//console.log('displays:', displays);
 
 	mainWindow.once('ready-to-show', () => mainWindow.show());
 	mainWindow.on('closed', () => mainWindow = null);
