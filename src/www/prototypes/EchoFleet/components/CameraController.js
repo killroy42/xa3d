@@ -1,38 +1,16 @@
 (() => {
 const THREE = require('THREE');
 const {Vector3} = THREE;
+const Accelerator = require('Accelerator');
 
-
-class Accelerator {
-	constructor(maxA, maxV) {
-		this.maxA = maxA;
-		this.maxV = maxV;
-		this.reset();
-	}
-	reset() {
-		this.velocity = 0;
-	}
-	calcAccel(x, dt) {
-		const v = this.velocity;
-		const maxA = this.maxA;
-		if(dt === 0) return 0;
-		const signX = (x < 0)?-1:1;
-		const a = signX * (Math.sqrt(Math.abs(1 + (2 * x) / (maxA * dt * dt))) * maxA - (v * signX) / dt - maxA);
-		return Math.min(maxA, Math.max(-maxA, a));
-	}
-	update(x, dt) {
-		const a = this.calcAccel(x, dt);
-		this.velocity = Math.max(-this.maxV, Math.min(this.maxV, this.velocity + a * dt));
-		return this.velocity * dt;
-	}
-}
 
 const CameraController_DEFAULTOPTS = {
 	angle: 50,
 	distance: 10,
 	zoomUnit: 0.5,
 	minZoom: -9,
-	maxZoom: 15,
+	//maxZoom: 15,
+	maxZoom: 100,
 };
 
 class CameraController {
@@ -59,8 +37,8 @@ class CameraController {
 		} = this;
 		let t0, dt;
 		const positionDelta = new Vector3(), targetDelta = new Vector3();
-		const pAccelerator = new Accelerator(200, 40);
-		const tAccelerator = new Accelerator(250, 45);
+		const pAccelerator = new Accelerator(400 * 1.0, 100 * 1.0);
+		const tAccelerator = new Accelerator(400 * 1.01, 100 * 1.01);
 		return time => {
 			if(t0 === undefined) { t0 = time; return; }
 			if(this.isAnimating) {
@@ -69,7 +47,7 @@ class CameraController {
 				targetDelta.subVectors(nextTarget, currentTarget);
 				const positionDistance = positionDelta.length();
 				const targetDistance = targetDelta.length();
-				if((positionDistance > 0) || (targetDistance > 0)) {
+				if(positionDistance + targetDistance > Number.EPSILON) {
 					if(positionDistance > 0) {
 						currentPosition.add(positionDelta.multiplyScalar(pAccelerator.update(positionDistance, dt) / positionDistance));
 					}
@@ -99,6 +77,7 @@ class CameraController {
 		this.target.copy(this._camera.position).add(new Vector3(0, 0, 1));
 		this._onBeforeRenderHandler = this.createOnBeforeRenderHandler();
 		this._runtime.OnBeforeRender.push(this._onBeforeRenderHandler);
+		this.setCamera(new Vector3(0, 0, 0), 0);
 	}
 	updatePositionOffset() {
 		const {_cameraTiltAxis, opts: {angle, distance}} = this;

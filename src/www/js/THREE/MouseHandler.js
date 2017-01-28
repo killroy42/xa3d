@@ -324,7 +324,13 @@
 		if(event.intersection) event.intersection.object.dispatchEvent(event);
 	};
 	MouseHandler.prototype.update = function(e) {
-		if(e !== undefined && e.clientX && e.clientY) this.mouseV2.set(e.clientX, e.clientY);
+		if(e !== undefined && e.clientX && e.clientY) {
+			if(document.pointerLockElement === null) {
+				this.mouseV2.set(e.clientX, e.clientY);
+			} else {
+				this.mouseV2.set(this.mouseV2.x + e.movementX, this.mouseV2.y + e.movementY);
+			}
+		}
 		var prevIntersection = this.intersection;
 		var nextIntersection = this.getIntersection(this.mouseV2);
 		if(prevIntersection && prevIntersection.object !== nextIntersection.object) this.triggerEvent('mouseleave', e);

@@ -60,7 +60,7 @@ class Environment {
 		return floor;
 	}
 	createFloorGrid({size = 100, colorCenterLine = colors.grey700, colorGrid = colors.grey800} = {}) {
-		const floorGrid = new GridHelper(size / 2, size, colorCenterLine, colorGrid);
+		const floorGrid = new GridHelper(size, size, colorCenterLine, colorGrid);
 		floorGrid.name = 'floorGrid';
 		floorGrid.position.set(0, 0.001, 0);
 		return floorGrid;
