@@ -67,8 +67,7 @@ const setup = entities => {
 const init = () => {
 	const runtime = createRuntime();
 	initCamera(runtime.entities);
-	initPushToScroll(runtime.entities);
-	setup();
+	setup(runtime.entities);
 	runtime.start();
 };
 
