@@ -30,15 +30,19 @@ class CameraController {
 	}
 	createOnBeforeRenderHandler() {
 		const {
+			entities,
 			target: currentTarget,
 			_camera: camera,
 			_camera: {position: currentPosition},
 			nextPosition, nextTarget,
 		} = this;
+		const cursor = entities.findComponent('Cursor');
+		const mouseEvents = entities.findComponent('MouseEvents');
+		
 		let t0, dt;
 		const positionDelta = new Vector3(), targetDelta = new Vector3();
-		const pAccelerator = new Accelerator(400 * 1.0, 100 * 1.0);
-		const tAccelerator = new Accelerator(400 * 1.01, 100 * 1.01);
+		const pAccelerator = new Accelerator(400 * 1.0, 40 * 1.0);
+		const tAccelerator = new Accelerator(400 * 1.01, 40 * 1.01);
 		return time => {
 			if(t0 === undefined) { t0 = time; return; }
 			if(this.isAnimating) {
@@ -67,6 +71,9 @@ class CameraController {
 					}
 				}
 				camera.lookAt(currentTarget);
+				// Update mouse cursor
+					const mouseIntersection = mouseEvents.getIntersection(mouseEvents.mouseV2);
+					if(mouseIntersection.point) cursor.cursor.position.copy(mouseIntersection.point);
 			}
 			t0 = time;
 		};

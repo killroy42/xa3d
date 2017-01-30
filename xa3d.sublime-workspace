@@ -187,6 +187,15 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "src/www/prototypes/EchoFleet/PushToScroll/index.js",
+			"settings":
+			{
+				"buffer_size": 4737,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		}
 	],
 	"build_system": "",
 	"build_system_choices":
@@ -440,54 +449,57 @@
 	"expanded_folders":
 	[
 		"/C/gitroot/xa3d/src/www/prototypes",
-		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/CameraController",
-		"/C/gitroot/xa3d/src/www/prototypes/electron",
-		"/C/gitroot/xa3d/src/www/prototypes/electron/brimstone",
-		"/C/gitroot/xa3d/src/www/js",
-		"/C/gitroot/xa3d/src/www/js/core",
-		"/C/gitroot/xa3d/src/www",
-		"/C/gitroot/xa3d/src/www/css",
-		"/C/gitroot/xa3d/src/www/js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/components",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/PushToScroll",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine",
 		"/C/gitroot/xa3d/src/www/js/xeno",
-		"/C/gitroot/xa3d/src/www/vendors/THREE/controls",
-		"/C/gitroot/xa3d/src/server",
-		"/C/gitroot/xa3d/src/server/objectserver",
-		"/C/gitroot/xa3d/src/server/portraitproxy",
-		"/C/gitroot/xa3d",
-		"/C/gitroot/xa3d/src"
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs",
+		"/C/gitroot/xa3d/src/www/js",
+		"/C/gitroot/xa3d/src/www/js/THREE",
+		"/C/gitroot/xa3d/src/www/js/xeno",
+		"/C/gitroot/xa3d/src/www/js/xenocards"
 	],
 	"file_history":
 	[
-		"/C/gitroot/xa3d/src/www/css/base.css",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/components/Accelerator.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/XenoRuntime.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsTHREE.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/MouseCursor.js",
+		"/C/gitroot/xa3d/src/www/js/THREE/MouseHandler.js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/components/CameraController.js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/PushToScroll/index.js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/Ships/index.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsEditor.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCore.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/Environment.js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/Ships/index.html",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/CameraController/index.html",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/CameraController/CameraController.js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/CameraController/index.js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/CameraController/bootstrap.js",
+		"/C/gitroot/xa3d/src/www/css/base.css",
 		"/C/gitroot/xa3d/src/www/prototypes/electron/brimstone/main.js",
 		"/C/gitroot/xa3d/src/www/prototypes/electron/brimstone/index.html",
 		"/C/gitroot/xa3d/src/www/prototypes/electron/brimstone/package.json",
 		"/C/Users/killroy/AppData/Local/Google/Chrome/User Data/Profile 1/Bookmarks",
 		"/C/Users/killroy/AppData/Local/Google/Chrome/User Data/Profile 1/Current Session",
 		"/C/Users/killroy/AppData/Local/Google/Chrome/User Data/Profile 1/Current Tabs",
-		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/CameraController/index.js",
 		"/C/gitroot/echofleet/src/EF_CameraController/Assets/Scripts/CameraControllerA.cs",
 		"/C/Program Files/Unity/Editor/Data/Resources/ScriptTemplates_/81-C# Script-NewBehaviourScript.cs - Copy.txt",
 		"/C/Program Files/Unity/Editor/Data/Resources/ScriptTemplates/81-C# Script-NewBehaviourScript.cs.txt",
 		"/C/Program Files/Unity/Editor/Data/Resources/ScriptTemplates_/81-C# Script-NewBehaviourScript.cs.txt",
 		"/C/Users/killroy/Desktop/81-C# Script-NewBehaviourScript.cs - Copy.txt",
 		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/TouchInput/index.html",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsTHREE.js",
 		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/TouchInput/index.js",
 		"/D/Library/Documents/Klei/DoNotStarveTogether/Cluster_1/cluster.ini",
-		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/CameraController/index.html",
-		"/C/gitroot/xa3d/src/www/js/xeno/Environment.js",
-		"/C/gitroot/xa3d/src/www/js/THREE/MouseHandler.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/XenoECS.js",
-		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/CameraController/bootstrap.js",
 		"/C/gitroot/xa3d/app.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/ShipGen/bootstrap.js",
 		"/C/gitroot/xa3d/src/server/portraitproxy/server.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCards.js",
 		"/C/gitroot/xa3d/src/www/prototypes/electron/brimstone/Environment.js",
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/BrimstoneVisualizer/index.html",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsEditor.js",
 		"/C/gitroot/xa3d/src/www/prototypes/electron/webgl/index.html",
 		"/C/gitroot/xa3d/src/www/prototypes/electron/webgl/js/showlogo3d.js",
 		"/C/gitroot/xa3d/src/www/prototypes/electron/webgl/main.js",
@@ -512,9 +524,7 @@
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsZones.js",
 		"/D/Downloads/qdjDuHGK6tovBN7nXtYV4c.hsreplay.xml",
 		"/C/gitroot/xa3d/src/www/vendors/CesiumUnminified/Workers/combineGeometry.js",
-		"/C/gitroot/xa3d/src/www/js/xenocards/MouseCursor.js",
 		"/C/gitroot/xa3d/src/www/js/helpers/GeometryHelpers.js",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCore.js",
 		"/C/gitroot/xa3d/src/server/portraitProxy/server.js",
 		"/C/gitroot/xa3d/package.json",
 		"/C/gitroot/xa3d/src/server/xenonetwork/server.js",
@@ -579,13 +589,7 @@
 		"/C/gitroot/rmsr2017/node_modules/material-ui/Avatar/Avatar.js",
 		"/C/gitroot/rmsr2017/src/server/cms/routes/events.js",
 		"/C/gitroot/rmsr2017/src/components/RaceEditor.js",
-		"/C/gitroot/rmsr2017/src/components/helpers.js",
-		"/C/gitroot/rmsr2017/lib/CesiumUnminified/Workers/createCircleGeometry.js",
-		"/C/gitroot/rmsr2017/src/components/RacesSaveUndoBar.js",
-		"/C/gitroot/rmsr2017/src/states/api.js",
-		"/C/gitroot/rmsr2017/src/components/__LegacyRaceManager.js",
-		"/C/gitroot/rmsr2017/src/apps/admin/pages/Dashboard.js",
-		"/C/gitroot/xenocards/src/www/views/app/index.js"
+		"/C/gitroot/rmsr2017/src/components/helpers.js"
 	],
 	"find":
 	{
@@ -651,6 +655,31 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"cursor",
+			"MouseEvents",
+			"MouseHandler",
+			"mouseV2",
+			"mouseV2.set",
+			"attachEvent",
+			"mousemoveHandler",
+			"mouse",
+			"domElement",
+			"camera",
+			"renderer",
+			"canvas",
+			"Accelerator",
+			"makeComponent",
+			"createOnBeforeRenderHandler",
+			"_t0",
+			"setCamera",
+			"target",
+			"axis",
+			"Vector3",
+			"Object3D",
+			"Vector3",
+			"Object3D",
+			"Camera",
+			"consol",
 			"clear",
 			"render",
 			"clear",
@@ -753,32 +782,7 @@
 			"sd",
 			"\n\t\t} else if(Math.abs(d - calcD(angV, maxA, 1)) >= sd) {\n\t\t\tsig = 1;\n\t\t\tangA = maxA;\n\t\t\t//angA = -Math.min(maxA, sa);",
 			"cardDims",
-			"_slotFunc",
-			"createGridSlots",
-			"FontLoader",
-			"textParts",
-			"reText",
-			"reSpl",
-			"Lotus Agen",
-			"escape",
-			"cardData",
-			"Ferry",
-			"json",
-			";\n",
-			"runtime",
-			"OnBeforeRender",
-			"materialBlueJson",
-			"facesne",
-			"0xdd00dd",
-			"ref",
-			"guiControl",
-			"addEvent",
-			"collider",
-			"MarkerMesh",
-			"anim",
-			"aninm",
-			"spaceWidth",
-			"[x]"
+			"_slotFunc"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -924,8 +928,42 @@
 	"groups":
 	[
 		{
+			"selected": 0,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "src/www/prototypes/EchoFleet/PushToScroll/index.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4737,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3730,
+								3730
+							]
+						],
+						"settings":
+						{
+							"apply_syntax_touched": true,
+							"bs_sintax": "javascript (babel)",
+							"buffer_scroll_name": "e1e88f26",
+							"spell_check": false,
+							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1655.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
 			]
 		}
 	],
@@ -1018,7 +1056,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 214.0,
+	"side_bar_width": 177.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
