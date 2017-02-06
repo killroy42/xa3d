@@ -187,15 +187,6 @@
 	},
 	"buffers":
 	[
-		{
-			"file": "src/www/prototypes/EchoFleet/PushToScroll/index.js",
-			"settings":
-			{
-				"buffer_size": 4737,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		}
 	],
 	"build_system": "",
 	"build_system_choices":
@@ -204,7 +195,7 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 87.0,
+		"height": 212.0,
 		"last_filter": "",
 		"selected_items":
 		[
@@ -421,7 +412,7 @@
 				"Preferences: Browse Packages"
 			]
 		],
-		"width": 418.0
+		"width": 378.0
 	},
 	"console":
 	{
@@ -450,27 +441,36 @@
 	[
 		"/C/gitroot/xa3d/src/www/prototypes",
 		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/CameraController",
 		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/components",
 		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/PushToScroll",
-		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine",
-		"/C/gitroot/xa3d/src/www/js/xeno",
-		"/C/gitroot/xa3d/src/www/js/xeno/ecs",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/Ships",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/Weapons",
 		"/C/gitroot/xa3d/src/www/js",
+		"/C/gitroot/xa3d/src/www/js/dev",
 		"/C/gitroot/xa3d/src/www/js/THREE",
-		"/C/gitroot/xa3d/src/www/js/xeno",
 		"/C/gitroot/xa3d/src/www/js/xenocards"
 	],
 	"file_history":
 	[
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/Weapons/index.js",
+		"/C/gitroot/three.js/build/three.js",
 		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/components/Accelerator.js",
-		"/C/gitroot/xa3d/src/www/js/xeno/XenoRuntime.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsTHREE.js",
-		"/C/gitroot/xa3d/src/www/js/xenocards/MouseCursor.js",
-		"/C/gitroot/xa3d/src/www/js/THREE/MouseHandler.js",
-		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/components/CameraController.js",
-		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/PushToScroll/index.js",
-		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/Ships/index.js",
+		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/BrimstoneVisualizer/index.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsEditor.js",
+		"/C/gitroot/xa3d/src/www/js/THREE/MouseHandler.js",
+		"/C/gitroot/xa3d/src/www/js/xeno/XenoRuntime.js",
+		"/C/gitroot/xenocards/src/www/loader/loader-v1.2.0.js",
+		"/C/gitroot/xa3d/src/www/fonts/Times New Roman_Regular_set1.json",
+		"/C/gitroot/xa3d/src/www/fonts/Times New Roman_Regular.json",
+		"/C/gitroot/echofleet/src/EF_CameraController/Assets/Scripts/ShipController.cs",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/Ships/index.js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/components/CameraController.js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/components/PushToScroller.js",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/PushToScroll/index.html",
+		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/PushToScroll/index.js",
+		"/C/gitroot/xa3d/src/www/js/xenocards/MouseCursor.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsCore.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/Environment.js",
 		"/C/gitroot/xa3d/src/www/prototypes/EchoFleet/Ships/index.html",
@@ -517,7 +517,6 @@
 		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/Interactor/index - Copy.js",
 		"/C/gitroot/xa3d/.gitignore",
 		"/C/gitroot/xa3d/src/www/js/helpers/DebugGraph.js",
-		"/C/gitroot/xa3d/src/www/prototypes/XenoEngine/BrimstoneVisualizer/index.js",
 		"/C/gitroot/xa3d/src/www/js/xeno/cardTargeting.js",
 		"/C/gitroot/xa3d/src/www/data/cards_v1.15590.pretty.json",
 		"/C/gitroot/xa3d/src/www/js/xenocards/assetdata.js",
@@ -581,15 +580,7 @@
 		"/C/gitroot/xa3d/src/www/js/xeno/ecs/ecsComponents.js",
 		"/C/gitroot/xa3d/xa3d.sublime-workspace",
 		"/C/gitroot/rmsr2017/src/components/RaceEventManager.js",
-		"/C/gitroot/rmsr2017/data/rmsr_events.nedb",
-		"/C/gitroot/rmsr2017/src/components/RaceEventSelector.js",
-		"/C/gitroot/rmsr2017/src/components/urls.js",
-		"/C/gitroot/rmsr2017/src/components/SaveUndoBar.js",
-		"/C/gitroot/rmsr2017/src/components/YearSelector.js",
-		"/C/gitroot/rmsr2017/node_modules/material-ui/Avatar/Avatar.js",
-		"/C/gitroot/rmsr2017/src/server/cms/routes/events.js",
-		"/C/gitroot/rmsr2017/src/components/RaceEditor.js",
-		"/C/gitroot/rmsr2017/src/components/helpers.js"
+		"/C/gitroot/rmsr2017/data/rmsr_events.nedb"
 	],
 	"find":
 	{
@@ -655,6 +646,22 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"cross",
+			"calcAngularDistance",
+			"pointerVector",
+			"ray",
+			"base",
+			"toBlob",
+			"base",
+			"button",
+			"font",
+			"handleWindowResize",
+			"requestAnimationFrame",
+			"camera",
+			"clearcolo",
+			"domElement",
+			"fov",
+			"Vector2",
 			"cursor",
 			"MouseEvents",
 			"MouseHandler",
@@ -766,23 +773,7 @@
 			"updateArc",
 			"axis",
 			"dOverTime",
-			"calcAccel",
-			"PI2",
-			"accelFun01",
-			"calcAccel",
-			"calcDecel",
-			"calcAccel",
-			"roundTo",
-			"flipp",
-			"flipped",
-			"allOpts",
-			"rnd2",
-			"sign",
-			"characterPointer",
-			"sd",
-			"\n\t\t} else if(Math.abs(d - calcD(angV, maxA, 1)) >= sd) {\n\t\t\tsig = 1;\n\t\t\tangA = maxA;\n\t\t\t//angA = -Math.min(maxA, sa);",
-			"cardDims",
-			"_slotFunc"
+			"calcAccel"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -928,42 +919,8 @@
 	"groups":
 	[
 		{
-			"selected": 0,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "src/www/prototypes/EchoFleet/PushToScroll/index.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4737,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3730,
-								3730
-							]
-						],
-						"settings":
-						{
-							"apply_syntax_touched": true,
-							"bs_sintax": "javascript (babel)",
-							"buffer_scroll_name": "e1e88f26",
-							"spell_check": false,
-							"syntax": "Packages/Babel/JavaScript (Babel).sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1655.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				}
 			]
 		}
 	],
@@ -1055,8 +1012,8 @@
 	"show_minimap": true,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": true,
-	"side_bar_width": 177.0,
+	"side_bar_visible": false,
+	"side_bar_width": 128.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

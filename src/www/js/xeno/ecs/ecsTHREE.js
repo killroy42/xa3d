@@ -475,32 +475,30 @@ class Text extends MeshComponent {
 			return;
 		}
 		/*
-		const geometry = new Geometry();
-		const posMat = new Matrix4();
-		this.value.split('\n').forEach((line, idx) => {
-			//posMat.setPosition(new Vector3(0, idx * 1, 0));
-			console.log('line:', idx, line, new Vector3(0, idx * 1, 0), posMat.toArray().join(', '));
-			console.log('%s\n%s',
-				posMat.toArray().join(', '),
-				posMat.setPosition(new Vector3(0, idx * 1, 0)).toArray().join(', '));
-			const lineGeo = new TextGeometry(line, {
-				font: this.font,
-				size: 1,
-				height: 1,
-				curveSegments: 0,
-				bevelEnabled: false,
-				bevelThickness: 0,
-				bevelSize: 0,
-				//material: 0,
-				//extrudeMaterial: 1
+			const geometry = new Geometry();
+			const posMat = new Matrix4();
+			this.value.split('\n').forEach((line, idx) => {
+				//posMat.setPosition(new Vector3(0, idx * 1, 0));
+				console.log('line:', idx, line, new Vector3(0, idx * 1, 0), posMat.toArray().join(', '));
+				console.log('%s\n%s',
+					posMat.toArray().join(', '),
+					posMat.setPosition(new Vector3(0, idx * 1, 0)).toArray().join(', '));
+				const lineGeo = new TextGeometry(line, {
+					font: this.font,
+					size: 1,
+					height: 1,
+					curveSegments: 0,
+					bevelEnabled: false,
+					bevelThickness: 0,
+					bevelSize: 0,
+					//material: 0,
+					//extrudeMaterial: 1
+				});
+				lineGeo.translate(0, 0.1, 0);
+				geometry.merge(lineGeo);
 			});
-			lineGeo.translate(0, 0.1, 0);
-			geometry.merge(lineGeo);
-		});
 		*/
-		
 		//singleGeometry.merge(boxMesh.geometry, boxMesh.matrix);
-		
 		const geometry = new TextGeometry(this.value, {
 			font: this.font,
 			size: 1,
@@ -512,12 +510,8 @@ class Text extends MeshComponent {
 			//material: 0,
 			//extrudeMaterial: 1
 		});
-		
 		geometry.rotateX(1.5 * Math.PI);
 		geometry.computeBoundingBox();
-
-
-
 		const size = geometry.boundingBox.getSize();
 		const zScale = 1 / size.z;
 		geometry.scale(zScale, zScale, zScale);

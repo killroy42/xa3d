@@ -18,7 +18,7 @@ class CameraController {
 		this.opts = opts;
 		this.isAnimating = false;
 		this.zoom = 0;
-		this.target = new Vector3();
+		this.currentTarget = new Vector3();
 		this.nextPosition = new Vector3();
 		this.nextTarget = new Vector3();
 		this._cameraTiltAxis = new Vector3(1, 0, 0);
@@ -31,7 +31,7 @@ class CameraController {
 	createOnBeforeRenderHandler() {
 		const {
 			entities,
-			target: currentTarget,
+			currentTarget,
 			_camera: camera,
 			_camera: {position: currentPosition},
 			nextPosition, nextTarget,
@@ -41,8 +41,8 @@ class CameraController {
 		
 		let t0, dt;
 		const positionDelta = new Vector3(), targetDelta = new Vector3();
-		const pAccelerator = new Accelerator(400 * 1.0, 40 * 1.0);
-		const tAccelerator = new Accelerator(400 * 1.01, 40 * 1.01);
+		const positionAccelerator = new Accelerator(400 * 1.0, 40 * 1.0);
+		const targetAccelerator = new Accelerator(400 * 1.01, 40 * 1.01);
 		return time => {
 			if(t0 === undefined) { t0 = time; return; }
 			if(this.isAnimating) {
@@ -53,17 +53,17 @@ class CameraController {
 				const targetDistance = targetDelta.length();
 				if(positionDistance + targetDistance > Number.EPSILON) {
 					if(positionDistance > 0) {
-						currentPosition.add(positionDelta.multiplyScalar(pAccelerator.update(positionDistance, dt) / positionDistance));
+						currentPosition.add(positionDelta.multiplyScalar(positionAccelerator.update(positionDistance, dt) / positionDistance));
 					}
 					if(targetDistance > 0) {
-						currentTarget.add(targetDelta.multiplyScalar(tAccelerator.update(targetDistance, dt) / targetDistance));
+						currentTarget.add(targetDelta.multiplyScalar(targetAccelerator.update(targetDistance, dt) / targetDistance));
 					}
 				} else {
 					this.isAnimating = false;
 					currentPosition.copy(nextPosition);
 					currentTarget.copy(nextTarget);
-					pAccelerator.reset();
-					tAccelerator.reset();
+					positionAccelerator.reset();
+					targetAccelerator.reset();
 					if(typeof this._onAnimationComplete === 'function') {
 						const onCompleteHandler = this._onAnimationComplete;
 						this._onAnimationComplete = undefined;
@@ -81,7 +81,7 @@ class CameraController {
 	OnAttachComponent(entity) {
 		this._camera = entity.requireComponent('Camera');
 		this._runtime = entity.requireComponent('Runtime');
-		this.target.copy(this._camera.position).add(new Vector3(0, 0, 1));
+		this.currentTarget.copy(this._camera.position).add(new Vector3(0, 0, 1));
 		this._onBeforeRenderHandler = this.createOnBeforeRenderHandler();
 		this._runtime.OnBeforeRender.push(this._onBeforeRenderHandler);
 		this.setCamera(new Vector3(0, 0, 0), 0);
@@ -99,33 +99,30 @@ class CameraController {
 			.set(0, Math.sign(zoom), -0.5 * Math.sign(zoom))
 			.multiplyScalar(Math.abs(zoom) * zoomUnit);
 	}
-	setZoom(zoom = this.zoom) {
+	setZoom(nextZoom = this.zoom) {
 		const {opts: {minZoom, maxZoom, zoomUnit}} = this;
-		this.zoom = Math.max(minZoom, Math.min(maxZoom, zoom));
+		this.zoom = Math.max(minZoom, Math.min(maxZoom, nextZoom));
 		this.updateZoomOffset();
 		return this.zoom;
 	}
 	calcPosition(target) {
 		return target.clone().add(this._zoomOffset).add(this._positionOffset);
 	}
-	slideCamera(target, zoom = this.zoom, onComplete) {
-		const {_camera: camera} = this;
-		this.setZoom(zoom);
-		const position = this.calcPosition(target);
+	slideCamera(nextTarget, nextZoom = this.zoom, onComplete) {
+		this.setZoom(nextZoom);
+		const position = this.calcPosition(nextTarget);
 		this.nextPosition.copy(position);
-		this.nextTarget.copy(target);
+		this.nextTarget.copy(nextTarget);
 		this.isAnimating = true;
 		this._onAnimationComplete = onComplete;
 	}
-	setCamera(target, zoom = this.zoom) {
+	setCamera(nextTarget, nextZoom = this.zoom) {
+		this.slideCamera(nextTarget, nextZoom);
+		this.isAnimating = false;
 		const {_camera: camera} = this;
-		this.setZoom(zoom);
-		const position = this.calcPosition(target);
-		this.nextPosition.copy(position);
-		this.nextTarget.copy(target);
-		this.target.copy(target);
-		camera.position.copy(position);
-		camera.lookAt(this.target);
+		camera.position.copy(this.nextPosition);
+		this.currentTarget.copy(this.nextTarget);
+		camera.lookAt(this.currentTarget);
 	}
 }
 
