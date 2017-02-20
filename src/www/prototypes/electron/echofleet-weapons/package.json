@@ -1,0 +1,20 @@
+{
+  "name": "echofleet-weaponspt",
+  "version": "0.0.2",
+  "author": "Sven Neumann <killroy@gmail.com>",
+  "main": "main.js",
+  "scripts": {
+    "pack": "build --dir",
+    "dist": "build --platform=win32"
+  },
+  "dependencies": {
+    "electron-prebuilt": "^1.4.13",
+    "electron-reload": "^1.1.0"
+  },
+  "build": {
+    "appId": "com.xenocards.echofleet.weaponspt",
+    "win": {
+      "iconUrl": "http://68.media.tumblr.com/avatar_1618c01aa664_128.png"
+    }
+  }
+}
