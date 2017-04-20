@@ -450,7 +450,7 @@ const showSceneGraph = ({entity, children}, indent = '') => {
 };
 
 
-if(typeof module !== 'undefined' && ('exports' in module)){
+if(typeof module !== 'undefined' && ('exports' in module)) {
 	const XenoECS = {
 		getComponentName,
 		Entity,
