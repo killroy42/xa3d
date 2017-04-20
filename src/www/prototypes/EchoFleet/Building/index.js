@@ -217,7 +217,7 @@ class WeaponController {
 	}
 	setNozzle(nozzle) {
 		//console.info('WeaponController.setNozzle(nozzle);', nozzle);
-		this.entity.node.children[0].children[1].attach(nozzle);
+		this.entity.node.children[0].children[0].attach(nozzle);
 		this._nozzle = nozzle;
 		this.setNozzleVisible(false);
 	}
@@ -302,20 +302,26 @@ class WeaponController {
 	const laserTurretModel = {
 		Transform: {},
 		Node: {children: [
+			{Transform: {position: {x: 0, y: 0, z: 0.5}}, Node: {}},
 			{
-				Transform: {position: {x: 0, y: 0, z: 0.2}, scale: {x: 0.2, y: 0.1, z: 0.6}},
+				Transform: {position: {x: 0, y: 0, z: 0.0}, scale: {x: 0.2, y: 0.06, z: 0.2}},
 				PhongMaterial: matWhite,
 				BoxGeometryComponent: {},
 				GenericMeshComponent: {},
 			},
-			{Transform: {position: {x: 0, y: 0, z: 0.5}}, Node: {}},
+			{
+				Transform: {position: {x: 0, y: 0, z: 0.2}, scale: {x: 0.1, y: 0.03, z: 0.6}},
+				PhongMaterial: matWhite,
+				BoxGeometryComponent: {},
+				GenericMeshComponent: {},
+			},
 		]}
 	};
 	const laserNozzleModel = {
 		Transform: {position: {x: 0, y: 0, z: 0}, scale: {x: 1, y: 1, z: 1}},
 		Node: {children: [
 			{
-				Transform: {position: {x: 0, y: 0, z: 0.5}, scale: {x: 0.05, y: 0.05, z: 1}},
+				Transform: {position: {x: 0, y: 0, z: 0.5}, scale: {x: 0.03, y: 0.02, z: 1}},
 				PhongMaterial: matLaserGreen,
 				BoxGeometryComponent: {},
 				GenericMeshComponent: {},
@@ -325,13 +331,13 @@ class WeaponController {
 	const rocketTurretModel = {
 		Transform: {},
 		Node: {children: [
+			{Transform: {position: {x: 0, y: 0, z: 0.1}}, Node: {}},
 			{
 				Transform: {position: {x: 0, y: 0, z: -0.05}, scale: {x: 0.24, y: 0.14, z: 0.3}},
 				PhongMaterial: matWhite,
 				BoxGeometryComponent: {},
 				GenericMeshComponent: {},
 			},
-			{Transform: {position: {x: 0, y: 0, z: 0.1}}, Node: {}}
 		]}
 	};
 	const rocketNozzleModel = {
@@ -398,12 +404,13 @@ class WeaponController {
 		Collider: {},
 		Node: {children: [
 			{
-				Transform: {scale: {x: 0.5, y: 0.5, z: 0.5}},
+				Transform: {scale: {x: 0.3, y: 0.3, z: 0.3}},
 				Node: {children: [
 					{
 						Transform: {position: {x: 0, y: 0, z: 0}, scale: {x: 1, y: 1, z: 1}},
 						PhongMaterial: matGold,
-						BoxGeometryComponent: {},
+						//BoxGeometryComponent: {},
+						IcosahedronGeometryComponent: {},
 						GenericMeshComponent: {},
 					},
 				]},
@@ -439,10 +446,10 @@ const handleLaserFire = (weapon) => {
 	const onBeforeRenderHandler = time => {
 		nozzle.getWorldPosition(nozPos); nozPos.y = 0;
 		tarPos.copy(target); tarPos.y = 0;
-		nozzle.scale.z = nozPos.distanceTo(tarPos);
+		nozzle.scale.z = nozPos.distanceTo(tarPos) - 0.1;
 		weapon.setNozzleVisible(Math.random() < 0.8);
 		//nozzle.rotateOnAxis(axis, (-1 + 2 * Math.random()) * 0.2 * PI / 180);
-		nozzle.rotation.y = (-1 + 2 * Math.random()) * 1 * PI / 180;
+		nozzle.rotation.y = (-1 + 2 * Math.random()) * 0.5 * PI / 180;
 	};
 	runtime.OnBeforeRender.push(onBeforeRenderHandler);
 	setTimeout(() => {
@@ -533,6 +540,42 @@ const rocketLauncher = {
 	onFire: handleRocketFire,
 };
 
+const initTargetDummies = entities => {
+	const runtime = entities.findComponent('Runtime');
+	const targetDummies = new Array(12);
+	const colorTargetDummy = (targetDummy, color) => {
+		targetDummy.node.children[0].children[0].entity.phongMaterial.fromJSON(color);	
+	};
+	const moveTargetDummy = (targetDummy, time = 0) => {
+		const angle = targetDummy.angle * PI / 180 + time * 0.00003 * PI;
+		const radius = 4;
+		targetDummy.transform.position.set(Math.cos(angle) * radius, 0.5, Math.sin(angle) * radius);
+	};
+	const handleTargetDummyClick = event => {
+		const targetDummy = event.target.entity;
+		targetDummies.forEach(dummy => colorTargetDummy(dummy, matGold));
+		colorTargetDummy(targetDummy, matMarkerRed);
+		targetDummy.dispatchEvent('selected', targetDummy);
+	};
+	const createTargetDummy = (angle) => {
+		const targetDummy = entities.createEntity(targetDummyModel);
+		targetDummy.collider.refresh();
+		targetDummy.angle = angle;
+		targetDummy.name = `TargetDummy[${angle}]`;
+		targetDummy.node.children[0].children[0].entity.phongMaterial.shading = THREE.FlatShading;
+		moveTargetDummy(targetDummy);
+		targetDummy.collider.addEventListener('click', handleTargetDummyClick);
+		return targetDummy;
+	};
+	for(var i = 0; i < targetDummies.length; i++) {
+		targetDummies[i] = createTargetDummy(i / targetDummies.length * 360);
+	}
+	runtime.OnBeforeRender.push(time => {
+		targetDummies.forEach(targetDummy => moveTargetDummy(targetDummy, time));
+	});
+	return targetDummies;
+};
+
 const initShips = entities => {
 	const runtime = entities.findComponent('Runtime');
 	const mouseEvents = entities.findComponent('MouseEvents');
@@ -578,7 +621,7 @@ const initShips = entities => {
 		};
 		moveTarget();
 	};
-	const createFireControl = weapons => {
+	const createFiringBehaviour = weapons => {
 		const fireOnTarget = () => {
 			weapons.forEach(wc => wc.fire());
 			setTimeout(fireOnTarget, (1 + 4 * Math.random()) * 1000);
@@ -587,12 +630,12 @@ const initShips = entities => {
 	};
 
 	weapons1.forEach(wc => wc.setTarget(ship2.transform.position));
-	createTargetMover(movePos);
-	createFireControl(weapons1);
+	//createTargetMover(movePos);
+	//createFireControl(weapons1);
 
 	weapons2.forEach(wc => wc.setTarget(ship.transform.position));
-	createTargetMover(targetB);
-	createFireControl(weapons2);
+	//createTargetMover(targetB);
+	//createFireControl(weapons2);
 	
 	const collider = ship2.requireComponent('Collider');
 	collider.refresh();
@@ -611,111 +654,40 @@ const initShips = entities => {
 		}
 	};
 
-	const targetWeapons = [];
-	const targetDummies = new Array(12);
-	for(var i = 0; i < targetDummies.length; i++) {
-		targetDummies[i] = entities.createEntity(targetDummyModel);
-		targetDummies[i].name = `Target ${i}`;
-		targetDummies[i].transform.position.set(
-			//(-1 + i % 3) * 3, 0.5, Math.floor(i / 3) * 8 - 4
-			Math.cos(i / targetDummies.length * 2 * Math.PI) * 4,
-			0.5,
-			Math.sin(i / targetDummies.length * 2 * Math.PI) * 4
-		);
-		targetDummies[i].collider.refresh();
-		targetDummies[i].collider.addEventListener('click', event => {
-			targetDummies.forEach(entity => {
-				entity.node.children[0].children[0].entity.phongMaterial.fromJSON(matGold);	
-			});
-			event.target.entity.node.children[0].children[0].entity.phongMaterial.fromJSON(matMarkerRed);
-			aquireTarget(event.target.entity);
-		});
-		const node = targetDummies[i].requireComponent('Node');
-		node.attach(entities.createEntity({
-			Transform: {},
-			Node: {children: [
-				weaponFramework(Object.assign({
-					position: {x: 0, y: 0.4, z: 0}},
-					Math.random() > 0.5
-					?rocketLauncher
-					:laserTurret
-				))
-			]}
-		}));
-		targetWeapons.push(node.findComponents('WeaponController')[0]);
-	}
+	const targetDummies = initTargetDummies(entities);
+	// Target + fire
+	//targetDummies.forEach(dummy => dummy.addEventListener('selected', aquireTarget));
+	// Build + target
 
-	targetWeapons.forEach(wc => {
-		wc.setTarget(
-			Math.random() > 0.5
-				?ship.transform.position
-				:ship2.transform.position
-		);
-		createFireControl([wc]);
-	});
-
-	runtime.OnBeforeRender.push(time => {
-		for(var i = 0; i < targetDummies.length; i++) {
-			targetDummies[i].transform.position.set(
-				Math.cos(i / targetDummies.length * 2 * PI + time * 0.0001 * PI) * 4,
-				0.5,
-				Math.sin(i / targetDummies.length * 2 * PI + time * 0.0001 * PI) * 4
-			);
+	const attachWeaponToPlatform = (platform, weapon) => {
+		if(platform.weapon === undefined) {
+			const node = platform.requireComponent('Node');
+			node.attach(entities.createEntity({
+				Transform: {},
+				Node: {children: [
+					weaponFramework(Object.assign({position: {x: 0, y: 0.4, z: 0}}, weapon))
+				]}
+			}));
+			platform.weapon = node.findComponents('WeaponController')[0];
+		} else {
+			const turret = platform.weapon.entity;
+			turret.node.children[0].detach();
+			const newModel = platform.entities.createEntity(weapon.turret);
+			turret.node.attach(newModel);
+			platform.weapon.fromJSON(weapon);
 		}
-	});
-
-	/*
-	const {floor} = entities.findComponent('Environment');
-	const updateLaser = nozzle =>	{
-		const nozPos = new Vector3(), tarPos = new Vector3();
-		nozzle.transform.getWorldPosition(nozPos); nozPos.y = 0;
-		return target => {
-			tarPos.copy(target); tarPos.y = 0;
-			nozzle.transform.scale.z = nozPos.distanceTo(tarPos);
-		};
+		return platform.weapon;
 	};
 
-	const updateRocket = nozzle =>	{
-		const nozPos = new Vector3(), tarPos = new Vector3();
-		nozzle.transform.getWorldPosition(nozPos); nozPos.y = 0;
-		return target => {
-			//tarPos.copy(target); tarPos.y = 0;
-			//nozzle.transform.scale.z = nozPos.distanceTo(tarPos);
-		};
-	};
-
-	const weaponHandlers = [];
-	weaponHandlers.push({
-		nozzle: weaponGetNozzle(ship1Laser),
-		target: targetA,
-		handler: updateLaser(weaponGetNozzle(ship1Laser)),
-	});
-	weaponHandlers.push({
-		nozzle: weaponGetNozzle(ship1Rocket),
-		target: targetA,
-		handler: updateLaser(weaponGetNozzle(ship1Rocket)),
-	});
-
-	runtime.OnBeforeRender.push(time => {
-		if(mouseEvents.intersection) targetA.copy(mouseEvents.intersection.point);
-		weaponHandlers.forEach(({nozzle, target, handler}) => {
-			if(nozzle.transform.visible) handler(target);
-		});
-	});
-
-	const {floor} = entities.findComponent('Environment');
-	floor.addEventListener('mousedown', event => {
-		if(event.buttons & 2) {
-			console.log('Fire!', weapons);
-			weaponSetVisible(ship1Laser, true);
-			weaponSetVisible(ship1Rocket, true);
-			setTimeout(() => {
-				weaponSetVisible(ship1Laser, false);
-				weaponSetVisible(ship1Rocket, false);
-			}, 2000);
+	targetDummies.forEach(dummy => dummy.addEventListener('selected', targetDummy => {
+		const weaponType = Math.random() > 0.5?rocketLauncher:laserTurret;
+		let isNew = targetDummy.weapon === undefined;
+		const weapon = attachWeaponToPlatform(targetDummy, weaponType);
+		if(isNew) {
+			weapon.setTarget(ship.transform.position);
+			createFiringBehaviour([weapon]);
 		}
-	});
-	*/
+	}));
 };
 
 const createRuntime = () => {
