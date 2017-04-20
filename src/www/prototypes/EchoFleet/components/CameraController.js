@@ -28,6 +28,8 @@ class CameraController {
 		this._zoomVector = new Vector3(0, 1, -0.5);
 		this.updatePositionOffset();
 		this.updateZoomOffset();
+		this.positionAccelerator = new Accelerator(400 * 1.0, 40 * 1.0);
+		this.targetAccelerator = new Accelerator(400 * 1.01, 40 * 1.01);
 	}
 	createOnBeforeRenderHandler() {
 		const {
@@ -36,14 +38,15 @@ class CameraController {
 			_camera: camera,
 			_camera: {position: currentPosition},
 			nextPosition, nextTarget,
+			positionAccelerator, targetAccelerator,
 		} = this;
 		const cursor = entities.findComponent('Cursor');
 		const mouseEvents = entities.findComponent('MouseEvents');
 		
 		let t0, dt;
 		const positionDelta = new Vector3(), targetDelta = new Vector3();
-		const positionAccelerator = new Accelerator(400 * 1.0, 40 * 1.0);
-		const targetAccelerator = new Accelerator(400 * 1.01, 40 * 1.01);
+		//const positionAccelerator = new Accelerator(400 * 1.0, 40 * 1.0);
+		//const targetAccelerator = new Accelerator(400 * 1.01, 40 * 1.01);
 		return time => {
 			if(t0 === undefined) { t0 = time; return; }
 			if(this.isAnimating) {
@@ -52,7 +55,7 @@ class CameraController {
 				targetDelta.subVectors(nextTarget, currentTarget);
 				const positionDistance = positionDelta.length();
 				const targetDistance = targetDelta.length();
-				if(positionDistance + targetDistance > Number.EPSILON) {
+				if(positionDistance + targetDistance > 1e-6) {
 					if(positionDistance > 0) {
 						currentPosition.add(positionDelta.multiplyScalar(positionAccelerator.update(positionDistance, dt) / positionDistance));
 					}
