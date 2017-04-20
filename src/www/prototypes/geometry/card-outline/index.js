@@ -102,16 +102,16 @@ function createBoundingSphere(boundingSphere, segments, color) {
 function createBoundingBox(boundingBox, color) {
 	if(color === undefined) color = 0x8888ff;
 	var boundingBoxMesh = new THREE.Mesh(
-		new THREE.BoxGeometry(boundingBox.size().x, boundingBox.size().y, boundingBox.size().z),
+		new THREE.BoxGeometry(boundingBox.getSize().x, boundingBox.getSize().y, boundingBox.getSize().z),
 		new THREE.LineBasicMaterial({color: color})
 	);
-	boundingBoxMesh.position.copy(boundingBox.center());
+	boundingBoxMesh.position.copy(boundingBox.getCenter());
 	boundingBoxMesh.updateMatrixWorld();
 	return new THREE.WireframeHelper(boundingBoxMesh, boundingBoxMesh.material.color);
 }
 
-function findCorners(boundingSphere, axis, targets) {
-	var DEBUG = false;
+function findCorners(scene, boundingSphere, axis, targets) {
+	var DEBUG = true;
 	var MAX_FACES = 1000;
 	var raycaster = new THREE.Raycaster();
 	// Face comparisson
@@ -173,7 +173,7 @@ function findCorners(boundingSphere, axis, targets) {
 		var scanDistance = 0.5;
 		var scanDepth = 0.5;
 		function scanNextHit(hit, debug) {
-			dir = hit.face.normal.clone();
+			var dir = hit.face.normal.clone();
 			dir.z = 0;
 			origin = hit.point;
 			for(var ang = -0.5 * Math.PI; ang < 1.5 * Math.PI; ang += angleStep) {
@@ -321,17 +321,18 @@ function castOutline1(card) {
 
 function castOutline2(card) {
 	var scene = card.parent;
-	var targets = ['card.collider', 'cost', 'health', 'attack']
-		.map(function(name) { return card.getObjectByName(name); });
+	var targets = ['card.body', 'cost', 'health', 'attack']
+		.map(function(name) { return card.getObjectByName(name); })
+		.filter(item => item !== undefined);
 	var mergedVertices = getMergedVertices(targets);
 	// boundingSphere
 		var boundingSphere = new THREE.Sphere();
 		boundingSphere.setFromPoints(mergedVertices);
-		//scene.add(createBoundingSphere(boundingSphere, 16, 0x8888ff));
+		scene.add(createBoundingSphere(boundingSphere, 16, 0x8888ff));
 	// boundingBox
 		var boundingBox = new THREE.Box3();
 		boundingBox.setFromPoints(mergedVertices);
-		//scene.add(createBoundingBox(boundingBox, 0x8888ff));
+		scene.add(createBoundingBox(boundingBox, 0x8888ff));
 	// Outline
 		var raycaster = new THREE.Raycaster();
 		function raycastPoint(v0, v1, v2, showArrows) {
@@ -351,6 +352,11 @@ function castOutline2(card) {
 				return hit.point;
 			}
 			if(showArrows === true) scene.add(new THREE.ArrowHelper(dir, origin, Math.max(1.1, len), 0x00ff00, 1, 0.5));
+			console.log(hits);
+			console.log(origin);
+			console.log(dir);
+			console.log(targets);
+			console.log(card);
 			throw new Error('No hit at point: '+v1.toString());
 		}
 		function raycastOutline(outline, showArrows) {
@@ -376,12 +382,12 @@ function castOutline2(card) {
 			}
 		}
 		var outline = [
-			new THREE.Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.center().z),
-			new THREE.Vector3(boundingBox.max.x, boundingBox.min.y, boundingBox.center().z),
-			new THREE.Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.center().z),
-			new THREE.Vector3(boundingBox.min.x, boundingBox.max.y, boundingBox.center().z)
+			new THREE.Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.getCenter().z),
+			new THREE.Vector3(boundingBox.max.x, boundingBox.min.y, boundingBox.getCenter().z),
+			new THREE.Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.getCenter().z),
+			new THREE.Vector3(boundingBox.min.x, boundingBox.max.y, boundingBox.getCenter().z)
 		];
-		raycastOutline(outline);
+		raycastOutline(outline, true);
 		var iterations = 4;
 		for(var i = 0; i < iterations; i++) subdivideOutline(outline);
 		console.log('outline:', outline.length);
@@ -392,14 +398,16 @@ function castOutline2(card) {
 
 function castOutline3(card) {
 	var scene = card.parent;
-	var targets = ['card.collider', 'cost', 'health', 'attack'].map(function(name) { return card.getObjectByName(name); });
+	var targets = ['card.body', 'cost', 'health', 'attack']
+		.map(function(name) { return card.getObjectByName(name); })
+		.filter(item => item !== undefined);
 	var mergedVertices = getMergedVertices(targets);
 	var boundingSphere = new THREE.Sphere();
 	boundingSphere.setFromPoints(mergedVertices);
 	card.position.z -= 2;
 	card.updateMatrixWorld();
 
-	var corners = findCorners(boundingSphere, new THREE.Vector3(0, 0, -1), targets);
+	var corners = findCorners(scene, boundingSphere, new THREE.Vector3(0, 0, -1), targets);
 	var outline = corners.map(function(corner) { return corner.point; });
 	//showOutline(scene, outline, 0xffff00);
 	outline.forEach(function(v) { card.worldToLocal(v); });
@@ -450,6 +458,16 @@ function visualizeOutline(card, outline) {
 		this.setCamera(new THREE.Vector3(0, 0, 300), new THREE.Vector3(0, 0, 0));
 		initLights(this);
 		var xenoCard3D = new XenoCard3D();
+
+		THREE.WireframeHelper = function(mesh, color) {
+			var wireframe = new THREE.WireframeGeometry(mesh.geometry);
+			THREE.LineSegments.call(this, wireframe);
+			this.material.depthTest = false;
+			this.material.opacity = 0.25;
+			this.material.transparent = true;
+			this.material.color.set(color);
+		};
+		THREE.WireframeHelper.prototype = Object.create(THREE.LineSegments.prototype);
 			
 		var card1 = xenoCard3D.createCard(this.loadTexture(getRandomPortraitUrl()));
 		card1.position.set(-180, 0, 0);
