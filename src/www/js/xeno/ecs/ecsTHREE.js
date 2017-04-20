@@ -169,8 +169,8 @@ class Collider extends MeshComponent {
 		super();
 		//this.minBounds = new Vector3(0.001, 0.001, 0.001);
 		this.padding = new Vector3(0.2, 0.2, 0.2);
-		this.delegatedEvents = ['mouseup'];
-		this.handlers = ['mouseup'];
+		this.delegatedEvents = ['mousedown', 'mouseup', 'mouseenter', 'mouseleave'];
+		this.handlers = ['mousedown', 'mouseup', 'mouseenter', 'mouseleave'];
 	}
 	OnAttachComponent(entity) {
 		//console.info('Collider.OnAttachComponent(entity);');
@@ -625,6 +625,20 @@ class BoxGeometryComponent extends GeometryComponent {
 	}
 }
 
+class IcosahedronGeometryComponent extends GeometryComponent {
+	OnAttachComponent(entity) {
+		//console.info('IcosahedronGeometryComponent.OnAttachComponent(entity);');
+		THREE.IcosahedronGeometry.call(this, 1, 0);
+	}
+	fromJSON({position, scale} = {}) {
+		return this;
+	}
+	toJSON() {
+		return {
+		};
+	}
+}
+
 class SphereGeometryComponent extends GeometryComponent {
 	OnAttachComponent(entity) {
 		//console.info('BoxGeometryComponent.OnAttachComponent(entity);');
@@ -670,7 +684,7 @@ if(typeof module !== 'undefined' && ('exports' in module)){
 		CSSFontLoaderComponent,
 		Text,
 		MaterialComponent, PhongMaterial,
-		GeometryComponent, BoxGeometryComponent, SphereGeometryComponent,
+		GeometryComponent, BoxGeometryComponent, IcosahedronGeometryComponent, SphereGeometryComponent,
 		GenericMeshComponent,
 	};
 	module.exports.ecsTHREE = module.exports;
